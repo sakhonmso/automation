@@ -19,7 +19,6 @@ import * as path                from "path";
 import ExcelJS                  from "exceljs";
 import "dotenv/config";
 
-const LABEL_NAME   = "เอกสาร P4P";
 const MAX_MESSAGES = 10;
 const JSON_DIR     = "./JSON";
 
@@ -124,27 +123,28 @@ async function firstSheetToRows(buffer) {
 async function main() {
   const gmail = createGmailClient();
 
-  // ── 1. Resolve label ──────────────────────────────────────────────────
-  console.log(`\n🔍  Looking up label: "${LABEL_NAME}" …`);
-  const matched = await gmail.listLabels(LABEL_NAME);
+  // ── 1. Build query — new inbox emails only ────────────────────────────
+  // in:inbox        → not archived
+  // -is:starred     → not starred
+  // -has:userlabels → not tagged with any user-created label
+  // is:unread       → only new, unread messages
+  const INBOX_QUERY = "in:inbox -is:starred -has:userlabels is:unread";
 
-  if (matched.length === 0) {
-    console.error(`\n❌  Label "${LABEL_NAME}" not found.`);
-    process.exit(1);
-  }
-
-  const label = matched.find((l) => l.name === LABEL_NAME) ?? matched[0];
-  console.log(`✅  Label: "${label.name}" (${label.id})`);
+  console.log(`\n🔍  Fetching messages — query: "${INBOX_QUERY}" …`);
 
   // ── 2. Fetch messages ─────────────────────────────────────────────────
-  const messages = await gmail.listMessages({ labelIds: label.id, maxResults: MAX_MESSAGES });
+  const messages = await gmail.listMessages({
+    labelIds : "INBOX",
+    query    : INBOX_QUERY,
+    maxResults: MAX_MESSAGES,
+  });
 
   if (messages.length === 0) {
-    console.log(`\n📭  No messages found.`);
+    console.log(`\n📭  No new unread unlabeled inbox messages found.`);
     return;
   }
 
-  console.log(`\n📬  ${messages.length} message(s):\n`);
+  console.log(`\n📬  ${messages.length} message(s) found:\n`);
   fs.mkdirSync(JSON_DIR, { recursive: true });
 
   // ── 3. Process each message ───────────────────────────────────────────

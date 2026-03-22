@@ -1,0 +1,43 @@
+name: P4P Gmail Processor
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"   # every 2 hours
+  workflow_dispatch:          # also allow manual trigger from GitHub UI
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30       # kill if stuck (safety net)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci               # ci is faster and stricter than npm install
+
+      - name: Run P4P processor
+        env:
+          GOOGLE_CLIENT_ID      : ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET  : ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN  : ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          ANTHROPIC_API_KEY     : ${{ secrets.ANTHROPIC_API_KEY }}
+          SUPABASE_URL          : ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY          : ${{ secrets.SUPABASE_KEY }}
+        run: node index.js
+
+      - name: Upload JSON results
+        if: always()             # upload even if the run had errors
+        uses: actions/upload-artifact@v4
+        with:
+          name: json-results-${{ github.run_number }}
+          path: JSON/
+          retention-days: 30
+          if-no-files-found: ignore
