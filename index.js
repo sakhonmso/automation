@@ -11,16 +11,15 @@
  *   npm start
  */
 
-import { createGmailClient }   from "./gmail-client.js";
-import { analyseJson }          from "./claude-analyst.js";
-import { checkNameInSupabase }  from "./supabase-client.js";
-import * as fs                  from "fs";
-import * as path                from "path";
-import ExcelJS                  from "exceljs";
+import { createGmailClient }          from "./gmail-client.js";
+import { analyseJson }                 from "./claude-analyst.js";
+import { matchName, saveScore }        from "./supabase-client.js";
+import { sendTelegram, formatResultMessage, formatErrorMessage } from "./telegram.js";
+import * as path                       from "path";
+import ExcelJS                         from "exceljs";
 import "dotenv/config";
 
 const MAX_MESSAGES = 10;
-const JSON_DIR     = "./JSON";
 
 // Messages from these senders are ignored entirely
 const SKIP_SENDERS = new Set([
@@ -43,12 +42,6 @@ function formatSize(bytes) {
   if (bytes < 1024)    return `${bytes} B`;
   if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / 1048576).toFixed(1)} MB`;
-}
-
-/** Sanitise a string for use as a filename */
-function safeName(str) {
-  if (!str) return "unnamed";
-  return String(str).replace(/[/\\?%*:|"<>\s]/g, "_").slice(0, 80);
 }
 
 // ── Excel loading (ExcelJS only) ──────────────────────────────────────────
@@ -145,7 +138,6 @@ async function main() {
   }
 
   console.log(`\n📬  ${messages.length} message(s) found:\n`);
-  fs.mkdirSync(JSON_DIR, { recursive: true });
 
   // ── 3. Process each message ───────────────────────────────────────────
   for (let i = 0; i < messages.length; i++) {
@@ -207,11 +199,10 @@ async function main() {
 
         if (rows.length === 0) {
           console.log(`│        ⚠️  Sheet is empty — skipping.`);
-          try { fs.unlinkSync(path.join(JSON_DIR, `temp_${safeName(att.filename)}_*.json`)); } catch (_) {}
           continue;
         }
 
-        // ── Build and save intermediate JSON with temp name ───────────
+        // ── Build intermediate object ──────────────────────────────────
         const intermediate = {
           _email_subject  : msg.subject,
           _email_body     : msg.body.trim(),
@@ -223,69 +214,62 @@ async function main() {
           rows,
         };
 
-        // Use a temp filename until Claude returns name + date
-        const tempFilename = `temp_${safeName(att.filename)}_${Date.now()}.json`;
-        let   dest         = path.join(JSON_DIR, tempFilename);
-        fs.writeFileSync(dest, JSON.stringify(intermediate, null, 2), "utf8");
-        console.log(`│        💾  Saved  → ${dest}`);
-
         // ── Claude analysis ────────────────────────────────────────────
         console.log(`│        🤖  Sending to Claude for analysis…`);
+        let analysis;
         try {
-          const analysis = await analyseJson(intermediate, att.filename);
-
+          analysis = await analyseJson(intermediate, att.filename);
           console.log(`│        ✅  Physician : ${analysis.name}`);
           console.log(`│        ✅  Date      : ${analysis.date}`);
           console.log(`│        ✅  Score     : ${analysis.score}`);
-
-          // ── Supabase name match ────────────────────────────────────
-          let matchResult = "unknown";
-          console.log(`│        🔍  Checking name in Supabase table "${analysis.date}"…`);
-          try {
-            matchResult = await checkNameInSupabase(analysis.name, analysis.date);
-            console.log(`│        ${matchResult === "matched" ? "✅" : "⚠️ "}  Name: ${matchResult}`);
-          } catch (dbErr) {
-            matchResult = `error: ${dbErr.message}`;
-            console.error(`│        ❌  Supabase error: ${dbErr.message}`);
-          }
-
-          // ── Build final filename: firstname-lastname_date.json ─────
-          const nameParts     = analysis.name.trim().split(/\s+/);
-          const firstname     = safeName(nameParts[0] ?? "unknown");
-          const lastname      = safeName(nameParts.slice(1).join(" ") || "unknown");
-          const baseName      = `${firstname}-${lastname}_${analysis.date}`;
-
-          // Guard against collision — append _2, _3 … if file already exists
-          let finalFilename = `${baseName}.json`;
-          let counter = 2;
-          while (fs.existsSync(path.join(JSON_DIR, finalFilename))) {
-            finalFilename = `${baseName}_${counter}.json`;
-            counter++;
-          }
-          const finalDest = path.join(JSON_DIR, finalFilename);
-
-          const result = {
-            name   : analysis.name,
-            date   : analysis.date,
-            score  : analysis.score,
-            matched: matchResult,
-          };
-
-          // Write final BEFORE deleting temp — if write fails, temp is preserved
-          fs.writeFileSync(finalDest, JSON.stringify(result, null, 2), "utf8");
-          fs.unlinkSync(dest);
-          dest = finalDest;
-          console.log(`│        📝  Final JSON written → ${dest}`);
-
         } catch (err) {
-          // Rename temp file to an error filename so it's identifiable
-          const errFilename = `error_${safeName(att.filename)}_${Date.now()}.json`;
-          const errDest     = path.join(JSON_DIR, errFilename);
-          const errorResult = { error: err.message };
-          try { fs.unlinkSync(dest); } catch (_) {}
-          fs.writeFileSync(errDest, JSON.stringify(errorResult, null, 2), "utf8");
           console.error(`│        ❌  Claude analysis failed: ${err.message}`);
-          console.error(`│        📝  Error written → ${errDest}`);
+          await sendTelegram(
+            formatErrorMessage(err.message, att.filename)
+          ).catch((e) => console.error(`│        ❌  Telegram error: ${e.message}`));
+          continue;
+        }
+
+        // ── Fuzzy name match in Supabase ───────────────────────────────
+        let match     = null;
+        let scoreSaved = false;
+
+        console.log(`│        🔍  Fuzzy-matching name in Supabase table "${analysis.date}"…`);
+        try {
+          match = await matchName(analysis.name, analysis.date);
+
+          if (match) {
+            console.log(`│        ✅  Best match : "${match.matchedName}" (${(match.similarity * 100).toFixed(0)}% similar)`);
+            console.log(`│        🔑  Row index  : ${match.index}`);
+
+            // ── Save score ───────────────────────────────────────────
+            await saveScore(analysis.date, match.index, parseFloat(analysis.score));
+            scoreSaved = true;
+            console.log(`│        💾  Score ${analysis.score} saved → table "${analysis.date}", row ${match.index}`);
+          } else {
+            console.log(`│        ⚠️  No sufficiently similar name found — score not saved.`);
+          }
+        } catch (dbErr) {
+          console.error(`│        ❌  Supabase error: ${dbErr.message}`);
+        }
+
+        // ── Send to Telegram ───────────────────────────────────────────
+        const result = {
+          name        : analysis.name,
+          matchedName : match?.matchedName ?? null,
+          similarity  : match?.similarity  ?? null,
+          date        : analysis.date,
+          score       : analysis.score,
+          saved       : scoreSaved,
+        };
+
+        const tgMessage = formatResultMessage(result, att.filename);
+        console.log(`│        📨  Sending to Telegram…`);
+        try {
+          await sendTelegram(tgMessage);
+          console.log(`│        ✅  Telegram message sent.`);
+        } catch (tgErr) {
+          console.error(`│        ❌  Telegram error: ${tgErr.message}`);
         }
       }
     }
@@ -293,14 +277,7 @@ async function main() {
     console.log(`└────────────────────────────────────────────────────────────\n`);
   }
 
-  // ── 4. Summary ────────────────────────────────────────────────────────
-  const savedFiles = fs.readdirSync(JSON_DIR).filter((f) => f.endsWith(".json"));
-  if (savedFiles.length > 0) {
-    console.log(`\n📁  JSON files in ./${JSON_DIR.replace("./", "")}:`);
-    for (const f of savedFiles) console.log(`    • ${f}`);
-  } else {
-    console.log(`\n💡  No Excel attachments were found — nothing written to ${JSON_DIR}.`);
-  }
+  console.log(`\n✅  Done.`);
 }
 
 main().catch((err) => {
