@@ -171,25 +171,29 @@ async function stripFormulasFromBuffer(inputBuffer) {
 }
 
 /**
- * Build a new single-sheet workbook for Drive upload.
- * Strips all formulas first to avoid ExcelJS shared-formula errors.
+ * Extract the target sheet from the ORIGINAL buffer and return it as a
+ * single-sheet xlsx, preserving all original formulas and formatting.
  *
- * Sheet selection:
- *   - Normally uses the FIRST sheet.
- *   - If the first sheet is blank or almost null (< 3 non-null cells),
- *     falls back to the SECOND sheet (the "index" sheet).
+ * Strategy:
+ *   1. Use the formula-stripped buffer to safely determine which sheet has
+ *      content (ExcelJS can't reliably read shared-formula files otherwise).
+ *   2. Map the chosen sheet index back to its raw XML path in the original zip.
+ *   3. Build a new minimal xlsx zip using only that sheet's original XML,
+ *      carrying over all shared resources (styles, sharedStrings, theme, etc.)
+ *      but removing references to the other sheets from workbook.xml.
  *
  * Returns a Buffer, or null if no usable sheet is found.
  */
 async function extractFirstSheetBuffer(buffer) {
-  const strippedBuffer = await stripFormulasFromBuffer(buffer);
+  const JSZip = (await import("jszip")).default;
 
+  // ── Step 1: determine which sheet index to use (0-based) ──────────────
+  const strippedBuffer = await stripFormulasFromBuffer(buffer);
   const source = new ExcelJS.Workbook();
   await source.xlsx.load(strippedBuffer);
 
   if (source.worksheets.length === 0) return null;
 
-  /** Count non-null cells in a worksheet */
   function nonNullCount(ws) {
     let count = 0;
     ws.eachRow((row) => {
@@ -200,40 +204,113 @@ async function extractFirstSheetBuffer(buffer) {
     return count;
   }
 
-  // Pick the best sheet: first sheet unless it's blank/almost null
-  let srcSheet = source.worksheets[0];
-  const firstCount = nonNullCount(srcSheet);
+  let sheetIndex = 0;
+  const firstCount = nonNullCount(source.worksheets[0]);
 
   if (firstCount < 3 && source.worksheets.length > 1) {
-    const second = source.worksheets[1];
-    const secondCount = nonNullCount(second);
-    console.log(`│        ℹ️   First sheet "${srcSheet.name}" has ${firstCount} cell(s) — falling back to sheet 2 "${second.name}" (${secondCount} cells) for upload.`);
-    srcSheet = second;
+    const secondCount = nonNullCount(source.worksheets[1]);
+    console.log(`│        ℹ️   First sheet "${source.worksheets[0].name}" has ${firstCount} cell(s) — using sheet 2 "${source.worksheets[1].name}" (${secondCount} cells) for upload.`);
     if (secondCount < 3) {
-      console.warn(`│        ⚠️  Second sheet also almost blank (${secondCount} cells) — upload aborted.`);
+      console.warn(`│        ⚠️  Second sheet also almost blank — upload aborted.`);
       return null;
     }
+    sheetIndex = 1;
   }
 
-  if (nonNullCount(srcSheet) < 3) return null;
+  if (nonNullCount(source.worksheets[sheetIndex]) < 3) return null;
 
-  const dest     = new ExcelJS.Workbook();
-  const dstSheet = dest.addWorksheet(srcSheet.name);
+  // ── Step 2: transplant original sheet XML into a new single-sheet zip ──
+  const origZip = await JSZip.loadAsync(buffer);
 
-  srcSheet.columns.forEach((col, i) => {
-    if (col.width) dstSheet.getColumn(i + 1).width = col.width;
-  });
-
-  srcSheet.eachRow({ includeEmpty: false }, (srcRow, rowNum) => {
-    const dstRow = dstSheet.getRow(rowNum);
-    srcRow.eachCell({ includeEmpty: false }, (srcCell, colNum) => {
-      dstRow.getCell(colNum).value = srcCell.value;
+  // Find all sheet XML paths in order (sheet1.xml, sheet2.xml, …)
+  const sheetPaths = Object.keys(origZip.files)
+    .filter((p) => /^xl\/worksheets\/sheet\d+\.xml$/.test(p))
+    .sort((a, b) => {
+      const na = parseInt(a.match(/(\d+)/)[1]);
+      const nb = parseInt(b.match(/(\d+)/)[1]);
+      return na - nb;
     });
-    dstRow.commit();
+
+  if (sheetIndex >= sheetPaths.length) return null;
+
+  const targetSheetPath = sheetPaths[sheetIndex]; // e.g. "xl/worksheets/sheet2.xml"
+  const targetSheetNum  = sheetIndex + 1;          // 1-based, for internal XML references
+
+  // Build output zip: copy everything except the other sheet XMLs and their rels
+  const outZip = new JSZip();
+
+  for (const [filePath, fileObj] of Object.entries(origZip.files)) {
+    if (fileObj.dir) continue;
+
+    // Drop worksheets other than our target
+    if (/^xl\/worksheets\/sheet\d+\.xml$/.test(filePath) && filePath !== targetSheetPath) continue;
+    if (/^xl\/worksheets\/_rels\/sheet\d+\.xml\.rels$/.test(filePath)) {
+      const num = parseInt(filePath.match(/sheet(\d+)/)[1]);
+      if (num !== targetSheetNum) continue;
+    }
+
+    // Rewrite workbook.xml to reference only the chosen sheet
+    if (filePath === "xl/workbook.xml") {
+      let wbXml = await fileObj.async("string");
+      // Keep only the target <sheet> element; renumber it as sheet 1
+      wbXml = wbXml.replace(/<sheets>[\s\S]*?<\/sheets>/, (sheetsBlock) => {
+        const sheetMatches = [...sheetsBlock.matchAll(/<sheet [^/]*/g)];
+        if (sheetMatches.length <= sheetIndex) return sheetsBlock; // safety
+        let targetTag = sheetMatches[sheetIndex][0];
+        // Renumber r:id to rId1 and sheetId to 1
+        targetTag = targetTag
+          .replace(/r:id="[^"]*"/, 'r:id="rId1"')
+          .replace(/sheetId="[^"]*"/, 'sheetId="1"');
+        return `<sheets>${targetTag}/></sheets>`;
+      });
+      outZip.file(filePath, wbXml);
+      continue;
+    }
+
+    // Rewrite workbook.xml.rels to keep only the target sheet relationship
+    if (filePath === "xl/_rels/workbook.xml.rels") {
+      let relsXml = await fileObj.async("string");
+      // Find the rId that pointed to the target sheet
+      const targetRel = new RegExp(
+        `<Relationship[^>]+Id="([^"]+)"[^>]+Target="worksheets/sheet${targetSheetNum}\\.xml"[^>]*/>`
+      );
+      const m = relsXml.match(targetRel);
+      if (m) {
+        const origRid = m[1];
+        // Keep only this relationship, renamed to rId1
+        relsXml = relsXml.replace(
+          /<Relationships[^>]*>([\s\S]*?)<\/Relationships>/,
+          (_, inner) => {
+            const kept = inner
+              .split(/(?=<Relationship)/)
+              .find((rel) => rel.includes(`Id="${origRid}"`)) ?? "";
+            const renumbered = kept
+              .replace(`Id="${origRid}"`, 'Id="rId1"')
+              .replace(`Target="worksheets/sheet${targetSheetNum}.xml"`, 'Target="worksheets/sheet1.xml"');
+            return `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${renumbered}</Relationships>`;
+          }
+        );
+      }
+      outZip.file(filePath, relsXml);
+      continue;
+    }
+
+    // Rename target sheet XML to sheet1.xml in the output
+    const outPath = filePath === targetSheetPath
+      ? "xl/worksheets/sheet1.xml"
+      : filePath.replace(`sheet${targetSheetNum}.xml`, "sheet1.xml");
+
+    const data = await fileObj.async("nodebuffer");
+    outZip.file(outPath, data);
+  }
+
+  const out = await outZip.generateAsync({
+    type              : "nodebuffer",
+    compression       : "DEFLATE",
+    compressionOptions: { level: 6 },
   });
 
-  const outBuffer = await dest.xlsx.writeBuffer();
-  return Buffer.from(outBuffer);
+  return out;
 }
 
 // ── Processing pipeline ───────────────────────────────────────────────────
