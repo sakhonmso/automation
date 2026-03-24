@@ -517,7 +517,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
   <div class="header">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
       <div>
-        <h1>แจ้งผลการส่ง P4P ของแพทย์ โรงพยาบาลสมุทรสาคร</h1>
+        <h1>แจ้งผลการส่ง P4P ของแพทย์<br>โรงพยาบาลสมุทรสาคร</h1>
         <p>อีเมลตอบกลับอัตโนมัติ</p>
       </div>
     </div>
@@ -529,11 +529,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
       ท่านสามารถตรวจสอบสถานะการส่งได้ที่
     </p>
     <a href="https://line.me/R/ti/p/%40703emfui" class="line-btn">
-      <svg width="30" height="30" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-        <rect width="48" height="48" rx="10" fill="white"/>
-        <path d="M40 22.6C40 15.1 32.8 9 24 9S8 15.1 8 22.6c0 6.8 5.9 12.5 13.9 13.6.5.1 1.3.4 1.4.9.2.5.1 1.1 0 1.6l-.2 1.4c-.1.5-.4 1.8 1.5.9s10.2-6 13.9-10.3c2.4-2.6 3.5-5.3 3.5-8.1z" fill="#06c755"/>
-        <path fill="white" d="M21.2 19.4h-1.6c-.3 0-.5.2-.5.5v7c0 .3.2.5.5.5h1.6c.3 0 .5-.2.5-.5v-7c0-.3-.2-.5-.5-.5zM31.3 19.4h-1.6c-.3 0-.5.2-.5.5v4.1l-3.1-4.3c0-.1-.1-.1-.1-.2h-1.7c-.3 0-.5.2-.5.5v7c0 .3.2.5.5.5h1.6c.3 0 .5-.2.5-.5v-4.1l3.1 4.3c.1.1.2.2.3.2h1.6c.3 0 .5-.2.5-.5v-7c-.1-.3-.3-.5-.6-.5zM18.2 24.9h-2.9v-5c0-.3-.2-.5-.5-.5h-1.6c-.3 0-.5.2-.5.5v7c0 .1.1.3.2.4.1.1.2.1.4.1h4.9c.3 0 .5-.2.5-.5v-1.5c0-.3-.2-.5-.5-.5zM37.3 21.4c.3 0 .5-.2.5-.5v-1.5c0-.3-.2-.5-.5-.5h-4.9c-.1 0-.3 0-.4.1-.1.1-.2.2-.2.4v7c0 .1.1.3.2.4.1.1.2.1.4.1h4.9c.3 0 .5-.2.5-.5v-1.5c0-.3-.2-.5-.5-.5h-2.9v-1h2.9c.3 0 .5-.2.5-.5V22c0-.3-.2-.5-.5-.5h-2.9v-1h2.9z"/>
-      </svg>
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAACuElEQVR4nO2dW27CMBBFnagqW4KFlEXCQtotwU/7FZQGO37NeB65R+oXpLLv8dgmxGIKjXx+f/22XuuR5+U+tVxXdRFCL6NGRtEbEXwbJSLm3BsQfjsl2e0KQPj95DJMCkD4dOxlGRWA8OlJZfomAOHzEct2zr0B0LLNeE69APhYZ53dhgJe5hAw+iVYMkcFCAMBwkyYfmRBBQgDAcJAgDAQIAwECAMBwkCAMB/SDSjhcb41X3v6uRK2hB51H8R6wi5FkxQVAkaEnkJahpgAydBTSMgYLkBj8FtGihgmwELwW0aIGLINtRh+CGPazS7AavgL3O1nm4KsBx+DY0piqQCP4YfA06+hu6CSDsRG2fo6ilFI/f96IK0AqZH/ON9ef9ZwdzPOmgQyAdY6rgUSAUcNn6LfJm5Hj2bkgHK3BoRgqyK7BVjqLAe9/XdZAZZwuwY8zrfmD1m56yirHhUgDAQIAwHCuBZgYYfWvQiffq4mOlpDTX9676a6rgALDN2GpkaLtgoqHdUU7SapAOkvNaSg6DfZFHRUCb1gDRCGVACqoB6WL+W1LaqUUA8ylinIayVw9Iv9sRQP1cA5oNgXYevVwN3+IbsgqxJGtBvnAyK4PB+wRaOIQ5yQiYEzYorAKUmF4JywMnJCtIe+xpwAb9Vg6rmg1vA1Br9gRkBt+JpDX2NCwMgvyUejXkDruTIrqBbgabeTQq2AvfA9BL+gUkAsfE+hr1AnYBu+1+AXVAlYwvce+ho1AnoOVFhGzXNBRww/BEUCjgoECAMBwkCAMBAgDAQIM7f+EjTo53m5T6gAYSBAmDmE9h+kB+0smaMChHkJQBWMY531nHoB8LDN+G0KggQ+YtlG1wBIoCeVaXIRhgQ69rLc3QVBQj+5DLPbUEhopyS7qnCtPUktRc2gbR7dkPGf1pniD2z1FZ9RgUNjAAAAAElFTkSuQmCC" width="32" height="32" alt="LINE" style="border-radius:8px;display:block"/>
       <span>LINE OA : SAKHONMSO</span>
     </a>
     <div class="detail-card">
