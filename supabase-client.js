@@ -85,7 +85,7 @@ export async function matchName(name, date, threshold = 0.6) {
   const supabase = getSupabase();
   const { data, error } = await supabase
     .from(date)
-    .select("index, firstname, lastname, prefix");
+    .select("index, firstname, lastname, prefix, department");
 
   if (error) throw new Error(`Supabase query error on table "${date}": ${error.message}`);
   if (!data || data.length === 0) return null;
@@ -98,7 +98,8 @@ export async function matchName(name, date, threshold = 0.6) {
     if (sim > (best?.similarity ?? -1)) {
       best = {
         matchedName: fullName,
-        prefix     : row.prefix ?? "",
+        prefix     : row.prefix      ?? "",
+        department : row.department  ?? "",
         index      : row.index,
         similarity : sim,
       };
@@ -129,3 +130,4 @@ export async function saveScore(date, index, score) {
 
   if (error) throw new Error(`Supabase update error on table "${date}": ${error.message}`);
 }
+

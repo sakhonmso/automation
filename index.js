@@ -136,8 +136,17 @@ async function stripFormulasFromBuffer(inputBuffer) {
   for (const sheetPath of sheetPaths) {
     let xml = await zip.files[sheetPath].async("string");
 
-    // Replace every <c ...> element: remove <f ...>...</f> keeping only <v>
-    xml = xml.replace(/<c ([^>]*)>([\s\S]*?)<\/c>/g, (match, attrs, inner) => {
+    // Normalize bare \r line endings to \n.
+    // Some Excel files (notably from Mac Excel) use \r without \n between
+    // the XML declaration and the root element. JSZip's internal XML parser
+    // treats \r as a document separator, triggering "documents may contain
+    // only one root" when the zip is re-serialised via generateAsync.
+    xml = xml.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+    // Match only non-self-closing cells: <c ...>...</c>
+    // The negative lookbehind (?<!\/) ensures we never match <c .../>
+    // (self-closing cells have no formula/value to strip and must pass through unchanged)
+    xml = xml.replace(/<c ([^>]*)(?<!\/)>([\s\S]*?)<\/c>/g, (match, attrs, inner) => {
       // Remove cm="1" attribute (dynamic array marker) from <c> tag
       const cleanAttrs = attrs.replace(/\s*cm="1"/, "");
 
@@ -162,12 +171,17 @@ async function stripFormulasFromBuffer(inputBuffer) {
 }
 
 /**
- * Build a new single-sheet workbook from the first sheet of the source buffer.
- * Strips all formulas to plain values first (avoids ExcelJS shared-formula errors).
- * Returns a Buffer, or null if the first sheet is blank.
+ * Build a new single-sheet workbook for Drive upload.
+ * Strips all formulas first to avoid ExcelJS shared-formula errors.
+ *
+ * Sheet selection:
+ *   - Normally uses the FIRST sheet.
+ *   - If the first sheet is blank or almost null (< 3 non-null cells),
+ *     falls back to the SECOND sheet (the "index" sheet).
+ *
+ * Returns a Buffer, or null if no usable sheet is found.
  */
 async function extractFirstSheetBuffer(buffer) {
-  // Strip formulas at XML level before ExcelJS loads the workbook
   const strippedBuffer = await stripFormulasFromBuffer(buffer);
 
   const source = new ExcelJS.Workbook();
@@ -175,11 +189,33 @@ async function extractFirstSheetBuffer(buffer) {
 
   if (source.worksheets.length === 0) return null;
 
-  const srcSheet = source.worksheets[0];
+  /** Count non-null cells in a worksheet */
+  function nonNullCount(ws) {
+    let count = 0;
+    ws.eachRow((row) => {
+      row.eachCell({ includeEmpty: false }, (cell) => {
+        if (cell.value !== null && cell.value !== undefined) count++;
+      });
+    });
+    return count;
+  }
 
-  let hasContent = false;
-  srcSheet.eachRow((row) => { if (row.hasValues) hasContent = true; });
-  if (!hasContent) return null;
+  // Pick the best sheet: first sheet unless it's blank/almost null
+  let srcSheet = source.worksheets[0];
+  const firstCount = nonNullCount(srcSheet);
+
+  if (firstCount < 3 && source.worksheets.length > 1) {
+    const second = source.worksheets[1];
+    const secondCount = nonNullCount(second);
+    console.log(`│        ℹ️   First sheet "${srcSheet.name}" has ${firstCount} cell(s) — falling back to sheet 2 "${second.name}" (${secondCount} cells) for upload.`);
+    srcSheet = second;
+    if (secondCount < 3) {
+      console.warn(`│        ⚠️  Second sheet also almost blank (${secondCount} cells) — upload aborted.`);
+      return null;
+    }
+  }
+
+  if (nonNullCount(srcSheet) < 3) return null;
 
   const dest     = new ExcelJS.Workbook();
   const dstSheet = dest.addWorksheet(srcSheet.name);
@@ -191,7 +227,6 @@ async function extractFirstSheetBuffer(buffer) {
   srcSheet.eachRow({ includeEmpty: false }, (srcRow, rowNum) => {
     const dstRow = dstSheet.getRow(rowNum);
     srcRow.eachCell({ includeEmpty: false }, (srcCell, colNum) => {
-      // All formulas already stripped — copy value directly
       dstRow.getCell(colNum).value = srcCell.value;
     });
     dstRow.commit();
@@ -368,6 +403,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
       ? `${nameParts[0]}  ${nameParts.slice(1).join("  ")}`
       : baseName;
     const displayName = `${prefix}${spacedName}`;
+    const department  = match?.department ?? "";
 
     const htmlReply = `<!DOCTYPE html>
 <html lang="th">
@@ -402,7 +438,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
 <body>
 <div class="card">
   <div class="header">
-    <h1>ระบบ P4P แพทย์ โรงพยาบาลสมุทรสาคร</h1>
+    <h1>แจ้งผลการส่ง P4P แพทย์ โรงพยาบาลสมุทรสาคร</h1>
     <p>อีเมลตอบกลับอัตโนมัติ</p>
   </div>
   <div class="body">
@@ -412,9 +448,10 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
       ท่านสามารถตรวจสอบสถานะการส่งได้ที่
     </p>
     <a href="https://line.me/R/ti/p/%40703emfui" class="line-btn">
-      <svg width="24" height="24" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M33 18.5C33 12.7 27.3 8 20 8S7 12.7 7 18.5c0 5.2 4.6 9.5 10.8 10.3.4.1 1 .3 1.1.7.1.3.1.8 0 1.2l-.2 1.1c0 .3-.3 1.3 1.1.7s7.7-4.5 10.5-7.7c1.8-2 2.7-4 2.7-6.3z" fill="white"/>
-        <path d="M17 16.5h-1.2c-.2 0-.3.1-.3.3v5c0 .2.1.3.3.3H17c.2 0 .3-.1.3-.3v-5c0-.2-.1-.3-.3-.3zM24.5 16.5h-1.2c-.2 0-.3.1-.3.3v3l-2.3-3.1s0-.1-.1-.1h-1.3c-.2 0-.3.1-.3.3v5c0 .2.1.3.3.3h1.2c.2 0 .3-.1.3-.3v-3l2.3 3.1c.1.1.1.1.2.1h1.2c.2 0 .3-.1.3-.3v-5c0-.2-.1-.3-.3-.3zM15.3 20.5h-2v-3.7c0-.2-.1-.3-.3-.3H11.8c-.2 0-.3.1-.3.3v5c0 .1 0 .2.1.2s.2.1.2.1h3.5c.2 0 .3-.1.3-.3v-1c0-.2-.1-.3-.3-.3zM29 17.8c.2 0 .3-.1.3-.3v-1c0-.2-.1-.3-.3-.3h-3.5c-.1 0-.2 0-.2.1s-.1.1-.1.2v5s0 .2.1.2.1.1.2.1H29c.2 0 .3-.1.3-.3v-1c0-.2-.1-.3-.3-.3h-2.2V20H29c.2 0 .3-.1.3-.3v-1c0-.2-.1-.3-.3-.3h-2.2v-.6H29z" fill="#06c755"/>
+      <svg width="28" height="28" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <rect width="48" height="48" rx="10" fill="#06c755"/>
+        <path d="M40 22.6C40 15.1 32.8 9 24 9S8 15.1 8 22.6c0 6.8 5.9 12.5 13.9 13.6.5.1 1.3.4 1.4.9.2.5.1 1.1 0 1.6l-.2 1.4c-.1.5-.4 1.8 1.5.9s10.2-6 13.9-10.3c2.4-2.6 3.5-5.3 3.5-8.1z" fill="white"/>
+        <path fill="#06c755" d="M21.2 19.4h-1.6c-.3 0-.5.2-.5.5v7c0 .3.2.5.5.5h1.6c.3 0 .5-.2.5-.5v-7c0-.3-.2-.5-.5-.5zM31.3 19.4h-1.6c-.3 0-.5.2-.5.5v4.1l-3.1-4.3c0-.1-.1-.1-.1-.2h-1.7c-.3 0-.5.2-.5.5v7c0 .3.2.5.5.5h1.6c.3 0 .5-.2.5-.5v-4.1l3.1 4.3c.1.1.2.2.3.2h1.6c.3 0 .5-.2.5-.5v-7c-.1-.3-.3-.5-.6-.5zM18.2 24.9h-2.9v-5c0-.3-.2-.5-.5-.5h-1.6c-.3 0-.5.2-.5.5v7c0 .1.1.3.2.4.1.1.2.1.4.1h4.9c.3 0 .5-.2.5-.5v-1.5c0-.3-.2-.5-.5-.5zM37.3 21.4c.3 0 .5-.2.5-.5v-1.5c0-.3-.2-.5-.5-.5h-4.9c-.1 0-.3 0-.4.1-.1.1-.2.2-.2.4v7c0 .1.1.3.2.4.1.1.2.1.4.1h4.9c.3 0 .5-.2.5-.5v-1.5c0-.3-.2-.5-.5-.5h-2.9v-1h2.9c.3 0 .5-.2.5-.5V22c0-.3-.2-.5-.5-.5h-2.9v-1h2.9z"/>
       </svg>
       <span>LINE OA : SAKHONMSO</span>
     </a>
@@ -425,6 +462,10 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
           <td>ชื่อแพทย์</td>
           <td>${displayName}</td>
         </tr>
+        ${department ? `<tr>
+          <td>กลุ่มงาน</td>
+          <td>${department}</td>
+        </tr>` : ""}
         <tr>
           <td>เดือน / ปี</td>
           <td>${displayDate}</td>
