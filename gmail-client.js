@@ -115,8 +115,8 @@ export function createGmailClient() {
    * @param {string}   [opts.from]              Defaults to authenticated account
    * @param {string}   [opts.replyToMessageId]  Thread reply support
    */
-  async function sendMessage({ to, subject, body, from, replyToMessageId } = {}) {
-    if (!to || !subject || !body) throw new Error("`to`, `subject`, and `body` are required.");
+  async function sendMessage({ to, subject, body, html, from, replyToMessageId } = {}) {
+    if (!to || !subject || (!body && !html)) throw new Error("`to`, `subject`, and `body` or `html` are required.");
 
     // Encode non-ASCII header values per RFC 2047 (e.g. Thai text in subject)
     const encodeHeader = (str) =>
@@ -124,6 +124,58 @@ export function createGmailClient() {
         ? `=?utf-8?B?${Buffer.from(str, "utf8").toString("base64")}?=`
         : str;
 
+    // Build MIME message — multipart/alternative when both html and plain text provided,
+    // single part otherwise
+    let mimeBody;
+    if (html) {
+      const boundary = `boundary_${Date.now().toString(36)}`;
+      const plainText = body || "กรุณาเปิดอีเมลด้วยโปรแกรมที่รองรับ HTML";
+      mimeBody = [
+        `MIME-Version: 1.0`,
+        `Content-Type: multipart/alternative; boundary="${boundary}"`,
+        `To: ${encodeHeader(to)}`,
+        `Subject: ${encodeHeader(subject)}`,
+        ...(from ? [`From: ${encodeHeader(from)}`] : []),
+      ];
+
+      let threadId;
+      if (replyToMessageId) {
+        const orig = await getMessage(replyToMessageId, "metadata");
+        threadId = orig.threadId;
+        const origHeaders = Object.fromEntries(
+          (orig.payload?.headers ?? []).map((h) => [h.name.toLowerCase(), h.value])
+        );
+        const msgId = origHeaders["message-id"];
+        const refs  = origHeaders["references"];
+        if (msgId) {
+          mimeBody.push(`In-Reply-To: ${msgId}`);
+          mimeBody.push(`References: ${refs ? refs + " " + msgId : msgId}`);
+        }
+      }
+
+      mimeBody = mimeBody.join("\r\n") + "\r\n\r\n"
+        + `--${boundary}\r\n`
+        + `Content-Type: text/plain; charset=utf-8\r\n\r\n`
+        + plainText + "\r\n"
+        + `--${boundary}\r\n`
+        + `Content-Type: text/html; charset=utf-8\r\n\r\n`
+        + html + "\r\n"
+        + `--${boundary}--`;
+
+      const raw = Buffer.from(mimeBody)
+        .toString("base64")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+
+      const res = await gmail.users.messages.send({
+        userId: "me",
+        requestBody: { raw, ...(threadId ? { threadId } : {}) },
+      });
+      return res.data;
+    }
+
+    // Plain-text fallback (original path)
     const headerLines = [
       `To: ${encodeHeader(to)}`,
       `Subject: ${encodeHeader(subject)}`,
@@ -136,7 +188,7 @@ export function createGmailClient() {
     let threadId;
     if (replyToMessageId) {
       const orig = await getMessage(replyToMessageId, "metadata");
-      threadId = orig.threadId; // message ID !== thread ID
+      threadId = orig.threadId;
       const origHeaders = Object.fromEntries(
         (orig.payload?.headers ?? []).map((h) => [h.name.toLowerCase(), h.value])
       );

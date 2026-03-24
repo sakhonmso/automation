@@ -23,10 +23,8 @@ const ENV_PATH = path.join(__dirname, ".env");
 // ── Scopes ─────────────────────────────────────────────────────────────────
 // Adjust to the minimum your application actually needs.
 const SCOPES = [
-  "https://www.googleapis.com/auth/gmail.readonly",   // read messages & metadata
-  "https://www.googleapis.com/auth/gmail.send",        // send on behalf of the user
-  // "https://www.googleapis.com/auth/gmail.modify",  // uncomment to mark read/unread etc.
-  // "https://mail.google.com/",                      // uncomment for full access
+  "https://www.googleapis.com/auth/gmail.modify",      // read, mark read/starred, apply labels
+  "https://www.googleapis.com/auth/drive",             // full Drive access — needed to replace files not created by this app
 ];
 
 // ── Validate env ───────────────────────────────────────────────────────────

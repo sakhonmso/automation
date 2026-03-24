@@ -77,7 +77,7 @@ function similarity(a, b) {
  * @param {string} name   Physician name from Claude, e.g. "สมชาย ใจดี"
  * @param {string} date   Table name, e.g. "2569_02"
  * @param {number} [threshold=0.6]  Minimum similarity to accept (0–1)
- * @returns {Promise<{ matchedName: string, index: number|string, similarity: number } | null>}
+ * @returns {Promise<{ matchedName: string, prefix: string, index: number|string, similarity: number } | null>}
  */
 export async function matchName(name, date, threshold = 0.6) {
   if (!date || date.startsWith("0000") || date.endsWith("_00")) return null;
@@ -85,7 +85,7 @@ export async function matchName(name, date, threshold = 0.6) {
   const supabase = getSupabase();
   const { data, error } = await supabase
     .from(date)
-    .select("index, firstname, lastname");
+    .select("index, firstname, lastname, prefix");
 
   if (error) throw new Error(`Supabase query error on table "${date}": ${error.message}`);
   if (!data || data.length === 0) return null;
@@ -96,7 +96,12 @@ export async function matchName(name, date, threshold = 0.6) {
     const fullName = `${row.firstname ?? ""} ${row.lastname ?? ""}`.trim();
     const sim = similarity(name, fullName);
     if (sim > (best?.similarity ?? -1)) {
-      best = { matchedName: fullName, index: row.index, similarity: sim };
+      best = {
+        matchedName: fullName,
+        prefix     : row.prefix ?? "",
+        index      : row.index,
+        similarity : sim,
+      };
     }
   }
 
