@@ -498,7 +498,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
   .body{padding:28px 32px}
   .greeting{font-size:17px;color:#056839;font-weight:600;margin-bottom:14px}
   .intro{line-height:1.8;color:#3a5a44;margin-bottom:22px;font-size:15px}
-  .line-btn{display:flex;align-items:center;justify-content:center;gap:12px;background:#06c755;border-radius:10px;padding:13px 20px;margin-bottom:24px;text-decoration:none}
+  .line-btn{display:block;background:#06c755;border-radius:10px;padding:13px 20px;margin-bottom:24px;text-decoration:none}
   .line-btn span{color:#fff;font-weight:600;font-size:14px;letter-spacing:.2px}
   .detail-card{background:#eef7f2;border-left:4px solid #056839;border-radius:0 10px 10px 0;padding:18px 22px;margin-bottom:24px}
   .detail-title{font-size:11.5px;font-weight:700;color:#6a9e7e;text-transform:uppercase;letter-spacing:.7px;margin-bottom:13px}
@@ -529,8 +529,21 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
       ท่านสามารถตรวจสอบสถานะการส่งได้ที่
     </p>
     <a href="https://line.me/R/ti/p/%40703emfui" class="line-btn">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" width="32" height="32" alt="LINE" style="display:block;border-radius:6px;background:#fff;padding:2px"/>
-      <span>LINE OA : SAKHONMSO</span>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td align="center" valign="middle">
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td valign="middle">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" width="28" height="28" alt="LINE" style="display:block;border-radius:6px;background:#fff;padding:2px"/>
+                </td>
+                <td width="12"></td>
+                <td valign="middle" style="color:#fff;font-weight:600;font-size:14px;letter-spacing:.2px;white-space:nowrap">LINE OA : SAKHONMSO</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
     </a>
     <div class="detail-card">
       <div class="detail-title">รายละเอียดไฟล์</div>
