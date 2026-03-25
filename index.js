@@ -498,7 +498,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
   .body{padding:28px 32px}
   .greeting{font-size:17px;color:#056839;font-weight:600;margin-bottom:14px}
   .intro{line-height:1.8;color:#3a5a44;margin-bottom:22px;font-size:15px}
-  .line-btn{display:flex;align-items:center;gap:12px;background:#06c755;border-radius:10px;padding:13px 20px;margin-bottom:24px;text-decoration:none}
+  .line-btn{display:flex;align-items:center;justify-content:center;gap:12px;background:#06c755;border-radius:10px;padding:13px 20px;margin-bottom:24px;text-decoration:none}
   .line-btn span{color:#fff;font-weight:600;font-size:14px;letter-spacing:.2px}
   .detail-card{background:#eef7f2;border-left:4px solid #056839;border-radius:0 10px 10px 0;padding:18px 22px;margin-bottom:24px}
   .detail-title{font-size:11.5px;font-weight:700;color:#6a9e7e;text-transform:uppercase;letter-spacing:.7px;margin-bottom:13px}
