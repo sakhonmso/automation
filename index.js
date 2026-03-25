@@ -498,7 +498,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
   .body{padding:28px 32px}
   .greeting{font-size:17px;color:#056839;font-weight:600;margin-bottom:14px}
   .intro{line-height:1.8;color:#3a5a44;margin-bottom:22px;font-size:15px}
-  .line-btn{display:flex;align-items:center;gap:10px;background:#06c755;border-radius:10px;padding:13px 20px;margin-bottom:24px;text-decoration:none}
+  .line-btn{display:flex;align-items:center;gap:12px;background:#06c755;border-radius:10px;padding:13px 20px;margin-bottom:24px;text-decoration:none}
   .line-btn span{color:#fff;font-weight:600;font-size:14px;letter-spacing:.2px}
   .detail-card{background:#eef7f2;border-left:4px solid #056839;border-radius:0 10px 10px 0;padding:18px 22px;margin-bottom:24px}
   .detail-title{font-size:11.5px;font-weight:700;color:#6a9e7e;text-transform:uppercase;letter-spacing:.7px;margin-bottom:13px}
@@ -529,7 +529,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
       ท่านสามารถตรวจสอบสถานะการส่งได้ที่
     </p>
     <a href="https://line.me/R/ti/p/%40703emfui" class="line-btn">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAACuElEQVR4nO2dW27CMBBFnagqW4KFlEXCQtotwU/7FZQGO37NeB65R+oXpLLv8dgmxGIKjXx+f/22XuuR5+U+tVxXdRFCL6NGRtEbEXwbJSLm3BsQfjsl2e0KQPj95DJMCkD4dOxlGRWA8OlJZfomAOHzEct2zr0B0LLNeE69APhYZ53dhgJe5hAw+iVYMkcFCAMBwkyYfmRBBQgDAcJAgDAQIAwECAMBwkCAMB/SDSjhcb41X3v6uRK2hB51H8R6wi5FkxQVAkaEnkJahpgAydBTSMgYLkBj8FtGihgmwELwW0aIGLINtRh+CGPazS7AavgL3O1nm4KsBx+DY0piqQCP4YfA06+hu6CSDsRG2fo6ilFI/f96IK0AqZH/ON9ef9ZwdzPOmgQyAdY6rgUSAUcNn6LfJm5Hj2bkgHK3BoRgqyK7BVjqLAe9/XdZAZZwuwY8zrfmD1m56yirHhUgDAQIAwHCuBZgYYfWvQiffq4mOlpDTX9676a6rgALDN2GpkaLtgoqHdUU7SapAOkvNaSg6DfZFHRUCb1gDRCGVACqoB6WL+W1LaqUUA8ylinIayVw9Iv9sRQP1cA5oNgXYevVwN3+IbsgqxJGtBvnAyK4PB+wRaOIQ5yQiYEzYorAKUmF4JywMnJCtIe+xpwAb9Vg6rmg1vA1Br9gRkBt+JpDX2NCwMgvyUejXkDruTIrqBbgabeTQq2AvfA9BL+gUkAsfE+hr1AnYBu+1+AXVAlYwvce+ho1AnoOVFhGzXNBRww/BEUCjgoECAMBwkCAMBAgDAQIM7f+EjTo53m5T6gAYSBAmDmE9h+kB+0smaMChHkJQBWMY531nHoB8LDN+G0KggQ+YtlG1wBIoCeVaXIRhgQ69rLc3QVBQj+5DLPbUEhopyS7qnCtPUktRc2gbR7dkPGf1pniD2z1FZ9RgUNjAAAAAElFTkSuQmCC" width="32" height="32" alt="LINE" style="border-radius:8px;display:block"/>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" width="32" height="32" alt="LINE" style="display:block;border-radius:6px;background:#fff;padding:2px"/>
       <span>LINE OA : SAKHONMSO</span>
     </a>
     <div class="detail-card">
@@ -567,7 +567,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     try {
       await gmail.sendMessage({
         to              : replyTo,
-        subject         : `Re: ${subject}`,
+        subject         : `องค์กรแพทย์ รพ. สค.`,
         html            : htmlReply,
         body            : `เรียน ${displayName}\n\nองค์กรแพทย์ โรงพยาบาลสมุทรสาคร ได้จัดเก็บไฟล์ P4P ของท่านแล้ว\n\nชื่อแพทย์: ${displayName}\nเดือน/ปี: ${displayDate}\nคะแนนรวม: ${analysis.score}\n\nขอบคุณที่ให้ความร่วมมือเป็นอย่างดี`,
         replyToMessageId: messageId,

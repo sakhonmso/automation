@@ -2,7 +2,7 @@ name: P4P Gmail Processor
 
 on:
   schedule:
-    - cron: "0 */2 * * *"   # every 2 hours
+    - cron: "0 * * * *"   # every 1 hour
   workflow_dispatch:          # also allow manual trigger from GitHub UI
 
 jobs:
