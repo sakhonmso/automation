@@ -176,7 +176,16 @@ function extractScoreFromRows(rows) {
     }
   }
   if (subCandidates.length > 0) {
-    return { score: Math.max(...subCandidates), method: "sub-total label row (col_1-3)" };
+    const subMax = Math.max(...subCandidates);
+    // Sanity-check: if the sheet has a larger number than any labeled sub-total row,
+    // the grand total is likely in a row whose label sits in col_4+ (not col_1-3).
+    // Prefer the sheet-wide max in that case.
+    const allNums = collectCandidates(rows);
+    const sheetMax = allNums.length > 0 ? Math.max(...allNums) : subMax;
+    if (sheetMax > subMax) {
+      return { score: sheetMax, method: "largest in sheet (exceeds sub-total label rows)" };
+    }
+    return { score: subMax, method: "sub-total label row (col_1-3)" };
   }
 
   // Step 3: largest valid number in the whole sheet
