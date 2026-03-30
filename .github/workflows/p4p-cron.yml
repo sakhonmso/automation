@@ -31,7 +31,22 @@ jobs:
           ANTHROPIC_API_KEY     : ${{ secrets.ANTHROPIC_API_KEY }}
           SUPABASE_URL          : ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY          : ${{ secrets.SUPABASE_KEY }}
-        run: node index.js
+          TELEGRAM_BOT_TOKEN    : ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID      : ${{ secrets.TELEGRAM_CHAT_ID }}
+          P4P_FOLDER_ID         : ${{ secrets.P4P_FOLDER_ID }}
+        # Retry once on transient network/API failures; cap at 25 min to stay under job timeout
+        run: |
+          for attempt in 1 2; do
+            echo "▶ Attempt $attempt"
+            node index.js && break
+            if [ $attempt -lt 2 ]; then
+              echo "⚠️ Attempt $attempt failed — retrying in 30s…"
+              sleep 30
+            else
+              echo "❌ All attempts failed."
+              exit 1
+            fi
+          done
 
       - name: Upload JSON results
         if: always()             # upload even if the run had errors

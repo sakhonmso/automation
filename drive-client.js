@@ -54,12 +54,17 @@ export function createDriveClient() {
   const auth  = createAuthClient();
   const drive = google.drive({ version: "v3", auth });
 
+  /** Escape a string for use inside a Drive API query (single-quote safe). */
+  function driveEscape(s) {
+    return s.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+  }
+
   /**
    * Find a folder by name within a parent. Returns its ID or null.
    */
   async function findFolder(name, parentId) {
     const res = await drive.files.list({
-      q        : `name='${name}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+      q        : `name='${driveEscape(name)}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
       fields   : "files(id, name)",
       pageSize : 5,
       supportsAllDrives: true,
@@ -117,7 +122,7 @@ export function createDriveClient() {
 
     // Check for an existing file with the same name in that folder
     const existing = await drive.files.list({
-      q        : `name='${fileName}' and '${folderId}' in parents and trashed=false`,
+      q        : `name='${driveEscape(fileName)}' and '${folderId}' in parents and trashed=false`,
       fields   : "files(id, modifiedTime)",
       pageSize : 2,
       supportsAllDrives: true,

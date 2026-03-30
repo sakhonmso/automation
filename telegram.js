@@ -30,6 +30,9 @@ function getConfig() {
 export async function sendTelegram(text, { parseMode } = {}) {
   const { token, chatId } = getConfig();
 
+  if (text.length > 4096) {
+    console.warn(`Telegram message truncated: ${text.length} → 4096 chars`);
+  }
   const body = {
     chat_id : chatId,
     text    : text.slice(0, 4096),   // Telegram hard limit

@@ -60,12 +60,27 @@ function similarity(a, b) {
   const shorter = tokA.length <= tokB.length ? tokA : tokB;
   const longer  = tokA.length <= tokB.length ? tokB : tokA;
   const allMatch = shorter.every((t) => longer.includes(t));
-  if (allMatch && shorter.length > 0) return 0.9;
+  // Require ≥ 2 tokens to avoid a single first-name token matching any physician
+  // with the same first name but a different last name (false-positive at 0.9).
+  if (allMatch && shorter.length >= 2) return 0.9;
 
   // Levenshtein-based similarity
   const maxLen = Math.max(na.length, nb.length);
   if (maxLen === 0) return 1.0;
   return 1 - levenshtein(na, nb) / maxLen;
+}
+
+// ── Date validator ─────────────────────────────────────────────────────────
+/**
+ * Returns true only for well-formed date keys: BE year 2400–2700, month 01–12.
+ * Catches "0000_01", "2569_13", "9999_99", etc.
+ */
+function isValidDate(date) {
+  if (!date) return false;
+  const m = date.match(/^(\d{4})_(\d{2})$/);
+  if (!m) return false;
+  const yr = parseInt(m[1], 10), mo = parseInt(m[2], 10);
+  return yr >= 2400 && yr <= 2700 && mo >= 1 && mo <= 12;
 }
 
 // ── Exports ────────────────────────────────────────────────────────────────
@@ -80,7 +95,7 @@ function similarity(a, b) {
  * @returns {Promise<{ matchedName: string, prefix: string, index: number|string, similarity: number } | null>}
  */
 export async function matchName(name, date, threshold = 0.6) {
-  if (!date || date.startsWith("0000") || date.endsWith("_00")) return null;
+  if (!isValidDate(date)) return null;
 
   const supabase = getSupabase();
   const { data, error } = await supabase
@@ -118,7 +133,7 @@ export async function matchName(name, date, threshold = 0.6) {
  * @param {number}        score  Score to save (float8)
  */
 export async function saveScore(date, index, score) {
-  if (!date || date.startsWith("0000") || date.endsWith("_00")) {
+  if (!isValidDate(date)) {
     throw new Error(`Cannot save score — invalid date key: "${date}"`);
   }
 

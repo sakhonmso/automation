@@ -264,7 +264,11 @@ export async function analyseJson(jsonData, filename = "data.json") {
       Object.entries(row).filter(([, v]) => v !== null)
     ));
 
-  const rowsJson = JSON.stringify(compactRows, null, 2).slice(0, 8000);
+  const fullJson = JSON.stringify(compactRows, null, 2);
+  if (fullJson.length > 8000) {
+    console.warn(`│        ⚠️  Row JSON truncated: ${fullJson.length} → 8000 chars (${compactRows.length} rows)`);
+  }
+  const rowsJson = fullJson.slice(0, 8000);
 
   const bodyPreview = body.trim().slice(0, 400); // trimmed — avoid injecting leading whitespace
 
@@ -296,7 +300,7 @@ Format: 2 decimal places, no commas.
 ${rowsJson}`;
 
   const message = await client.messages.create({
-    model     : "claude-opus-4-5-20251101",
+    model     : process.env.CLAUDE_MODEL || "claude-opus-4-5-20251101",
     max_tokens: 512,
     messages  : [{ role: "user", content: prompt }],
   });
@@ -320,10 +324,14 @@ ${rowsJson}`;
     throw new Error(`Missing or empty "name": ${raw}`);
   }
 
-  // Validate date format xxxx_xx
+  // Validate date format xxxx_xx and semantic range
   const date = parsed?.date;
   if (typeof date !== "string" || !/^\d{4}_\d{2}$/.test(date)) {
     throw new Error(`Invalid date format "${date}" — expected xxxx_xx: ${raw}`);
+  }
+  const [yr, mo] = date.split("_").map(Number);
+  if (yr < 2400 || yr > 2700 || mo < 1 || mo > 12) {
+    throw new Error(`Date "${date}" out of valid range (BE year 2400–2700, month 01–12): ${raw}`);
   }
 
   // Score: prefer Claude's answer; fall back to JS if Claude returns 0/null

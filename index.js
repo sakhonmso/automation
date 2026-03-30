@@ -51,6 +51,16 @@ function formatSize(bytes) {
   return `${(bytes / 1048576).toFixed(1)} MB`;
 }
 
+/** Escape user-derived strings before inserting into HTML to prevent XSS. */
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 // ── Excel loading ─────────────────────────────────────────────────────────
 
 /**
@@ -335,7 +345,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     ({ rows, allSheets, chosenSheet } = await firstSheetToRows(buffer));
   } catch (err) {
     console.error(`│        ❌  Failed to parse workbook: ${err.message}`);
-    await sendTelegram(formatErrorMessage(`Workbook parse failed: ${err.message}`, filename)).catch(() => {});
+    await sendTelegram(formatErrorMessage(`Workbook parse failed: ${err.message}`, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
     return false;
   }
 
@@ -347,7 +357,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
   if (rows.length === 0) {
     const msg = "Workbook parsed but contains no data rows — file may be empty or corrupt.";
     console.error(`│        ❌  ${msg}`);
-    await sendTelegram(formatErrorMessage(msg, filename)).catch(() => {});
+    await sendTelegram(formatErrorMessage(msg, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
     return false;
   }
 
@@ -357,7 +367,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
   if (nonNullCount < 3) {
     const msg = `Workbook has only ${nonNullCount} non-null cell(s) — likely corrupt or blank.`;
     console.error(`│        ❌  ${msg}`);
-    await sendTelegram(formatErrorMessage(msg, filename)).catch(() => {});
+    await sendTelegram(formatErrorMessage(msg, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
     return false;
   }
 
@@ -384,7 +394,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     console.log(`│        ✅  Score     : ${analysis.score}`);
   } catch (err) {
     console.error(`│        ❌  Claude analysis failed: ${err.message}`);
-    await sendTelegram(formatErrorMessage(err.message, filename)).catch(() => {});
+    await sendTelegram(formatErrorMessage(err.message, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
     return false;
   }
 
@@ -400,6 +410,8 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     }
   } catch (dbErr) {
     console.error(`│        ❌  Supabase match error: ${dbErr.message}`);
+    sendTelegram(formatErrorMessage(`Supabase match error: ${dbErr.message}`, filename))
+      .catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
   }
 
   // ── Upload to Google Drive (must succeed before saving score / archiving) ─
@@ -413,7 +425,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
       if (!uploadBuffer) {
         const msg = "First sheet is blank — Drive upload aborted.";
         console.warn(`│        ⚠️  ${msg}`);
-        await sendTelegram(formatErrorMessage(msg, filename)).catch(() => {});
+        await sendTelegram(formatErrorMessage(msg, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
         return false;
       }
 
@@ -428,7 +440,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
       console.error(`│        ❌  Drive upload failed: ${driveErr.message}`);
       await sendTelegram(
         formatErrorMessage(`Drive upload failed: ${driveErr.message}`, filename)
-      ).catch(() => {});
+      ).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
       return false;  // ← do not archive, do not save score
     }
   }
@@ -469,7 +481,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
       "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม",
     ];
     const [beYear, monthNum] = analysis.date.split("_");
-    const thaiMonth  = THAI_MONTHS[parseInt(monthNum, 10)] ?? monthNum;
+    const thaiMonth  = THAI_MONTHS[parseInt(monthNum, 10)] || monthNum;
     const displayDate = `${thaiMonth} ${beYear}`;
 
     // Build display name: "prefix firstname  lastname" (1 space after prefix, 2 between names)
@@ -479,8 +491,13 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     const spacedName = nameParts.length >= 2
       ? `${nameParts[0]}  ${nameParts.slice(1).join("  ")}`
       : baseName;
-    const displayName = `${prefix}${spacedName}`;
-    const department  = match?.department ?? "";
+    const displayName    = `${prefix}${spacedName}`;
+    const department     = match?.department ?? "";
+    // Escape all user-derived values before HTML interpolation (XSS prevention)
+    const safeDisplayName = escapeHtml(displayName);
+    const safeDepartment  = escapeHtml(department);
+    const safeDisplayDate = escapeHtml(displayDate);
+    const safeScore       = escapeHtml(analysis.score);
 
     const htmlReply = `<!DOCTYPE html>
 <html lang="th">
@@ -523,7 +540,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     </div>
   </div>
   <div class="body">
-    <p class="greeting">เรียน ${displayName}</p>
+    <p class="greeting">เรียน ${safeDisplayName}</p>
     <p class="intro">
       องค์กรแพทย์ โรงพยาบาลสมุทรสาคร ได้จัดเก็บไฟล์ P4P ของท่านแล้ว<br>
       ท่านสามารถตรวจสอบสถานะการส่งได้ที่
@@ -550,19 +567,19 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
       <table>
         <tr>
           <td>ชื่อแพทย์</td>
-          <td>${displayName}</td>
+          <td>${safeDisplayName}</td>
         </tr>
-        ${department ? `<tr>
+        ${safeDepartment ? `<tr>
           <td>กลุ่มงาน</td>
-          <td>${department}</td>
+          <td>${safeDepartment}</td>
         </tr>` : ""}
         <tr>
           <td>เดือน / ปี</td>
-          <td>${displayDate}</td>
+          <td>${safeDisplayDate}</td>
         </tr>
         <tr>
           <td>คะแนนรวม</td>
-          <td class="score-val">${analysis.score}</td>
+          <td class="score-val">${safeScore}</td>
         </tr>
       </table>
     </div>
@@ -582,7 +599,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
         to              : replyTo,
         subject         : `องค์กรแพทย์ รพ. สค.`,
         html            : htmlReply,
-        body            : `เรียน ${displayName}\n\nองค์กรแพทย์ โรงพยาบาลสมุทรสาคร ได้จัดเก็บไฟล์ P4P ของท่านแล้ว\n\nชื่อแพทย์: ${displayName}\nเดือน/ปี: ${displayDate}\nคะแนนรวม: ${analysis.score}\n\nขอบคุณที่ให้ความร่วมมือเป็นอย่างดี`,
+        body            : `เรียน ${displayName}\n\nองค์กรแพทย์ โรงพยาบาลสมุทรสาคร ได้จัดเก็บไฟล์ P4P ของท่านแล้ว\n\nชื่อแพทย์: ${displayName}\nเดือน/ปี: ${displayDate}\nคะแนนรวม: ${analysis.score}\n\nขอบคุณที่ให้ความร่วมมือเป็นอย่างดี`,  // plain text — no escaping needed
         replyToMessageId: messageId,
       });
       console.log(`│        ✅  Auto-reply sent to ${replyTo}`);
