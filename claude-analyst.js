@@ -300,7 +300,7 @@ Format: 2 decimal places, no commas.
 ${rowsJson}`;
 
   const message = await client.messages.create({
-    model     : process.env.CLAUDE_MODEL || "claude-sonnet-4-5-20251101",
+    model     : process.env.CLAUDE_MODEL || "claude-sonnet-4-5",
     max_tokens: 512,
     messages  : [{ role: "user", content: prompt }],
   });
