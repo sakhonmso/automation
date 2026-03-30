@@ -4,9 +4,13 @@
   "description": "Server-to-server Gmail API access via OAuth2 refresh token",
   "main": "index.js",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "setup": "node setup.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "test" : "node --test test/*.test.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

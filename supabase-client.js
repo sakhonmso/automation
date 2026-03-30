@@ -9,6 +9,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import "dotenv/config";
+import { SIMILARITY_THRESHOLD, SUPABASE_ROW_LIMIT } from "./config.js";
 
 // ── Singleton client ───────────────────────────────────────────────────────
 let _supabase = null;
@@ -22,14 +23,14 @@ function getSupabase() {
 }
 
 // ── Text normaliser ────────────────────────────────────────────────────────
-const normalise = (s) =>
+export const normalise = (s) =>
   String(s ?? "")
     .replace(/[\s\u00a0\u200b\u202f\u2009\u3000\ufeff]+/g, " ")
     .trim()
     .toLowerCase();
 
 // ── Levenshtein distance ───────────────────────────────────────────────────
-function levenshtein(a, b) {
+export function levenshtein(a, b) {
   const m = a.length, n = b.length;
   const dp = Array.from({ length: m + 1 }, (_, i) =>
     Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
@@ -49,7 +50,7 @@ function levenshtein(a, b) {
  * 1.0 = exact match, 0 = completely different.
  * Also awards partial credit when all tokens of the shorter name appear in the longer.
  */
-function similarity(a, b) {
+export function similarity(a, b) {
   const na = normalise(a);
   const nb = normalise(b);
   if (na === nb) return 1.0;
@@ -75,7 +76,7 @@ function similarity(a, b) {
  * Returns true only for well-formed date keys: BE year 2400–2700, month 01–12.
  * Catches "0000_01", "2569_13", "9999_99", etc.
  */
-function isValidDate(date) {
+export function isValidDate(date) {
   if (!date) return false;
   const m = date.match(/^(\d{4})_(\d{2})$/);
   if (!m) return false;
@@ -94,13 +95,14 @@ function isValidDate(date) {
  * @param {number} [threshold=0.6]  Minimum similarity to accept (0–1)
  * @returns {Promise<{ matchedName: string, prefix: string, index: number|string, similarity: number } | null>}
  */
-export async function matchName(name, date, threshold = 0.6) {
+export async function matchName(name, date, threshold = SIMILARITY_THRESHOLD) {
   if (!isValidDate(date)) return null;
 
   const supabase = getSupabase();
   const { data, error } = await supabase
     .from(date)
-    .select("index, firstname, lastname, prefix, department");
+    .select("index, firstname, lastname, prefix, department")
+    .limit(SUPABASE_ROW_LIMIT);
 
   if (error) throw new Error(`Supabase query error on table "${date}": ${error.message}`);
   if (!data || data.length === 0) return null;

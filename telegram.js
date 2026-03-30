@@ -8,6 +8,7 @@
  */
 
 import "dotenv/config";
+import { TELEGRAM_TIMEOUT_MS } from "./config.js";
 
 const BASE = "https://api.telegram.org";
 
@@ -39,11 +40,20 @@ export async function sendTelegram(text, { parseMode } = {}) {
     ...(parseMode ? { parse_mode: parseMode } : {}),
   };
 
-  const res = await fetch(`${BASE}/bot${token}/sendMessage`, {
-    method  : "POST",
-    headers : { "Content-Type": "application/json" },
-    body    : JSON.stringify(body),
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TELEGRAM_TIMEOUT_MS);
+
+  let res;
+  try {
+    res = await fetch(`${BASE}/bot${token}/sendMessage`, {
+      method  : "POST",
+      headers : { "Content-Type": "application/json" },
+      body    : JSON.stringify(body),
+      signal  : controller.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
 
   const json = await res.json();
   if (!json.ok) {

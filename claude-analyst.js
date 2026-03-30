@@ -10,6 +10,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import "dotenv/config";
+import { MAX_ROW_JSON_CHARS, CLAUDE_MAX_TOKENS } from "./config.js";
 
 // ── Singleton client ───────────────────────────────────────────────────────
 let _client = null;
@@ -38,7 +39,7 @@ function stripFences(str) {
  * Searches in priority order: filename → subject → body (most → least reliable).
  * Returns null if no year found.
  */
-function resolveBeYear(filename, subject, body) {
+export function resolveBeYear(filename, subject, body) {
   // Try each source independently, highest confidence first.
   // This prevents a day number in the body (e.g. "วันที่ 28") from
   // being misread as a short CE year (28 → 2028 → BE 2571).
@@ -49,24 +50,27 @@ function resolveBeYear(filename, subject, body) {
   ];
 
   for (const t of sources) {
+    // Use (?<!\d) / (?!\d) instead of \b so that underscore-delimited numbers
+    // in filenames like "P4P_2569_02.xlsx" are matched correctly.
+    // (\b does NOT fire between _ and a digit because _ is a \w character.)
+
     // 1. Full BE year: 25xx (2500–2599)
-    const mFullBE = t.match(/\b(25\d{2})\b/);
+    const mFullBE = t.match(/(?<!\d)(25\d{2})(?!\d)/);
     if (mFullBE) return parseInt(mFullBE[1], 10);
 
     // 2. Full CE year: 20xx (2000–2099)
-    const mFullCE = t.match(/\b(20\d{2})\b/);
+    const mFullCE = t.match(/(?<!\d)(20\d{2})(?!\d)/);
     if (mFullCE) return parseInt(mFullCE[1], 10) + 543;
 
     // 3. 2-digit 43–99 → short BE (e.g. 69 → 2569).
-    //    Negative lookbehind avoids matching last 2 digits of a 4-digit number.
-    const mShortBE = t.match(/(?<!\d)\b([4-9]\d)\b(?!\d)/);
+    const mShortBE = t.match(/(?<!\d)([4-9]\d)(?!\d)/);
     if (mShortBE) return 2500 + parseInt(mShortBE[1], 10);
 
     // 4. 2-digit 00–42 → short CE (e.g. 26 → 2026 → BE 2569).
     //    Only applied per-source so body day numbers don't pollute filename results.
     //    Skip if this source is the body (too noisy — day numbers are common).
     if (t !== body) {
-      const mShortCE = t.match(/(?<!\d)\b([0-3]\d)\b(?!\d)/);
+      const mShortCE = t.match(/(?<!\d)([0-3]\d)(?!\d)/);
       if (mShortCE) return 2000 + parseInt(mShortCE[1], 10) + 543;
     }
   }
@@ -138,7 +142,7 @@ function collectCandidates(rows) {
  * @param {object[]} rows
  * @returns {{ score: number|null, method: string }}
  */
-function extractScoreFromRows(rows) {
+export function extractScoreFromRows(rows) {
   if (!Array.isArray(rows) || rows.length === 0) {
     return { score: null, method: "no rows" };
   }
@@ -265,10 +269,10 @@ export async function analyseJson(jsonData, filename = "data.json") {
     ));
 
   const fullJson = JSON.stringify(compactRows, null, 2);
-  if (fullJson.length > 8000) {
-    console.warn(`│        ⚠️  Row JSON truncated: ${fullJson.length} → 8000 chars (${compactRows.length} rows)`);
+  if (fullJson.length > MAX_ROW_JSON_CHARS) {
+    console.warn(`│        ⚠️  Row JSON truncated: ${fullJson.length} → ${MAX_ROW_JSON_CHARS} chars (${compactRows.length} rows)`);
   }
-  const rowsJson = fullJson.slice(0, 8000);
+  const rowsJson = fullJson.slice(0, MAX_ROW_JSON_CHARS);
 
   const bodyPreview = body.trim().slice(0, 400); // trimmed — avoid injecting leading whitespace
 
@@ -301,7 +305,7 @@ ${rowsJson}`;
 
   const message = await client.messages.create({
     model     : process.env.CLAUDE_MODEL || "claude-sonnet-4-5",
-    max_tokens: 512,
+    max_tokens: CLAUDE_MAX_TOKENS,
     messages  : [{ role: "user", content: prompt }],
   });
 
@@ -356,5 +360,6 @@ ${rowsJson}`;
     }
   }
 
-  return { name: name.trim(), date, score: numeric.toFixed(2) };
+  // Return score as a number — callers format with .toFixed(2) for display
+  return { name: name.trim(), date, score: numeric };
 }

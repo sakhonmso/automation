@@ -14,8 +14,12 @@ import { createDriveClient }             from "./drive-client.js";
 import { analyseJson }                   from "./claude-analyst.js";
 import { matchName, saveScore }          from "./supabase-client.js";
 import { sendTelegram, formatResultMessage, formatErrorMessage } from "./telegram.js";
-import * as path                         from "path";
-import ExcelJS                           from "exceljs";
+import { buildHtmlReply }               from "./templates/reply.js";
+import { checkEnv }                     from "./env-check.js";
+import { MAX_MESSAGES, SKIP_SENDERS }   from "./config.js";
+import log                              from "./logger.js";
+import * as path                        from "path";
+import ExcelJS                          from "exceljs";
 import "dotenv/config";
 
 // Lazy Drive client — only initialised if P4P_FOLDER_ID is set
@@ -25,14 +29,6 @@ function getDrive() {
   if (!_drive) _drive = createDriveClient();
   return _drive;
 }
-
-const MAX_MESSAGES = 10;
-
-// Messages from these senders are ignored entirely
-const SKIP_SENDERS = new Set([
-  "sakhonmso@gmail.com",
-  "p4pskh@gmail.com",
-]);
 
 // MIME types AND extensions that we treat as Excel files (.xlsx only)
 const EXCEL_MIMETYPES = new Set([
@@ -62,6 +58,11 @@ function escapeHtml(s) {
 }
 
 // ── Excel loading ─────────────────────────────────────────────────────────
+// Note: both ExcelJS and JSZip are intentionally used together.
+//   • JSZip  — low-level ZIP/XML manipulation to strip formulas and extract
+//              a single sheet without re-encoding the whole workbook.
+//   • ExcelJS — high-level row/cell reading after the XML has been sanitised.
+// Replacing either library would require reimplementing the other's role.
 
 /**
  * Load any Excel buffer with ExcelJS and convert the FIRST sheet to row objects.
@@ -391,7 +392,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     analysis = await analyseJson(intermediate, filename);
     console.log(`│        ✅  Physician : ${analysis.name}`);
     console.log(`│        ✅  Date      : ${analysis.date}`);
-    console.log(`│        ✅  Score     : ${analysis.score}`);
+    console.log(`│        ✅  Score     : ${analysis.score.toFixed(2)}`);
   } catch (err) {
     console.error(`│        ❌  Claude analysis failed: ${err.message}`);
     await sendTelegram(formatErrorMessage(err.message, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
@@ -449,9 +450,9 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
   let scoreSaved = false;
   if (match) {
     try {
-      await saveScore(analysis.date, match.index, parseFloat(analysis.score));
+      await saveScore(analysis.date, match.index, analysis.score);
       scoreSaved = true;
-      console.log(`│        💾  Score ${analysis.score} saved → table "${analysis.date}", row ${match.index}`);
+      console.log(`│        💾  Score ${analysis.score.toFixed(2)} saved → table "${analysis.date}", row ${match.index}`);
     } catch (dbErr) {
       console.error(`│        ❌  Supabase save error: ${dbErr.message}`);
     }
@@ -465,7 +466,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
       matchedName: match?.matchedName ?? null,
       similarity : match?.similarity  ?? null,
       date       : analysis.date,
-      score      : analysis.score,
+      score      : analysis.score.toFixed(2),
       saved      : scoreSaved,
     }, filename));
     console.log(`│        ✅  Telegram message sent.`);
@@ -497,101 +498,9 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     const safeDisplayName = escapeHtml(displayName);
     const safeDepartment  = escapeHtml(department);
     const safeDisplayDate = escapeHtml(displayDate);
-    const safeScore       = escapeHtml(analysis.score);
+    const safeScore       = escapeHtml(analysis.score.toFixed(2));
 
-    const htmlReply = `<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:#e6f2ec;font-family:'Sarabun',sans-serif;font-size:15px;color:#1a2e22;padding:32px 16px}
-  .card{background:#fff;max-width:540px;margin:0 auto;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(5,104,57,.15)}
-  .header{background:linear-gradient(135deg,#056839,#0a8a4a);padding:28px 32px}
-  .header h1{color:#fff;font-size:19px;font-weight:600;letter-spacing:.2px}
-  .header p{color:#a8d5bc;font-size:13px;margin-top:5px;font-weight:400}
-  .body{padding:28px 32px}
-  .greeting{font-size:17px;color:#056839;font-weight:600;margin-bottom:14px}
-  .intro{line-height:1.8;color:#3a5a44;margin-bottom:22px;font-size:15px}
-  .line-btn{display:block;background:#06c755;border-radius:10px;padding:13px 20px;margin-bottom:24px;text-decoration:none}
-  .line-btn span{color:#fff;font-weight:600;font-size:14px;letter-spacing:.2px}
-  .detail-card{background:#eef7f2;border-left:4px solid #056839;border-radius:0 10px 10px 0;padding:18px 22px;margin-bottom:24px}
-  .detail-title{font-size:11.5px;font-weight:700;color:#6a9e7e;text-transform:uppercase;letter-spacing:.7px;margin-bottom:13px}
-  table{width:100%;border-collapse:collapse}
-  td{padding:9px 0;font-size:14px;vertical-align:middle}
-  td:first-child{color:#4a7a5a;width:42%}
-  td:last-child{font-weight:600;color:#033d21;text-align:right}
-  tr+tr td{border-top:1px solid #cce8d8}
-  .score-val{font-size:14px;color:#056839;font-weight:700}
-  .thanks{color:#3a5a44;line-height:1.8;font-size:15px;margin-bottom:8px}
-  .footer{border-top:1px solid #d4ebe0;padding:15px 32px;background:#f4fbf7;text-align:center;font-size:12px;color:#7aaa8a}
-</style>
-</head>
-<body>
-<div class="card">
-  <div class="header">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-      <div>
-        <h1>แจ้งผลการส่ง P4P ของแพทย์<br>โรงพยาบาลสมุทรสาคร</h1>
-        <p>อีเมลตอบกลับอัตโนมัติ</p>
-      </div>
-    </div>
-  </div>
-  <div class="body">
-    <p class="greeting">เรียน ${safeDisplayName}</p>
-    <p class="intro">
-      องค์กรแพทย์ โรงพยาบาลสมุทรสาคร ได้จัดเก็บไฟล์ P4P ของท่านแล้ว<br>
-      ท่านสามารถตรวจสอบสถานะการส่งได้ที่
-    </p>
-    <a href="https://line.me/R/ti/p/%40703emfui" class="line-btn">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td align="center" valign="middle">
-            <table cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td valign="middle">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" width="28" height="28" alt="LINE" style="display:block;border-radius:6px;background:#fff;padding:2px"/>
-                </td>
-                <td width="12"></td>
-                <td valign="middle" style="color:#fff;font-weight:600;font-size:14px;letter-spacing:.2px;white-space:nowrap">LINE OA : SAKHONMSO</td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
-    </a>
-    <div class="detail-card">
-      <div class="detail-title">รายละเอียดไฟล์</div>
-      <table>
-        <tr>
-          <td>ชื่อแพทย์</td>
-          <td>${safeDisplayName}</td>
-        </tr>
-        ${safeDepartment ? `<tr>
-          <td>กลุ่มงาน</td>
-          <td>${safeDepartment}</td>
-        </tr>` : ""}
-        <tr>
-          <td>เดือน / ปี</td>
-          <td>${safeDisplayDate}</td>
-        </tr>
-        <tr>
-          <td>คะแนนรวม</td>
-          <td class="score-val">${safeScore}</td>
-        </tr>
-      </table>
-    </div>
-    <p class="thanks">ขอบคุณที่ให้ความร่วมมือเป็นอย่างดี</p>
-    <p style="margin-top:18px;font-size:13px;color:#7a9a82;line-height:1.7;border-top:1px solid #d4ebe0;padding-top:16px;font-style:italic">
-      <strong style="color:#056839;font-style:normal">หมายเหตุ</strong> หากท่านส่งไฟล์ฉบับแก้ไข หรือส่งไฟล์เดิมซ้ำ ระบบจะจัดเก็บไฟล์ใหม่นี้ แทนที่ไฟล์ของเดิม ทั้งนี้ เมื่อมีการเซ็นชื่อแล้ว จะไม่สามารถเปลี่ยนแปลงข้อมูลได้
-    </p>
-  </div>
-  <div class="footer">อีเมลนี้เป็นระบบตอบกลับอัตโนมัติ กรุณาอย่าตอบกลับ</div>
-</div>
-</body>
-</html>`;
+    const htmlReply = buildHtmlReply({ displayName: safeDisplayName, safeDepartment, safeDisplayDate, safeScore });
 
     console.log(`│        📧  Sending auto-reply to ${replyTo}…`);
     try {
@@ -599,7 +508,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
         to              : replyTo,
         subject         : `องค์กรแพทย์ รพ. สค.`,
         html            : htmlReply,
-        body            : `เรียน ${displayName}\n\nองค์กรแพทย์ โรงพยาบาลสมุทรสาคร ได้จัดเก็บไฟล์ P4P ของท่านแล้ว\n\nชื่อแพทย์: ${displayName}\nเดือน/ปี: ${displayDate}\nคะแนนรวม: ${analysis.score}\n\nขอบคุณที่ให้ความร่วมมือเป็นอย่างดี`,  // plain text — no escaping needed
+        body            : `เรียน ${displayName}\n\nองค์กรแพทย์ โรงพยาบาลสมุทรสาคร ได้จัดเก็บไฟล์ P4P ของท่านแล้ว\n\nชื่อแพทย์: ${displayName}\nเดือน/ปี: ${displayDate}\nคะแนนรวม: ${analysis.score.toFixed(2)}\n\nขอบคุณที่ให้ความร่วมมือเป็นอย่างดี`,  // plain text — no escaping needed
         replyToMessageId: messageId,
       });
       console.log(`│        ✅  Auto-reply sent to ${replyTo}`);
@@ -613,7 +522,39 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
 
 // ── Main ──────────────────────────────────────────────────────────────────
 
+/**
+ * Download and process a single Excel attachment through the full pipeline.
+ * Extracted so multiple attachments can be processed in parallel via Promise.allSettled.
+ */
+async function processAttachment(att, messageId, context, gmail) {
+  const excel = isExcelFile(att.mimeType, att.filename);
+
+  console.log(`│`);
+  console.log(`│      • ${att.filename}`);
+  console.log(`│        MIME type : ${att.mimeType}`);
+  console.log(`│        Size      : ${formatSize(att.size)}`);
+  console.log(`│        Excel?    : ${excel ? "✅  Yes" : "❌  No — skipping"}`);
+
+  if (!excel) return false;
+
+  let buffer;
+  try {
+    buffer = await gmail.downloadAttachment(messageId, att.attachmentId);
+  } catch (err) {
+    console.error(`│        ❌  Download failed: ${err.message}`);
+    return false;
+  }
+
+  return processBuffer(buffer, { ...context, filename: att.filename, gmail });
+}
+
 async function main() {
+  // Fail fast if any required env var is missing
+  const { absentOptional } = checkEnv();
+  if (absentOptional.length > 0) {
+    log.info(`Optional env vars not set: ${absentOptional.join(", ")}`);
+  }
+
   const gmail = createGmailClient();
 
   // ── Resolve "เอกสาร P4P" label ID once ───────────────────────────────
@@ -683,36 +624,24 @@ async function main() {
     } else {
       console.log(`│  📎  ${attachments.length} attachment(s):`);
 
-      for (const att of attachments) {
-        const excel = isExcelFile(att.mimeType, att.filename);
-
-        console.log(`│`);
-        console.log(`│      • ${att.filename}`);
-        console.log(`│        MIME type : ${att.mimeType}`);
-        console.log(`│        Size      : ${formatSize(att.size)}`);
-        console.log(`│        Excel?    : ${excel ? "✅  Yes" : "❌  No — skipping"}`);
-
-        if (!excel) continue;
-
-        let buffer;
-        try {
-          buffer = await gmail.downloadAttachment(id, att.attachmentId);
-        } catch (err) {
-          console.error(`│        ❌  Download failed: ${err.message}`);
-          continue;
+      // Process all Excel attachments in parallel — faster for messages with multiple files
+      const context = {
+        subject  : msg.subject,
+        body     : msg.body.trim(),
+        replyTo  : msg.from,
+        messageId: id,
+      };
+      const results = await Promise.allSettled(
+        attachments.map((att) => processAttachment(att, id, context, gmail))
+      );
+      processedAnyAttachment = results.some(
+        (r) => r.status === "fulfilled" && r.value === true
+      );
+      results.forEach((r, idx) => {
+        if (r.status === "rejected") {
+          console.error(`│      ❌  Attachment[${idx}] threw: ${r.reason?.message ?? r.reason}`);
         }
-
-        const succeeded = await processBuffer(buffer, {
-          subject  : msg.subject,
-          body     : msg.body.trim(),
-          filename : att.filename,
-          replyTo  : msg.from,
-          messageId: id,
-          gmail,
-        });
-
-        if (succeeded) processedAnyAttachment = true;
-      }
+      });
     }
 
     // ── Mark message: read + starred + labeled ────────────────────────
