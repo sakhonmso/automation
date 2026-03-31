@@ -632,10 +632,13 @@ async function main() {
       console.log(`│  📎  ${attachments.length} attachment(s):`);
 
       // Process all Excel attachments in parallel — faster for messages with multiple files
+      // Use fromEmail (plain addr) not msg.from (full header) for replyTo —
+      // the full From: header can contain RFC 2047-encoded display names in many
+      // formats; using just the address avoids any encoding issue in To: header.
       const context = {
         subject  : msg.subject,
         body     : msg.body.trim(),
-        replyTo  : msg.from,
+        replyTo  : fromEmail,
         messageId: id,
       };
       const results = await Promise.allSettled(
