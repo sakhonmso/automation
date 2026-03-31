@@ -20,7 +20,10 @@ import { MAX_MESSAGES, SKIP_SENDERS }   from "./config.js";
 import log                              from "./logger.js";
 import * as path                        from "path";
 import ExcelJS                          from "exceljs";
-import "dotenv/config";
+// override:true ensures .env values win over stale system-level env vars
+// (e.g. ANTHROPIC_API_KEY="" set at OS level would otherwise shadow the real key)
+import { config as dotenvConfig } from "dotenv";
+dotenvConfig({ override: true });
 
 // Lazy Drive client — only initialised if P4P_FOLDER_ID is set
 let _drive = null;

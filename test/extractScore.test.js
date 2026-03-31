@@ -54,3 +54,15 @@ test("grand-total label beats sub-total", () => {
   assert.equal(score, 11011.5);
   assert.match(method, /grand-total/);
 });
+
+test("extracts score when label and number share one cell", () => {
+  // Real-world case: cell V75 = "รวมทั้งหมด  = 11011.5"
+  // Other row data includes unrelated numbers (2200 threshold, day numbers)
+  const rows = [
+    { col_1: "เกณฑ์ขั้นต้น 2200 คะแนน" },
+    { col_22: "รวมทั้งหมด  = 11011.5", col_3: "รับรองว่าผลถูกต้อง" },
+  ];
+  const { score, method } = extractScoreFromRows(rows);
+  assert.equal(score, 11011.5);
+  assert.match(method, /grand-total/);
+});

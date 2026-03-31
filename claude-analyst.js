@@ -93,6 +93,17 @@ const SUBTOTAL_LABELS = [
 // Combined for weight×day fallback (avoid importing twice)
 const TOTAL_LABELS = [...GRAND_TOTAL_LABELS, ...SUBTOTAL_LABELS];
 
+/**
+ * Extract all positive, non-year numbers embedded in a mixed text+number string.
+ * Handles cells like "รวมทั้งหมด  = 11011.5" where label and score share one cell.
+ */
+function numsFromText(val) {
+  const s = String(val ?? "").replace(/,/g, "");
+  return [...s.matchAll(/\d+(?:\.\d+)?/g)]
+    .map((m) => parseFloat(m[0]))
+    .filter((n) => !isNaN(n) && n > 0 && !isYearLike(n));
+}
+
 /** Coerce any cell value to a number. Returns NaN if not numeric. */
 function toNum(val) {
   if (val === null || val === undefined || val === "") return NaN;
@@ -152,12 +163,16 @@ export function extractScoreFromRows(rows) {
   const grandCandidates = [];
   for (const row of rows) {
     const allValues = Object.values(row).map((v) => String(v ?? ""));
-    const hasGrandLabel = allValues.some((s) =>
+    const labelCells = allValues.filter((s) =>
       GRAND_TOTAL_LABELS.some((label) => s.includes(label))
     );
-    if (hasGrandLabel) {
+    if (labelCells.length > 0) {
       const nums = collectCandidates([row]);
-      grandCandidates.push(...nums);
+      // Also extract numbers embedded inside the label cells themselves.
+      // Handles the case where label and score share one cell, e.g.:
+      //   "รวมทั้งหมด  = 11011.5"
+      const embedded = labelCells.flatMap((s) => numsFromText(s));
+      grandCandidates.push(...nums, ...embedded);
     }
   }
   if (grandCandidates.length > 0) {
