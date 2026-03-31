@@ -6,7 +6,6 @@
  */
 
 import { google } from "googleapis";
-import "dotenv/config";
 
 // ── Build a pre-authorised OAuth2 client ──────────────────────────────────
 function createAuthClient() {
