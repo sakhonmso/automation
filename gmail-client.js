@@ -123,6 +123,21 @@ export function createGmailClient() {
         ? `=?utf-8?B?${Buffer.from(str, "utf8").toString("base64")}?=`
         : str;
 
+    // Encode an address header (To:/From:) correctly per RFC 2047.
+    // Only the display name is encoded — the <addr> part must stay literal,
+    // otherwise Gmail rejects the message with "Invalid To header".
+    // e.g. "สมชาย <dr@hosp.com>" → "=?utf-8?B?...?= <dr@hosp.com>"
+    // e.g. "dr@hosp.com"         → "dr@hosp.com"  (no encoding needed)
+    const encodeAddressHeader = (str) => {
+      const m = str.match(/^(.*?)\s*<([^>]+)>\s*$/);
+      if (m) {
+        const name = m[1].trim();
+        const addr = m[2].trim();
+        return name ? `${encodeHeader(name)} <${addr}>` : `<${addr}>`;
+      }
+      return str; // plain address — no encoding needed
+    };
+
     // Build MIME message — multipart/alternative when both html and plain text provided,
     // single part otherwise
     let mimeBody;
@@ -132,9 +147,9 @@ export function createGmailClient() {
       mimeBody = [
         `MIME-Version: 1.0`,
         `Content-Type: multipart/alternative; boundary="${boundary}"`,
-        `To: ${encodeHeader(to)}`,
+        `To: ${encodeAddressHeader(to)}`,
         `Subject: ${encodeHeader(subject)}`,
-        ...(from ? [`From: ${encodeHeader(from)}`] : []),
+        ...(from ? [`From: ${encodeAddressHeader(from)}`] : []),
       ];
 
       let threadId;
@@ -176,13 +191,13 @@ export function createGmailClient() {
 
     // Plain-text fallback (original path)
     const headerLines = [
-      `To: ${encodeHeader(to)}`,
+      `To: ${encodeAddressHeader(to)}`,
       `Subject: ${encodeHeader(subject)}`,
       "Content-Type: text/plain; charset=utf-8",
       "MIME-Version: 1.0",
     ];
 
-    if (from) headerLines.push(`From: ${encodeHeader(from)}`);
+    if (from) headerLines.push(`From: ${encodeAddressHeader(from)}`);
 
     let threadId;
     if (replyToMessageId) {
