@@ -30,12 +30,15 @@ function getConfig() {
 export async function sendTelegram(text, { parseMode } = {}) {
   const { token, chatId } = getConfig();
 
-  if (text.length > 4096) {
-    console.warn(`Telegram message truncated: ${text.length} → 4096 chars`);
+  // Guard against null/undefined — avoids TypeError on .length and .slice
+  const safeText = String(text ?? "");
+
+  if (safeText.length > 4096) {
+    console.warn(`Telegram message truncated: ${safeText.length} → 4096 chars`);
   }
   const body = {
     chat_id : chatId,
-    text    : text.slice(0, 4096),   // Telegram hard limit
+    text    : safeText.slice(0, 4096),   // Telegram hard limit
     ...(parseMode ? { parse_mode: parseMode } : {}),
   };
 
@@ -74,16 +77,17 @@ export function formatResultMessage(result, filename) {
     : "";
   const saved = result.saved ? "✅ Score saved to DB" : "⚠️ Score NOT saved";
 
+  // Plain text mode (no parseMode) — do NOT use *markdown* as it renders literally
   return [
-    `📋 *P4P Workload Report*`,
+    `📋 P4P Workload Report`,
     ``,
-    `👤 Name     : ${result.name}`,
+    `👤 Name     : ${result.name ?? "—"}`,
     `🔗 Matched  : ${result.matchedName ?? "—"}${sim}`,
-    `📅 Date     : ${result.date}`,
-    `🏅 Score    : ${result.score}`,
+    `📅 Date     : ${result.date ?? "—"}`,
+    `🏅 Score    : ${result.score ?? "—"}`,
     `💾 ${saved}`,
     ``,
-    `📎 File: ${filename}`,
+    `📎 File: ${filename ?? "(unknown)"}`,
   ].join("\n");
 }
 
@@ -92,9 +96,9 @@ export function formatResultMessage(result, filename) {
  */
 export function formatErrorMessage(error, filename) {
   return [
-    `❌ *P4P Processing Error*`,
+    `❌ P4P Processing Error`,
     ``,
-    `📎 File : ${filename}`,
-    `💬 Error: ${error}`,
+    `📎 File : ${filename ?? "(unknown)"}`,
+    `💬 Error: ${error ?? "unknown error"}`,
   ].join("\n");
 }

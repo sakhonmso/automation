@@ -6,10 +6,12 @@
  */
 
 /** Maximum number of Gmail messages fetched per run. */
-export const MAX_MESSAGES = parseInt(process.env.MAX_MESSAGES ?? "10", 10);
+const _maxMsg = parseInt(process.env.MAX_MESSAGES ?? "10", 10);
+export const MAX_MESSAGES = Number.isFinite(_maxMsg) && _maxMsg > 0 ? _maxMsg : 10;
 
 /** Minimum Levenshtein similarity (0–1) to accept a physician name match. */
-export const SIMILARITY_THRESHOLD = parseFloat(process.env.SIMILARITY_THRESHOLD ?? "0.6");
+const _simThr = parseFloat(process.env.SIMILARITY_THRESHOLD ?? "0.6");
+export const SIMILARITY_THRESHOLD = Number.isFinite(_simThr) && _simThr >= 0 && _simThr <= 1 ? _simThr : 0.6;
 
 /** Maximum characters of compact row JSON sent to Claude. */
 export const MAX_ROW_JSON_CHARS = 8_000;

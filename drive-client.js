@@ -21,7 +21,8 @@
  *     (b) share the P4P folder with the OAuth account as Editor.
  */
 
-import { google } from "googleapis";
+import { google }   from "googleapis";
+import { Readable } from "stream";
 
 // ── Thai month folder names (match the Drive folder names exactly) ─────────
 const MONTH_FOLDER_NAMES = {
@@ -153,7 +154,6 @@ export function createDriveClient() {
 }
 
 // ── Helper: convert Buffer to a Node.js Readable stream ───────────────────
-import { Readable } from "stream";
 function bufferToReadable(buf) {
   const r = new Readable();
   r.push(buf);

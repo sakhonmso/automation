@@ -141,6 +141,9 @@ export async function saveScore(date, index, score) {
   if (index === null || index === undefined) {
     throw new Error(`Cannot save score — index is ${index}`);
   }
+  if (!Number.isFinite(score)) {
+    throw new Error(`Cannot save score — value is not a finite number: ${score}`);
+  }
 
   const supabase = getSupabase();
   const { error } = await supabase

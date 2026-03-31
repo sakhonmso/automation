@@ -5,7 +5,8 @@
  * Automatically refreshes the access token as needed — no browser involved.
  */
 
-import { google } from "googleapis";
+import { google }   from "googleapis";
+import { Readable } from "stream";
 
 // ── Build a pre-authorised OAuth2 client ──────────────────────────────────
 function createAuthClient() {
@@ -138,13 +139,32 @@ export function createGmailClient() {
       return str; // plain address — no encoding needed
     };
 
+    // Resolve thread ID and add In-Reply-To/References headers for thread replies.
+    // Extracted to avoid duplicating the same fetch logic in both send paths.
+    async function resolveThreadHeaders(headerLines) {
+      if (!replyToMessageId) return null;
+      const orig = await getMessage(replyToMessageId, "metadata");
+      const origHeaders = Object.fromEntries(
+        (orig.payload?.headers ?? []).map((h) => [h.name.toLowerCase(), h.value])
+      );
+      const msgId = origHeaders["message-id"];
+      const refs  = origHeaders["references"];
+      if (msgId) {
+        headerLines.push(`In-Reply-To: ${msgId}`);
+        headerLines.push(`References: ${refs ? refs + " " + msgId : msgId}`);
+      }
+      return orig.threadId ?? null;
+    }
+
     // Build MIME message — multipart/alternative when both html and plain text provided,
-    // single part otherwise
-    let mimeBody;
+    // single part otherwise.
+    // Content-Transfer-Encoding: 8bit declares that parts contain UTF-8 (8-bit) bytes.
+    // Without it the implicit encoding is 7bit (ASCII only), which can corrupt Thai text
+    // in email clients that strictly follow RFC 2822.
     if (html) {
       const boundary = `boundary_${Date.now().toString(36)}`;
       const plainText = body || "กรุณาเปิดอีเมลด้วยโปรแกรมที่รองรับ HTML";
-      mimeBody = [
+      const headerLines = [
         `MIME-Version: 1.0`,
         `Content-Type: multipart/alternative; boundary="${boundary}"`,
         `To: ${encodeAddressHeader(to)}`,
@@ -152,27 +172,16 @@ export function createGmailClient() {
         ...(from ? [`From: ${encodeAddressHeader(from)}`] : []),
       ];
 
-      let threadId;
-      if (replyToMessageId) {
-        const orig = await getMessage(replyToMessageId, "metadata");
-        threadId = orig.threadId;
-        const origHeaders = Object.fromEntries(
-          (orig.payload?.headers ?? []).map((h) => [h.name.toLowerCase(), h.value])
-        );
-        const msgId = origHeaders["message-id"];
-        const refs  = origHeaders["references"];
-        if (msgId) {
-          mimeBody.push(`In-Reply-To: ${msgId}`);
-          mimeBody.push(`References: ${refs ? refs + " " + msgId : msgId}`);
-        }
-      }
+      const threadId = await resolveThreadHeaders(headerLines);
 
-      mimeBody = mimeBody.join("\r\n") + "\r\n\r\n"
+      const mimeBody = headerLines.join("\r\n") + "\r\n\r\n"
         + `--${boundary}\r\n`
-        + `Content-Type: text/plain; charset=utf-8\r\n\r\n`
+        + `Content-Type: text/plain; charset=utf-8\r\n`
+        + `Content-Transfer-Encoding: 8bit\r\n\r\n`
         + plainText + "\r\n"
         + `--${boundary}\r\n`
-        + `Content-Type: text/html; charset=utf-8\r\n\r\n`
+        + `Content-Type: text/html; charset=utf-8\r\n`
+        + `Content-Transfer-Encoding: 8bit\r\n\r\n`
         + html + "\r\n"
         + `--${boundary}--`;
 
@@ -189,30 +198,18 @@ export function createGmailClient() {
       return res.data;
     }
 
-    // Plain-text fallback (original path)
+    // Plain-text fallback
     const headerLines = [
+      `MIME-Version: 1.0`,
+      `Content-Type: text/plain; charset=utf-8`,
+      `Content-Transfer-Encoding: 8bit`,
       `To: ${encodeAddressHeader(to)}`,
       `Subject: ${encodeHeader(subject)}`,
-      "Content-Type: text/plain; charset=utf-8",
-      "MIME-Version: 1.0",
     ];
 
     if (from) headerLines.push(`From: ${encodeAddressHeader(from)}`);
 
-    let threadId;
-    if (replyToMessageId) {
-      const orig = await getMessage(replyToMessageId, "metadata");
-      threadId = orig.threadId;
-      const origHeaders = Object.fromEntries(
-        (orig.payload?.headers ?? []).map((h) => [h.name.toLowerCase(), h.value])
-      );
-      const msgId = origHeaders["message-id"];
-      const refs  = origHeaders["references"];
-      if (msgId) {
-        headerLines.push(`In-Reply-To: ${msgId}`);
-        headerLines.push(`References: ${refs ? refs + " " + msgId : msgId}`);
-      }
-    }
+    const threadId = await resolveThreadHeaders(headerLines);
 
     const raw = Buffer.from(headerLines.join("\r\n") + "\r\n\r\n" + body)
       .toString("base64")

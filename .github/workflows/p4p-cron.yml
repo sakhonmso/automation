@@ -35,7 +35,10 @@ jobs:
           TELEGRAM_CHAT_ID      : ${{ secrets.TELEGRAM_CHAT_ID }}
           P4P_FOLDER_ID         : ${{ secrets.P4P_FOLDER_ID }}
         # Retry once on transient network/API failures; cap at 25 min to stay under job timeout
+        # set -o pipefail: makes the pipeline exit code reflect node's exit code, not tee's.
+        # Without it, `node ... | tee run.log && break` always breaks because tee exits 0.
         run: |
+          set -o pipefail
           for attempt in 1 2; do
             echo "▶ Attempt $attempt"
             node index.js 2>&1 | tee run.log && break

@@ -637,7 +637,7 @@ async function main() {
       // formats; using just the address avoids any encoding issue in To: header.
       const context = {
         subject  : msg.subject,
-        body     : msg.body.trim(),
+        body     : msg.body?.trim() ?? "",
         replyTo  : fromEmail,
         messageId: id,
       };
