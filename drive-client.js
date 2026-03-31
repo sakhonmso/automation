@@ -22,7 +22,6 @@
  */
 
 import { google } from "googleapis";
-import "dotenv/config";
 
 // ── Thai month folder names (match the Drive folder names exactly) ─────────
 const MONTH_FOLDER_NAMES = {

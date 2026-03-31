@@ -25,6 +25,13 @@ import ExcelJS                          from "exceljs";
 import { config as dotenvConfig } from "dotenv";
 dotenvConfig({ override: true });
 
+// Thai month names for auto-reply display (index 0 unused; 1 = January … 12 = December)
+const THAI_MONTHS = [
+  "", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน",
+  "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม",
+  "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม",
+];
+
 // Lazy Drive client — only initialised if P4P_FOLDER_ID is set
 let _drive = null;
 function getDrive() {
@@ -41,6 +48,7 @@ const EXCEL_MIMETYPES = new Set([
 
 function isExcelFile(mimeType, filename) {
   if (EXCEL_MIMETYPES.has(mimeType)) return true;
+  if (!filename) return false;
   return path.extname(filename).toLowerCase() === ".xlsx";
 }
 
@@ -414,7 +422,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     }
   } catch (dbErr) {
     console.error(`│        ❌  Supabase match error: ${dbErr.message}`);
-    sendTelegram(formatErrorMessage(`Supabase match error: ${dbErr.message}`, filename))
+    await sendTelegram(formatErrorMessage(`Supabase match error: ${dbErr.message}`, filename))
       .catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
   }
 
@@ -479,11 +487,6 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
 
   // ── Auto-reply to sender ──────────────────────────────────────────────
   if (replyTo && messageId) {
-    const THAI_MONTHS = [
-      "", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน",
-      "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม",
-      "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม",
-    ];
     const [beYear, monthNum] = analysis.date.split("_");
     const thaiMonth  = THAI_MONTHS[parseInt(monthNum, 10)] || monthNum;
     const displayDate = `${thaiMonth} ${beYear}`;
@@ -605,8 +608,9 @@ async function main() {
     const { id } = messages[i];
     const { msg, attachments } = await gmail.getMessageWithAttachments(id);
 
-    const bodyPreview = msg.body.trim();
-    const fromEmail   = (msg.from.match(/<(.+?)>/) ?? [, msg.from])[1].trim().toLowerCase();
+    const bodyPreview = msg.body?.trim() ?? "";
+    const fromRaw     = msg.from ?? "";
+    const fromEmail   = (fromRaw.match(/<(.+?)>/) ?? [, fromRaw])[1].trim().toLowerCase();
 
     console.log(`┌─ [${i + 1}/${messages.length}] ──────────────────────────────────────────`);
     console.log(`│  Date:     ${msg.date}`);

@@ -9,7 +9,6 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import "dotenv/config";
 import { MAX_ROW_JSON_CHARS, CLAUDE_MAX_TOKENS } from "./config.js";
 
 // ── Singleton client ───────────────────────────────────────────────────────
@@ -93,6 +92,11 @@ const SUBTOTAL_LABELS = [
 // Combined for weight×day fallback (avoid importing twice)
 const TOTAL_LABELS = [...GRAND_TOTAL_LABELS, ...SUBTOTAL_LABELS];
 
+/** True if n looks like a calendar year and not a score. */
+function isYearLike(n) {
+  return (n >= 1900 && n <= 2099) || (n >= 2400 && n <= 2699);
+}
+
 /**
  * Extract all positive, non-year numbers embedded in a mixed text+number string.
  * Handles cells like "รวมทั้งหมด  = 11011.5" where label and score share one cell.
@@ -114,11 +118,6 @@ function toNum(val) {
   // which looks like a CE year but slips through isYearLike for out-of-range dates
   if (/^\d{4}-\d{2}-\d{2}/.test(s)) return NaN;
   return parseFloat(s.replace(/,/g, ""));
-}
-
-/** True if n looks like a calendar year and not a score. */
-function isYearLike(n) {
-  return (n >= 1900 && n <= 2099) || (n >= 2400 && n <= 2699);
 }
 
 /**
@@ -251,7 +250,7 @@ export function extractScoreFromRows(rows) {
 /**
  * @param {object} jsonData  { _email_subject, _email_body, _source_file, rows[] }
  * @param {string} filename
- * @returns {Promise<{ name: string, date: string, score: string }>}
+ * @returns {Promise<{ name: string, date: string, score: number }>}
  */
 export async function analyseJson(jsonData, filename = "data.json") {
   const client  = getClient();

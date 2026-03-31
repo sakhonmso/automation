@@ -8,7 +8,6 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
-import "dotenv/config";
 import { SIMILARITY_THRESHOLD, SUPABASE_ROW_LIMIT } from "./config.js";
 
 // ── Singleton client ───────────────────────────────────────────────────────
@@ -120,6 +119,7 @@ export async function matchName(name, date, threshold = SIMILARITY_THRESHOLD) {
         index      : row.index,
         similarity : sim,
       };
+      if (sim === 1.0) break; // exact match — no need to scan remaining rows
     }
   }
 
@@ -137,6 +137,9 @@ export async function matchName(name, date, threshold = SIMILARITY_THRESHOLD) {
 export async function saveScore(date, index, score) {
   if (!isValidDate(date)) {
     throw new Error(`Cannot save score — invalid date key: "${date}"`);
+  }
+  if (index === null || index === undefined) {
+    throw new Error(`Cannot save score — index is ${index}`);
   }
 
   const supabase = getSupabase();

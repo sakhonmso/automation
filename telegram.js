@@ -7,7 +7,6 @@
  *   TELEGRAM_CHAT_ID    — your chat/group/channel ID
  */
 
-import "dotenv/config";
 import { TELEGRAM_TIMEOUT_MS } from "./config.js";
 
 const BASE = "https://api.telegram.org";
