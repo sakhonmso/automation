@@ -35,7 +35,7 @@ function stripFences(str) {
 
 /**
  * Extract and convert any year expression to a 4-digit BE year.
- * Searches in priority order: filename → subject → body (most → least reliable).
+ * Searches in priority order: subject → body → filename (most → least reliable).
  * Returns null if no year found.
  */
 export function resolveBeYear(filename, subject, body) {
@@ -43,9 +43,9 @@ export function resolveBeYear(filename, subject, body) {
   // This prevents a day number in the body (e.g. "วันที่ 28") from
   // being misread as a short CE year (28 → 2028 → BE 2571).
   const sources = [
-    filename ?? "",
     subject  ?? "",
     body     ?? "",
+    filename ?? "",
   ];
 
   for (const t of sources) {
@@ -72,6 +72,74 @@ export function resolveBeYear(filename, subject, body) {
       const mShortCE = t.match(/(?<!\d)([0-3]\d)(?!\d)/);
       if (mShortCE) return 2000 + parseInt(mShortCE[1], 10) + 543;
     }
+  }
+
+  return null;
+}
+
+// ── JS-side physician name resolver ───────────────────────────────────────
+// Thai title prefixes to strip before returning a name
+const TITLE_PREFIX_RE = /^(?:นพ\.|พญ\.|นายแพทย์\s*|แพทย์หญิง\s*|ทพ\.|ทพญ\.|ดร\.|Dr\.\s*|Prof\.\s*|Mr\.\s*|Mrs\.\s*)/;
+
+// Thai words that are not physician names (common non-name tokens in filenames/subjects)
+const NON_NAME_THAI = new Set([
+  "P4P", "เดือน", "ปี", "แพทย์", "โรงพยาบาล", "รพ", "ผลงาน", "คะแนน",
+  "แต้ม", "รวม", "ข้อมูล", "ส่ง", "ไฟล์", "สค", "สมุทรสาคร", "องค์กร",
+  "ฝ่าย", "กลุ่ม", "งาน", "ประจำ", "ทำงาน",
+]);
+
+/**
+ * Try to extract "firstname lastname" from a single text string.
+ * Strategy:
+ *   1. Title prefix + two Thai words  (most reliable — "นพ.สมชาย ใจดี")
+ *   2. Two consecutive Thai words separated by space/underscore/dash
+ *      (filename pattern — "สมชาย_ใจดี.xlsx")
+ * Returns "firstname lastname" with no title, or null.
+ */
+function extractNameFromText(text) {
+  if (!text) return null;
+
+  // Pattern 1: recognised title prefix immediately followed by two Thai words
+  const titleRe = /(?:นพ\.|พญ\.|นายแพทย์|แพทย์หญิง|ทพ\.|ทพญ\.|ดร\.)\s*([\u0E00-\u0E7F]{2,})\s+([\u0E00-\u0E7F]{2,})/;
+  const m1 = text.match(titleRe);
+  if (m1) return `${m1[1]} ${m1[2]}`;
+
+  // Pattern 2: two consecutive Thai-character sequences (min 2 chars each),
+  // separated by one of: space, underscore, dash, dot — but NOT a digit boundary.
+  // Both words must not be in the NON_NAME_THAI exclusion set.
+  const twoWordRe = /([\u0E00-\u0E7F]{2,})[\s_\-.]+([\u0E00-\u0E7F]{2,})/g;
+  let m2;
+  while ((m2 = twoWordRe.exec(text)) !== null) {
+    const first = m2[1];
+    const last  = m2[2];
+    if (!NON_NAME_THAI.has(first) && !NON_NAME_THAI.has(last)) {
+      return `${first} ${last}`;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Extract physician name (firstname + lastname, no title) in priority order:
+ *   1. Excel attachment filename
+ *   2. Email subject
+ *   3. Email body
+ * Returns the first plausible name found, or null (caller falls back to sheet/Claude).
+ */
+export function resolvePhysicianName(filename, subject, body) {
+  // Strip file extension from filename before scanning
+  const fileBase = (filename ?? "").replace(/\.[^.]+$/, "");
+
+  const sources = [
+    fileBase,
+    subject ?? "",
+    body    ?? "",
+  ];
+
+  for (const src of sources) {
+    const name = extractNameFromText(src);
+    if (name) return name;
   }
 
   return null;
@@ -340,7 +408,14 @@ export async function analyseJson(jsonData, filename = "data.json") {
 
   if (rows.length === 0) throw new Error("No rows to analyse.");
 
-  // Resolve BE year per-source (filename → subject → body) for highest accuracy
+  // Resolve physician name: filename → subject → body → null (fall back to sheet)
+  const resolvedName = resolvePhysicianName(file, subject, body);
+  const nameHint = resolvedName
+    ? `Pre-resolved name (from filename/subject/body): "${resolvedName}"  ← USE THIS VALUE, strip titles if still present.`
+    : `Name not pre-detected — search in order: (1) filename "${file}", (2) email subject/body, (3) row data.`;
+  console.log(`│        👤  JS name pre-scan: ${resolvedName ?? "null (will use sheet)"}`);
+
+  // Resolve BE year per-source (subject → body → filename) for highest accuracy
   const resolvedBE = resolveBeYear(file, subject, body);
   const yearHint   = resolvedBE
     ? `Pre-resolved BE year: ${resolvedBE}  ← USE THIS EXACT VALUE, do not recalculate.`
@@ -374,12 +449,15 @@ Return ONLY this JSON, nothing else:
 {"name": "PHYSICIAN_NAME", "date": "xxxx_xx", "score": "TOTAL"}
 
 ━━ 1. name ━━
+${nameHint}
 Firstname + " " + lastname only. Strip all titles: นพ. พญ. นายแพทย์ แพทย์หญิง ทพ. ดร. Dr. Prof. Mr. Mrs.
+If pre-resolved name above is provided, use it. Otherwise search: (1) filename, (2) subject/body, (3) row data.
 
 ━━ 2. date ━━
 ${yearHint}
 
-Month sources — Filename: "${file}" | Subject: "${subject}" | Body: "${bodyPreview}"
+Month sources — Subject: "${subject}" | Body: "${bodyPreview}" | Filename: "${file}"
+Priority: (1) subject/body, (2) filename, (3) row data.
 ม.ค./มค/มกราคม/Jan/January=01    ก.พ./กพ/กุมภาพันธ์/Feb/February=02
 มี.ค./มีค/มีนาคม/Mar/March=03     เม.ย./เมย/เมษายน/Apr/April=04
 พ.ค./พค/พฤษภาคม/May=05            มิ.ย./มิย/มิถุนายน/Jun/June=06
