@@ -641,38 +641,51 @@ async function main() {
     console.warn(`⚠️   Could not resolve label: ${err.message}`);
   }
 
-  // ── Build query — new inbox emails only ───────────────────────────────
-  // in:inbox        → not archived
-  // -is:starred     → not starred
-  // -has:userlabels → not tagged with any user-created label
-  // is:unread       → only new, unread messages
+  // ── Fetch messages from INBOX, SPAM, and JUNK ────────────────────────
+  // in:inbox / in:spam  → scope to folder
+  // -is:starred         → not already processed
+  // -has:userlabels     → not tagged with any user-created label
+  // is:unread           → only new, unread messages
   const INBOX_QUERY = "in:inbox -is:starred -has:userlabels is:unread";
+  const SPAM_QUERY  = "-is:starred -has:userlabels is:unread";
 
-  console.log(`\n🔍  Fetching messages — query: "${INBOX_QUERY}" …`);
-
-  const messages = await gmail.listMessages({
+  console.log(`\n🔍  Fetching messages — INBOX …`);
+  const inboxMessages = await gmail.listMessages({
     labelIds  : "INBOX",
     query     : INBOX_QUERY,
     maxResults: MAX_MESSAGES,
   });
 
+  console.log(`🔍  Fetching messages — SPAM / Junk …`);
+  const spamMessages = await gmail.listMessages({
+    labelIds  : "SPAM",
+    query     : SPAM_QUERY,
+    maxResults: MAX_MESSAGES,
+  });
+
+  // Tag each message with its source folder so we can remove the right label later
+  const messages = [
+    ...inboxMessages.map((m) => ({ ...m, _sourceLabel: "INBOX" })),
+    ...spamMessages.map((m) => ({ ...m, _sourceLabel: "SPAM" })),
+  ];
+
   if (messages.length === 0) {
-    console.log(`\n📭  No new unread unlabeled inbox messages found.`);
+    console.log(`\n📭  No new unread unlabeled messages found (inbox + spam).`);
     console.log(`\n✅  Done.`);
     return;
   }
 
-  console.log(`\n📬  ${messages.length} message(s) found:\n`);
+  console.log(`\n📬  ${messages.length} message(s) found (${inboxMessages.length} inbox, ${spamMessages.length} spam/junk):\n`);
 
   for (let i = 0; i < messages.length; i++) {
-    const { id } = messages[i];
+    const { id, _sourceLabel } = messages[i];
     const { msg, attachments } = await gmail.getMessageWithAttachments(id);
 
     const msgBody   = msg.body?.trim() ?? "";
     const fromRaw   = msg.from ?? "";
     const fromEmail = (fromRaw.match(/<(.+?)>/) ?? [, fromRaw])[1].trim().toLowerCase();
 
-    console.log(`┌─ [${i + 1}/${messages.length}] ──────────────────────────────────────────`);
+    console.log(`┌─ [${i + 1}/${messages.length}] [${_sourceLabel}] ──────────────────────────────────────────`);
     console.log(`│  Date:     ${msg.date}`);
     console.log(`│  From:     ${msg.from}`);
     console.log(`│  Subject:  ${msg.subject}`);
@@ -711,7 +724,7 @@ async function main() {
       }
       if (alertSent) {
         const addLabels    = ["STARRED", ...(p4pLabelId ? [p4pLabelId] : [])];
-        const removeLabels = ["UNREAD", "INBOX"];
+        const removeLabels = ["UNREAD", _sourceLabel];
         try {
           await gmail.modifyMessage(id, addLabels, removeLabels);
           console.log(`│  🏷️   Marked: read · starred · archived · "${P4P_LABEL_NAME}"`);
@@ -754,7 +767,7 @@ async function main() {
     // Applied after a successful processing OR after an alert reply was sent.
     if (processedAnyAttachment || repliedToAny) {
       const addLabels    = ["STARRED", ...(p4pLabelId ? [p4pLabelId] : [])];
-      const removeLabels = ["UNREAD", "INBOX"];
+      const removeLabels = ["UNREAD", _sourceLabel];
       try {
         await gmail.modifyMessage(id, addLabels, removeLabels);
         console.log(`│  🏷️   Marked: read · starred · archived · "${P4P_LABEL_NAME}"`);
