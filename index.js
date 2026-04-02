@@ -15,6 +15,7 @@ import { analyseJson }                   from "./claude-analyst.js";
 import { matchName, saveScore }          from "./supabase-client.js";
 import { sendTelegram, formatResultMessage, formatErrorMessage } from "./telegram.js";
 import { buildHtmlReply }               from "./templates/reply.js";
+import { buildHtmlErrorReply }          from "./templates/error-reply.js";
 import { checkEnv }                     from "./env-check.js";
 import { MAX_MESSAGES, SKIP_SENDERS }   from "./config.js";
 import log                              from "./logger.js";
@@ -45,6 +46,9 @@ const EXCEL_MIMETYPES = new Set([
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
   "application/wps-office.xlsx",                                         // WPS variant
 ]);
+
+// Matches cloud-storage share links — used to detect "file link instead of real file"
+const CLOUD_LINK_RE = /https?:\/\/(drive\.google\.com|docs\.google\.com|1drv\.ms|dropbox\.com|onedrive\.live\.com|sharepoint\.com)/i;
 
 function isExcelFile(mimeType, filename) {
   if (EXCEL_MIMETYPES.has(mimeType)) return true;
@@ -335,6 +339,42 @@ async function extractFirstSheetBuffer(buffer) {
   return out;
 }
 
+// ── Alert reply helper ────────────────────────────────────────────────────
+
+const ALERT_SUBJECTS = {
+  wrong_extension : "[แจ้งข้อผิดพลาด] ประเภทไฟล์ไม่ถูกต้อง",
+  file_link       : "[แจ้งข้อผิดพลาด] ตรวจพบลิงก์ไฟล์แทนไฟล์จริง",
+  other           : "[แจ้งข้อผิดพลาด] ไม่สามารถประมวลผลไฟล์ P4P ได้",
+};
+
+/**
+ * Send an alert-themed HTML reply to the original sender.
+ * Silently no-ops if replyTo or messageId is missing.
+ *
+ * @param {"wrong_extension"|"file_link"|"other"} errorType
+ * @param {string} safeFilename  HTML-escaped filename (may be empty)
+ * @param {string} replyTo       Sender email address
+ * @param {string} messageId     Gmail message ID for thread reply
+ * @param {object} gmail         Shared Gmail client
+ */
+async function sendAlertReply({ errorType = "other", safeFilename = "", replyTo, messageId, gmail }) {
+  if (!replyTo || !messageId) return;
+  const subject  = ALERT_SUBJECTS[errorType] ?? ALERT_SUBJECTS.other;
+  const htmlReply = buildHtmlErrorReply({ safeFilename, errorType });
+  try {
+    await gmail.sendMessage({
+      to              : replyTo,
+      subject,
+      html            : htmlReply,
+      body            : `เรียนผู้ส่ง\n\nระบบไม่สามารถประมวลผลไฟล์ P4P ที่ท่านส่งมาได้\nกรุณาตรวจสอบและส่งใหม่อีกครั้ง`,
+      replyToMessageId: messageId,
+    });
+    console.log(`│        📧  Alert reply [${errorType}] sent to ${replyTo}`);
+  } catch (replyErr) {
+    console.error(`│        ❌  Alert reply failed: ${replyErr.message}`);
+  }
+}
+
 // ── Processing pipeline ───────────────────────────────────────────────────
 
 /**
@@ -351,6 +391,13 @@ async function extractFirstSheetBuffer(buffer) {
  * @param {object} context.gmail        Shared Gmail client instance
  */
 async function processBuffer(buffer, { subject = "", body = "", filename, replyTo = "", messageId = "", gmail }) {
+  /** Shorthand: fire an "other" alert reply for unexpected pipeline errors. */
+  const otherReply = () => sendAlertReply({
+    errorType   : "other",
+    safeFilename: escapeHtml(filename ?? ""),
+    replyTo, messageId, gmail,
+  });
+
   // Parse workbook
   let rows, allSheets, chosenSheet;
   try {
@@ -358,6 +405,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
   } catch (err) {
     console.error(`│        ❌  Failed to parse workbook: ${err.message}`);
     await sendTelegram(formatErrorMessage(`Workbook parse failed: ${err.message}`, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
+    await otherReply();
     return false;
   }
 
@@ -370,6 +418,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     const msg = "Workbook parsed but contains no data rows — file may be empty or corrupt.";
     console.error(`│        ❌  ${msg}`);
     await sendTelegram(formatErrorMessage(msg, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
+    await otherReply();
     return false;
   }
 
@@ -380,6 +429,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     const msg = `Workbook has only ${nonNullCount} non-null cell(s) — likely corrupt or blank.`;
     console.error(`│        ❌  ${msg}`);
     await sendTelegram(formatErrorMessage(msg, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
+    await otherReply();
     return false;
   }
 
@@ -407,6 +457,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
   } catch (err) {
     console.error(`│        ❌  Claude analysis failed: ${err.message}`);
     await sendTelegram(formatErrorMessage(err.message, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
+    await otherReply();
     return false;
   }
 
@@ -438,6 +489,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
         const msg = "First sheet is blank — Drive upload aborted.";
         console.warn(`│        ⚠️  ${msg}`);
         await sendTelegram(formatErrorMessage(msg, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
+        await otherReply();
         return false;
       }
 
@@ -453,6 +505,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
       await sendTelegram(
         formatErrorMessage(`Drive upload failed: ${driveErr.message}`, filename)
       ).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
+      await otherReply();
       return false;  // ← do not archive, do not save score
     }
   }
@@ -548,6 +601,13 @@ async function processAttachment(att, messageId, context, gmail) {
     buffer = await gmail.downloadAttachment(messageId, att.attachmentId);
   } catch (err) {
     console.error(`│        ❌  Download failed: ${err.message}`);
+    await sendAlertReply({
+      errorType   : "other",
+      safeFilename: escapeHtml(att.filename ?? ""),
+      replyTo     : context.replyTo,
+      messageId,
+      gmail,
+    });
     return false;
   }
 
@@ -608,15 +668,15 @@ async function main() {
     const { id } = messages[i];
     const { msg, attachments } = await gmail.getMessageWithAttachments(id);
 
-    const bodyPreview = msg.body?.trim() ?? "";
-    const fromRaw     = msg.from ?? "";
-    const fromEmail   = (fromRaw.match(/<(.+?)>/) ?? [, fromRaw])[1].trim().toLowerCase();
+    const msgBody   = msg.body?.trim() ?? "";
+    const fromRaw   = msg.from ?? "";
+    const fromEmail = (fromRaw.match(/<(.+?)>/) ?? [, fromRaw])[1].trim().toLowerCase();
 
     console.log(`┌─ [${i + 1}/${messages.length}] ──────────────────────────────────────────`);
     console.log(`│  Date:     ${msg.date}`);
     console.log(`│  From:     ${msg.from}`);
     console.log(`│  Subject:  ${msg.subject}`);
-    console.log(`│  Body:     ${bodyPreview.slice(0, 120).replace(/\n/g, " ")}${bodyPreview.length > 120 ? "…" : ""}`);
+    console.log(`│  Body:     ${msgBody.slice(0, 120).replace(/\n/g, " ")}${msgBody.length > 120 ? "…" : ""}`);
 
     if (SKIP_SENDERS.has(fromEmail)) {
       console.log(`│  ⏭️   Sender is on the skip list — skipping.`);
@@ -626,33 +686,53 @@ async function main() {
 
     let processedAnyAttachment = false;
 
-    if (attachments.length === 0) {
-      console.log(`│  📎  No attachments`);
-    } else {
-      console.log(`│  📎  ${attachments.length} attachment(s):`);
+    // ── Pre-flight error checks ───────────────────────────────────────────
+    // Classify message-level issues before touching attachments.
+    // Only send an alert reply when no xlsx file is present — if xlsx
+    // files exist alongside other attachments, process normally.
+    const xlsxAtts  = attachments.filter((a) => isExcelFile(a.mimeType, a.filename));
+    const otherAtts = attachments.filter((a) => !isExcelFile(a.mimeType, a.filename));
 
-      // Process all Excel attachments in parallel — faster for messages with multiple files
-      // Use fromEmail (plain addr) not msg.from (full header) for replyTo —
-      // the full From: header can contain RFC 2047-encoded display names in many
-      // formats; using just the address avoids any encoding issue in To: header.
-      const context = {
-        subject  : msg.subject,
-        body     : msg.body?.trim() ?? "",
-        replyTo  : fromEmail,
-        messageId: id,
-      };
-      const results = await Promise.allSettled(
-        attachments.map((att) => processAttachment(att, id, context, gmail))
-      );
-      processedAnyAttachment = results.some(
-        (r) => r.status === "fulfilled" && r.value === true
-      );
-      results.forEach((r, idx) => {
-        if (r.status === "rejected") {
-          console.error(`│      ❌  Attachment[${idx}] threw: ${r.reason?.message ?? r.reason}`);
-        }
-      });
+    if (xlsxAtts.length === 0) {
+      if (CLOUD_LINK_RE.test(msgBody)) {
+        // Sender pasted a cloud-storage link instead of attaching the file
+        console.log(`│  ⚠️   No xlsx found — cloud link detected in body → sending file_link alert`);
+        await sendAlertReply({ errorType: "file_link", safeFilename: "", replyTo: fromEmail, messageId: id, gmail });
+      } else if (otherAtts.length > 0) {
+        // Sender attached a file but in the wrong format (.xls, .ods, …)
+        const names = escapeHtml(otherAtts.map((a) => a.filename).join(", "));
+        console.log(`│  ⚠️   No xlsx found — wrong extension(s): ${otherAtts.map((a) => a.filename).join(", ")} → sending wrong_extension alert`);
+        await sendAlertReply({ errorType: "wrong_extension", safeFilename: names, replyTo: fromEmail, messageId: id, gmail });
+      } else {
+        console.log(`│  📎  No attachments and no cloud link — skipping`);
+      }
+      console.log(`└────────────────────────────────────────────────────────────\n`);
+      continue;
     }
+
+    console.log(`│  📎  ${attachments.length} attachment(s):`);
+
+    // Process all Excel attachments in parallel — faster for messages with multiple files
+    // Use fromEmail (plain addr) not msg.from (full header) for replyTo —
+    // the full From: header can contain RFC 2047-encoded display names in many
+    // formats; using just the address avoids any encoding issue in To: header.
+    const context = {
+      subject  : msg.subject,
+      body     : msgBody,
+      replyTo  : fromEmail,
+      messageId: id,
+    };
+    const results = await Promise.allSettled(
+      attachments.map((att) => processAttachment(att, id, context, gmail))
+    );
+    processedAnyAttachment = results.some(
+      (r) => r.status === "fulfilled" && r.value === true
+    );
+    results.forEach((r, idx) => {
+      if (r.status === "rejected") {
+        console.error(`│      ❌  Attachment[${idx}] threw: ${r.reason?.message ?? r.reason}`);
+      }
+    });
 
     // ── Mark message: read + starred + labeled ────────────────────────
     // Only applied after at least one xlsx attachment was processed.

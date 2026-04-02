@@ -248,6 +248,85 @@ export function extractScoreFromRows(rows) {
 }
 
 /**
+ * Wraps extractScoreFromRows with a two-tier fallback for files where
+ * fix_p4p_score.py (openpyxl) wrote =SUM(...) formulas without caching
+ * a <v> value. In those files the grand-total cell parses as empty, so
+ * extractScoreFromRows falls back to the largest plain number in the sheet
+ * (often a per-item weight like 2200) instead of the actual grand total.
+ *
+ * Tier 1 — grand-total row empty, all sub-total rows cached:
+ *   Sum the max value from each sub-total row.
+ *
+ * Tier 2 — some sub-total rows also uncached:
+ *   Detect the score column (last numeric column) from whichever sub-total
+ *   rows are populated, then sum that column from individual data rows only
+ *   (sub-total and grand-total rows are excluded to avoid double-counting).
+ */
+function resolveScore(rows) {
+  const { score: jsScore, method: jsMethod } = extractScoreFromRows(rows);
+
+  // Detect: grand-total label row present but contains no numbers
+  const grandRowEmpty = rows.some((row) => {
+    const allVals = Object.values(row).map((v) => String(v ?? ""));
+    const hasLabel = allVals.some((s) => GRAND_TOTAL_LABELS.some((lbl) => s.includes(lbl)));
+    if (!hasLabel) return false;
+    // Check for any positive non-year number in this row
+    return !Object.values(row).some((val) => {
+      const n = toNum(val);
+      return !isNaN(n) && n > 0 && !isYearLike(n);
+    });
+  });
+
+  if (!grandRowEmpty) return { score: jsScore, method: jsMethod };
+
+  const isSubtotalRow = (row) => {
+    const firstThree = ["col_1", "col_2", "col_3"].map((k) => String(row[k] ?? ""));
+    return firstThree.some((s) => SUBTOTAL_LABELS.some((lbl) => s.includes(lbl)));
+  };
+  const isGrandTotalRow = (row) =>
+    Object.values(row).some((v) => GRAND_TOTAL_LABELS.some((lbl) => String(v ?? "").includes(lbl)));
+
+  const rowNums = (row) =>
+    Object.values(row).map(toNum).filter((n) => !isNaN(n) && n > 0 && !isYearLike(n));
+
+  const populated = rows.filter((r) => isSubtotalRow(r) && rowNums(r).length > 0);
+  const empty     = rows.filter((r) => isSubtotalRow(r) && rowNums(r).length === 0);
+
+  // Tier 1: sum max from each populated sub-total row
+  const subtotalSum = populated.reduce((s, r) => s + Math.max(...rowNums(r)), 0);
+
+  // Tier 2: when some sub-totals are also uncached, sum score column from data rows
+  let dataRowSum = 0;
+  if (populated.length > 0 && empty.length > 0) {
+    let scoreColIndex = -1;
+    for (const row of populated) {
+      const indices = Object.keys(row)
+        .filter((k) => /^col_\d+$/.test(k) && !isNaN(toNum(row[k])) && toNum(row[k]) > 0)
+        .map((k) => parseInt(k.slice(4)));
+      if (indices.length > 0) scoreColIndex = Math.max(scoreColIndex, Math.max(...indices));
+    }
+    if (scoreColIndex > 0) {
+      const scoreColKey = `col_${scoreColIndex}`;
+      for (const row of rows) {
+        if (isSubtotalRow(row) || isGrandTotalRow(row)) continue;
+        const n = toNum(row[scoreColKey]);
+        if (!isNaN(n) && n > 0 && !isYearLike(n)) dataRowSum += n;
+      }
+    }
+  }
+
+  const best = Math.max(subtotalSum, dataRowSum);
+  if (best > 0 && best > (jsScore ?? 0)) {
+    const method = dataRowSum >= subtotalSum
+      ? "sum of score-column data rows (sub-totals partially uncached)"
+      : "sum of sub-total rows (grand-total formula uncached)";
+    return { score: best, method };
+  }
+
+  return { score: jsScore, method: jsMethod };
+}
+
+/**
  * @param {object} jsonData  { _email_subject, _email_body, _source_file, rows[] }
  * @param {string} filename
  * @returns {Promise<{ name: string, date: string, score: number }>}
