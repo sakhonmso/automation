@@ -406,7 +406,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     console.error(`│        ❌  Failed to parse workbook: ${err.message}`);
     await sendTelegram(formatErrorMessage(`Workbook parse failed: ${err.message}`, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
     await otherReply();
-    return false;
+    return "replied";
   }
 
   console.log(`│        All sheets : ${allSheets.join(", ")}`);
@@ -419,7 +419,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     console.error(`│        ❌  ${msg}`);
     await sendTelegram(formatErrorMessage(msg, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
     await otherReply();
-    return false;
+    return "replied";
   }
 
   const nonNullCount = rows.reduce(
@@ -430,7 +430,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     console.error(`│        ❌  ${msg}`);
     await sendTelegram(formatErrorMessage(msg, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
     await otherReply();
-    return false;
+    return "replied";
   }
 
   console.log(`│        Non-null cells: ${nonNullCount} ✅`);
@@ -458,7 +458,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     console.error(`│        ❌  Claude analysis failed: ${err.message}`);
     await sendTelegram(formatErrorMessage(err.message, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
     await otherReply();
-    return false;
+    return "replied";
   }
 
   // ── Fuzzy name match (lookup only — score saved after Drive succeeds) ──
@@ -490,7 +490,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
         console.warn(`│        ⚠️  ${msg}`);
         await sendTelegram(formatErrorMessage(msg, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
         await otherReply();
-        return false;
+        return "replied";
       }
 
       console.log(`│        📤  Uploading as "${uploadName}"…`);
@@ -506,7 +506,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
         formatErrorMessage(`Drive upload failed: ${driveErr.message}`, filename)
       ).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
       await otherReply();
-      return false;  // ← do not archive, do not save score
+      return "replied";  // ← do not archive, do not save score
     }
   }
 
@@ -608,7 +608,7 @@ async function processAttachment(att, messageId, context, gmail) {
       messageId,
       gmail,
     });
-    return false;
+    return "replied";
   }
 
   return processBuffer(buffer, { ...context, filename: att.filename, gmail });
@@ -694,17 +694,30 @@ async function main() {
     const otherAtts = attachments.filter((a) => !isExcelFile(a.mimeType, a.filename));
 
     if (xlsxAtts.length === 0) {
+      let alertSent = false;
       if (CLOUD_LINK_RE.test(msgBody)) {
         // Sender pasted a cloud-storage link instead of attaching the file
         console.log(`│  ⚠️   No xlsx found — cloud link detected in body → sending file_link alert`);
         await sendAlertReply({ errorType: "file_link", safeFilename: "", replyTo: fromEmail, messageId: id, gmail });
+        alertSent = true;
       } else if (otherAtts.length > 0) {
         // Sender attached a file but in the wrong format (.xls, .ods, …)
         const names = escapeHtml(otherAtts.map((a) => a.filename).join(", "));
         console.log(`│  ⚠️   No xlsx found — wrong extension(s): ${otherAtts.map((a) => a.filename).join(", ")} → sending wrong_extension alert`);
         await sendAlertReply({ errorType: "wrong_extension", safeFilename: names, replyTo: fromEmail, messageId: id, gmail });
+        alertSent = true;
       } else {
         console.log(`│  📎  No attachments and no cloud link — skipping`);
+      }
+      if (alertSent) {
+        const addLabels    = ["STARRED", ...(p4pLabelId ? [p4pLabelId] : [])];
+        const removeLabels = ["UNREAD", "INBOX"];
+        try {
+          await gmail.modifyMessage(id, addLabels, removeLabels);
+          console.log(`│  🏷️   Marked: read · starred · archived · "${P4P_LABEL_NAME}"`);
+        } catch (err) {
+          console.error(`│  ❌  Failed to update message labels: ${err.message}`);
+        }
       }
       console.log(`└────────────────────────────────────────────────────────────\n`);
       continue;
@@ -728,6 +741,9 @@ async function main() {
     processedAnyAttachment = results.some(
       (r) => r.status === "fulfilled" && r.value === true
     );
+    const repliedToAny = results.some(
+      (r) => r.status === "fulfilled" && r.value === "replied"
+    );
     results.forEach((r, idx) => {
       if (r.status === "rejected") {
         console.error(`│      ❌  Attachment[${idx}] threw: ${r.reason?.message ?? r.reason}`);
@@ -735,9 +751,8 @@ async function main() {
     });
 
     // ── Mark message: read + starred + labeled ────────────────────────
-    // Only applied after at least one xlsx attachment was processed.
-    // Prevents false-tagging emails that had no usable attachments.
-    if (processedAnyAttachment) {
+    // Applied after a successful processing OR after an alert reply was sent.
+    if (processedAnyAttachment || repliedToAny) {
       const addLabels    = ["STARRED", ...(p4pLabelId ? [p4pLabelId] : [])];
       const removeLabels = ["UNREAD", "INBOX"];
       try {
