@@ -106,21 +106,24 @@ const NON_NAME_THAI = new Set([
 function extractNameFromText(text) {
   if (!text) return null;
 
-  // Collapse dots that sit between Thai characters so abbreviated month forms
-  // are normalised before any regex runs:
-  //   "มี.ค."  →  "มีค."   (then twoWordRe captures "มีค" which is in NON_NAME_THAI)
-  //   "เม.ย."  →  "เมย."
-  //   "ม.ค."   →  "มค."
-  //   "ก.พ."   →  "กพ."
-  // The lookahead (?=[\u0E00-\u0E7F]) ensures we only remove dots that are
-  // immediately followed by another Thai character, leaving title dots like
-  // "นพ." or sentence punctuation untouched.
-  const text2 = text.replace(/([\u0E00-\u0E7F]+)\.(?=[\u0E00-\u0E7F])/g, "$1");
+  // Pattern 1: run on the ORIGINAL text so title dots ("นพ.", "พญ.") are intact.
+  // "P4P นพ.ศาศวัต มีนาคม 2569" → title detected → return "ศาศวัต" only
+  // (second word "มีนาคม" is a month — rejected by NON_NAME_THAI check below)
+  const titleRe = /(?:นพ\.|พญ\.|นายแพทย์|แพทย์หญิง|ทพ\.|ทพญ\.|ดร\.)\s*([\u0E00-\u0E7F]{2,})(?:\s+([\u0E00-\u0E7F]{2,}))?/;
+  const m1 = text.match(titleRe);
+  if (m1) {
+    const first = m1[1];
+    const last  = m1[2];
+    // If the word after the firstname is a month name, discard it — return firstname only
+    if (last && !NON_NAME_THAI.has(last)) return `${first} ${last}`;
+    return first; // single-token → will hit firstname-only Supabase lookup
+  }
 
-  // Pattern 1: recognised title prefix immediately followed by two Thai words
-  const titleRe = /(?:นพ\.|พญ\.|นายแพทย์|แพทย์หญิง|ทพ\.|ทพญ\.|ดร\.)\s*([\u0E00-\u0E7F]{2,})\s+([\u0E00-\u0E7F]{2,})/;
-  const m1 = text2.match(titleRe);
-  if (m1) return `${m1[1]} ${m1[2]}`;
+  // Collapse dots between Thai characters only for Pattern 2 (month abbreviations).
+  // Done AFTER Pattern 1 so title dots ("นพ.") are never destroyed.
+  //   "มี.ค."  →  "มีค."  →  twoWordRe captures "มีค" → blocked by NON_NAME_THAI
+  //   "เม.ย."  →  "เมย."
+  const text2 = text.replace(/([\u0E00-\u0E7F]+)\.(?=[\u0E00-\u0E7F])/g, "$1");
 
   // Pattern 2: two consecutive Thai-character sequences (min 2 chars each),
   // separated by one of: space, underscore, dash, dot — but NOT a digit boundary.
