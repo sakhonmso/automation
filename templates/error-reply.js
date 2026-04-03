@@ -6,9 +6,10 @@
  *
  * @param {object} data
  * @param {string} data.safeFilename  Attachment filename(s), HTML-escaped (may be empty)
- * @param {"wrong_extension"|"file_link"|"other"} data.errorType
+ * @param {"wrong_extension"|"file_link"|"wrong_date"|"other"} data.errorType
+ * @param {string} [data.detectedDate]  Date string extracted from file, shown when errorType="wrong_date"
  */
-export function buildHtmlErrorReply({ safeFilename = "", errorType = "other" }) {
+export function buildHtmlErrorReply({ safeFilename = "", errorType = "other", detectedDate = "" }) {
   const CONTENT = {
     wrong_extension: {
       bannerTitle  : "ประเภทไฟล์ไม่ถูกต้อง",
@@ -19,6 +20,11 @@ export function buildHtmlErrorReply({ safeFilename = "", errorType = "other" }) 
       bannerTitle  : "ตรวจพบลิงก์ไฟล์แทนไฟล์จริง",
       bannerBody   : "ระบบไม่สามารถเข้าถึงไฟล์ผ่านลิงก์ได้<br>กรุณาแนบไฟล์ <strong>.xlsx</strong> โดยตรงในอีเมล",
       instruction  : "กรุณาดาวน์โหลดไฟล์ก่อน แล้วแนบไฟล์ <strong>.xlsx</strong> โดยตรงในอีเมล — ไม่ใช่ลิงก์",
+    },
+    wrong_date: {
+      bannerTitle  : "วันที่/เดือน/ปี ในไฟล์ไม่ถูกต้อง",
+      bannerBody   : "ระบบไม่พบข้อมูลสำหรับช่วงเวลาที่ระบุในไฟล์<br>กรุณาตรวจสอบว่าไฟล์ P4P ตรงกับเดือนและปีที่ถูกต้อง",
+      instruction  : "กรุณาตรวจสอบชื่อไฟล์และข้อมูลภายในว่าระบุเดือน/ปีถูกต้อง แล้วส่งไฟล์ใหม่อีกครั้ง",
     },
     other: {
       bannerTitle  : "เกิดข้อผิดพลาดในการประมวลผล",
@@ -35,6 +41,15 @@ export function buildHtmlErrorReply({ safeFilename = "", errorType = "other" }) 
           <td>${safeFilename}</td>
         </tr>`
     : "";
+
+  const dateRow = detectedDate
+    ? `<tr>
+          <td>วันที่ที่ตรวจพบ</td>
+          <td>${detectedDate}</td>
+        </tr>`
+    : "";
+
+  const detailRows = filenameRow + dateRow;
 
   return `<!DOCTYPE html>
 <html lang="th">
@@ -75,9 +90,9 @@ export function buildHtmlErrorReply({ safeFilename = "", errorType = "other" }) 
       <div class="banner-title">${c.bannerTitle}</div>
       <div class="banner-body">${c.bannerBody}</div>
     </div>
-    ${filenameRow ? `<div class="detail-card">
+    ${detailRows ? `<div class="detail-card">
       <div class="detail-title">รายละเอียด</div>
-      <table>${filenameRow}</table>
+      <table>${detailRows}</table>
     </div>` : ""}
     <p class="note">${c.instruction}</p>
   </div>

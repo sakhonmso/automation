@@ -344,6 +344,7 @@ async function extractFirstSheetBuffer(buffer) {
 const ALERT_SUBJECTS = {
   wrong_extension : "[แจ้งข้อผิดพลาด] ประเภทไฟล์ไม่ถูกต้อง",
   file_link       : "[แจ้งข้อผิดพลาด] ตรวจพบลิงก์ไฟล์แทนไฟล์จริง",
+  wrong_date      : "[แจ้งข้อผิดพลาด] วันที่/เดือน/ปีในไฟล์ไม่ถูกต้อง",
   other           : "[แจ้งข้อผิดพลาด] ไม่สามารถประมวลผลไฟล์ P4P ได้",
 };
 
@@ -357,14 +358,14 @@ const ALERT_SUBJECTS = {
  * @param {string} messageId     Gmail message ID for thread reply
  * @param {object} gmail         Shared Gmail client
  */
-async function sendAlertReply({ errorType = "other", safeFilename = "", replyTo, messageId, gmail }) {
+async function sendAlertReply({ errorType = "other", safeFilename = "", detectedDate = "", replyTo, messageId, gmail }) {
   if (!SEND_ERROR_REPLIES) {
     console.log(`│        ⏸️   Alert reply [${errorType}] suppressed (SEND_ERROR_REPLIES=false)`);
     return;
   }
   if (!replyTo || !messageId) return;
   const subject  = ALERT_SUBJECTS[errorType] ?? ALERT_SUBJECTS.other;
-  const htmlReply = buildHtmlErrorReply({ safeFilename, errorType });
+  const htmlReply = buildHtmlErrorReply({ safeFilename, errorType, detectedDate });
   try {
     await gmail.sendMessage({
       to              : replyTo,
@@ -477,6 +478,19 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     }
   } catch (dbErr) {
     console.error(`│        ❌  Supabase match error: ${dbErr.message}`);
+    // Table not found → the extracted date is wrong; tell the sender
+    if (/does not exist|undefined_table|42P01/i.test(dbErr.message)) {
+      console.log(`│        📅  Table "${analysis.date}" not found — sending wrong_date reply`);
+      await sendAlertReply({
+        errorType   : "wrong_date",
+        safeFilename: escapeHtml(filename ?? ""),
+        detectedDate: analysis.date,
+        replyTo, messageId, gmail,
+      });
+      await sendTelegram(formatErrorMessage(`Table "${analysis.date}" not found — wrong date extracted from ${filename}`, filename))
+        .catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
+      return "replied";
+    }
     await sendTelegram(formatErrorMessage(`Supabase match error: ${dbErr.message}`, filename))
       .catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
   }
