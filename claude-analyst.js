@@ -106,11 +106,23 @@ const NON_NAME_THAI = new Set([
 function extractNameFromText(text) {
   if (!text) return null;
 
-  // Pattern 1: run on the ORIGINAL text so title dots ("นพ.", "พญ.") are intact.
-  // "P4P นพ.ศาศวัต มีนาคม 2569" → title detected → return "ศาศวัต" only
-  // (second word "มีนาคม" is a month — rejected by NON_NAME_THAI check below)
+  // Normalise dotted title abbreviations ONLY (before Pattern 1) so that both
+  // "นพ." and "น.พ." / "พญ." and "พ.ญ." etc. are matched by the same regex.
+  // This is a targeted replacement of known titles — NOT the general month-dot
+  // collapsing (which runs later, after Pattern 1).
+  const titleNorm = text
+    .replace(/น\.พ\./g,    "นพ.")
+    .replace(/พ\.ญ\./g,    "พญ.")
+    .replace(/ท\.พ\./g,    "ทพ.")
+    .replace(/ท\.พ\.ญ\./g, "ทพญ.")
+    .replace(/ด\.ร\./g,    "ดร.");
+
+  // Pattern 1: run on titleNorm so title dots are intact but dotted variants
+  // are already collapsed ("พ.ญ.ศาศวัต" → "พญ.ศาศวัต" → matched correctly).
+  // "P4P นพ.ศาศวัต มีนาคม 2569"   → "ศาศวัต" (month discarded)
+  // "P4P พ.ญ.ศาศวัต มีนาคม 2569"  → "ศาศวัต" (dotted title normalised first)
   const titleRe = /(?:นพ\.|พญ\.|นายแพทย์|แพทย์หญิง|ทพ\.|ทพญ\.|ดร\.)\s*([\u0E00-\u0E7F]{2,})(?:\s+([\u0E00-\u0E7F]{2,}))?/;
-  const m1 = text.match(titleRe);
+  const m1 = titleNorm.match(titleRe);
   if (m1) {
     const first = m1[1];
     const last  = m1[2];
