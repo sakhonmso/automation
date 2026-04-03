@@ -17,7 +17,7 @@ import { sendTelegram, formatResultMessage, formatErrorMessage } from "./telegra
 import { buildHtmlReply }               from "./templates/reply.js";
 import { buildHtmlErrorReply }          from "./templates/error-reply.js";
 import { checkEnv }                     from "./env-check.js";
-import { MAX_MESSAGES, SKIP_SENDERS }   from "./config.js";
+import { MAX_MESSAGES, SKIP_SENDERS, SEND_ERROR_REPLIES } from "./config.js";
 import log                              from "./logger.js";
 import * as path                        from "path";
 import ExcelJS                          from "exceljs";
@@ -358,6 +358,10 @@ const ALERT_SUBJECTS = {
  * @param {object} gmail         Shared Gmail client
  */
 async function sendAlertReply({ errorType = "other", safeFilename = "", replyTo, messageId, gmail }) {
+  if (!SEND_ERROR_REPLIES) {
+    console.log(`│        ⏸️   Alert reply [${errorType}] suppressed (SEND_ERROR_REPLIES=false)`);
+    return;
+  }
   if (!replyTo || !messageId) return;
   const subject  = ALERT_SUBJECTS[errorType] ?? ALERT_SUBJECTS.other;
   const htmlReply = buildHtmlErrorReply({ safeFilename, errorType });

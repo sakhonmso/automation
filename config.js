@@ -25,6 +25,13 @@ export const SUPABASE_ROW_LIMIT = 1_000;
 /** Milliseconds before a Telegram API call is aborted. */
 export const TELEGRAM_TIMEOUT_MS = 10_000;
 
+/**
+ * Whether to send error/alert reply emails back to the original sender.
+ * Set to false to suppress all alert replies (e.g. during testing).
+ * Resume by setting back to true.
+ */
+export const SEND_ERROR_REPLIES = false;
+
 /** Gmail senders to skip entirely (comma-separated in env, or hardcoded default). */
 export const SKIP_SENDERS = new Set(
   (process.env.SKIP_SENDERS ?? "sakhonmso@gmail.com,p4pskh@gmail.com")
