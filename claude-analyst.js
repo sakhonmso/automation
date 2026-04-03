@@ -106,9 +106,20 @@ const NON_NAME_THAI = new Set([
 function extractNameFromText(text) {
   if (!text) return null;
 
+  // Collapse dots that sit between Thai characters so abbreviated month forms
+  // are normalised before any regex runs:
+  //   "มี.ค."  →  "มีค."   (then twoWordRe captures "มีค" which is in NON_NAME_THAI)
+  //   "เม.ย."  →  "เมย."
+  //   "ม.ค."   →  "มค."
+  //   "ก.พ."   →  "กพ."
+  // The lookahead (?=[\u0E00-\u0E7F]) ensures we only remove dots that are
+  // immediately followed by another Thai character, leaving title dots like
+  // "นพ." or sentence punctuation untouched.
+  const text2 = text.replace(/([\u0E00-\u0E7F]+)\.(?=[\u0E00-\u0E7F])/g, "$1");
+
   // Pattern 1: recognised title prefix immediately followed by two Thai words
   const titleRe = /(?:นพ\.|พญ\.|นายแพทย์|แพทย์หญิง|ทพ\.|ทพญ\.|ดร\.)\s*([\u0E00-\u0E7F]{2,})\s+([\u0E00-\u0E7F]{2,})/;
-  const m1 = text.match(titleRe);
+  const m1 = text2.match(titleRe);
   if (m1) return `${m1[1]} ${m1[2]}`;
 
   // Pattern 2: two consecutive Thai-character sequences (min 2 chars each),
@@ -116,7 +127,7 @@ function extractNameFromText(text) {
   // Both words must not be in the NON_NAME_THAI exclusion set.
   const twoWordRe = /([\u0E00-\u0E7F]{2,})[\s_\-.]+([\u0E00-\u0E7F]{2,})/g;
   let m2;
-  while ((m2 = twoWordRe.exec(text)) !== null) {
+  while ((m2 = twoWordRe.exec(text2)) !== null) {
     const first = m2[1];
     const last  = m2[2];
     if (!NON_NAME_THAI.has(first) && !NON_NAME_THAI.has(last)) {
