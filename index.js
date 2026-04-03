@@ -17,7 +17,7 @@ import { sendTelegram, formatResultMessage, formatErrorMessage } from "./telegra
 import { buildHtmlReply }               from "./templates/reply.js";
 import { buildHtmlErrorReply }          from "./templates/error-reply.js";
 import { checkEnv }                     from "./env-check.js";
-import { MAX_MESSAGES, SKIP_SENDERS, SEND_ERROR_REPLIES } from "./config.js";
+import { MAX_MESSAGES, SKIP_SENDERS, SEND_ERROR_REPLIES, THREAD_RELAY_SENDERS } from "./config.js";
 import log                              from "./logger.js";
 import * as path                        from "path";
 import ExcelJS                          from "exceljs";
@@ -344,6 +344,7 @@ async function extractFirstSheetBuffer(buffer) {
 const ALERT_SUBJECTS = {
   wrong_extension : "[แจ้งข้อผิดพลาด] ประเภทไฟล์ไม่ถูกต้อง",
   file_link       : "[แจ้งข้อผิดพลาด] ตรวจพบลิงก์ไฟล์แทนไฟล์จริง",
+  zero_score      : "[แจ้งข้อผิดพลาด] คะแนนรวมเป็นศูนย์",
   wrong_date      : "[แจ้งข้อผิดพลาด] วันที่/เดือน/ปีในไฟล์ไม่ถูกต้อง",
   other           : "[แจ้งข้อผิดพลาด] ไม่สามารถประมวลผลไฟล์ P4P ได้",
 };
@@ -459,10 +460,15 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     console.log(`│        ✅  Physician : ${analysis.name}`);
     console.log(`│        ✅  Date      : ${analysis.date}`);
     console.log(`│        ✅  Score     : ${analysis.score.toFixed(2)}`);
+    if (analysis.score === 0) throw new Error("Score is 0 — cannot save a zero score.");
   } catch (err) {
     console.error(`│        ❌  Claude analysis failed: ${err.message}`);
     await sendTelegram(formatErrorMessage(err.message, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
-    await otherReply();
+    if (/score is 0/i.test(err.message)) {
+      await sendAlertReply({ errorType: "zero_score", safeFilename: escapeHtml(filename ?? ""), replyTo, messageId, gmail });
+    } else {
+      await otherReply();
+    }
     return "replied";
   }
 
@@ -710,7 +716,57 @@ async function main() {
     console.log(`│  Body:     ${msgBody.slice(0, 120).replace(/\n/g, " ")}${msgBody.length > 120 ? "…" : ""}`);
 
     if (SKIP_SENDERS.has(fromEmail)) {
-      console.log(`│  ⏭️   Sender is on the skip list — skipping.`);
+      // Relay senders (e.g. sakhonmso@gmail.com) forward/reply to physician emails.
+      // Instead of skipping, search the thread for an xlsx from the original sender.
+      if (THREAD_RELAY_SENDERS.has(fromEmail) && msg.threadId) {
+        console.log(`│  🔄  Relay sender — searching thread for xlsx from original messages…`);
+        let relayProcessed = false;
+        try {
+          const threadMsgs = await gmail.getThreadMessages(msg.threadId);
+          for (const tm of [...threadMsgs].reverse()) {
+            if (tm.msg.id === id) continue;
+            const tmEmail = (tm.msg.from.match(/<(.+?)>/) ?? [, tm.msg.from])[1].trim().toLowerCase();
+            if (THREAD_RELAY_SENDERS.has(tmEmail)) continue; // skip other relay messages
+            const xlsxInMsg = tm.attachments.filter((a) => isExcelFile(a.mimeType, a.filename));
+            if (xlsxInMsg.length > 0) {
+              console.log(`│  📎  Found xlsx in thread — original sender: ${tm.msg.from}`);
+              const relayContext = {
+                subject  : tm.msg.subject || msg.subject,
+                body     : tm.msg.body    || msgBody,
+                replyTo  : tmEmail,   // reply to the original physician, not the relay
+                messageId: id,        // thread-link to the current (relay) message
+              };
+              const results = await Promise.allSettled(
+                xlsxInMsg.map((att) => processAttachment(att, tm.msg.id, relayContext, gmail))
+              );
+              relayProcessed = results.some((r) => r.status === "fulfilled" && r.value === true);
+              results.forEach((r, idx) => {
+                if (r.status === "rejected") {
+                  console.error(`│      ❌  Relay attachment[${idx}] threw: ${r.reason?.message ?? r.reason}`);
+                }
+              });
+              if (relayProcessed) {
+                const addLabels    = ["STARRED", ...(p4pLabelId ? [p4pLabelId] : [])];
+                const removeLabels = ["UNREAD", _sourceLabel];
+                try {
+                  await gmail.modifyMessage(id, addLabels, removeLabels);
+                  console.log(`│  🏷️   Marked: read · starred · archived · "${P4P_LABEL_NAME}"`);
+                } catch (err) {
+                  console.error(`│  ❌  Failed to update message labels: ${err.message}`);
+                }
+              }
+              break;
+            }
+          }
+        } catch (err) {
+          console.warn(`│  ⚠️   Relay thread search failed: ${err.message}`);
+        }
+        if (!relayProcessed) {
+          console.log(`│  📭  No xlsx found in thread from original sender — skipping`);
+        }
+      } else {
+        console.log(`│  ⏭️   Sender is on the skip list — skipping.`);
+      }
       console.log(`└────────────────────────────────────────────────────────────\n`);
       continue;
     }

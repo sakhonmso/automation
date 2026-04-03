@@ -39,3 +39,15 @@ export const SKIP_SENDERS = new Set(
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean)
 );
+
+/**
+ * Relay senders: messages FROM these addresses are not skipped outright.
+ * Instead the pipeline searches the thread for an xlsx from the original sender.
+ * Must be a subset of SKIP_SENDERS (or independently listed).
+ */
+export const THREAD_RELAY_SENDERS = new Set(
+  (process.env.THREAD_RELAY_SENDERS ?? "sakhonmso@gmail.com")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+);
