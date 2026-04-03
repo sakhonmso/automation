@@ -17,7 +17,8 @@ function getClient() {
   if (_client) return _client;
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("Missing ANTHROPIC_API_KEY in .env");
-  _client = new Anthropic({ apiKey });
+  const baseURL = process.env.ANTHROPIC_BASE_URL;
+  _client = new Anthropic({ apiKey, ...(baseURL && { baseURL }) });
   return _client;
 }
 
