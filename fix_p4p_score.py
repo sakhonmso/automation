@@ -198,10 +198,11 @@ def fix_p4p_file(input_path, output_path=None):
         wb_do = openpyxl.load_workbook(input_path, data_only=True)
         ws_do = wb_do[sheet_name]
         current = nearest_number_near_cell(ws_do, anchor.row, anchor.column, score_col)
-        # Also try direct sum from score column as ground truth
+        # Direct sum of data rows only (header and anchor rows excluded to avoid
+        # double-counting sub-totals or the grand-total formula itself)
         direct_sum = sum(
             ws_do.cell(r, score_col).value
-            for r in range(1, ws_do.max_row + 1)
+            for r in range(header_row + 1, anchor.row)
             if isinstance(ws_do.cell(r, score_col).value, (int, float))
         )
         print(f"  Direct SUM of score column = {direct_sum}")
@@ -249,7 +250,8 @@ def fix_p4p_file(input_path, output_path=None):
 
             old_merge = unmerge_if_needed(ws, anchor.coordinate)
             anchor_cell = ws[anchor.coordinate]
-            anchor_cell.value = f'="{label}  = "&TEXT({sum_cell_addr},"0.##")'
+            safe_label = label.replace('"', '""')
+            anchor_cell.value = f'="{safe_label}  = "&TEXT({sum_cell_addr},"0.##")'
             try:
                 anchor_cell.font = Font(
                     name=sum_cell.font.name,
