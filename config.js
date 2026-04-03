@@ -30,7 +30,7 @@ export const TELEGRAM_TIMEOUT_MS = 10_000;
  * Set to false to suppress all alert replies (e.g. during testing).
  * Resume by setting back to true.
  */
-export const SEND_ERROR_REPLIES = false;
+export const SEND_ERROR_REPLIES = true;
 
 /** Gmail senders to skip entirely (comma-separated in env, or hardcoded default). */
 export const SKIP_SENDERS = new Set(
