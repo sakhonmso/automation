@@ -106,6 +106,28 @@ export async function matchName(name, date, threshold = SIMILARITY_THRESHOLD) {
   if (error) throw new Error(`Supabase query error on table "${date}": ${error.message}`);
   if (!data || data.length === 0) return null;
 
+  // ── Firstname-only shortcut ────────────────────────────────────────────────
+  // When the extracted name is a single token (no last name supplied), check
+  // whether exactly one row shares that first name.  If unambiguous, auto-
+  // assign the last name from the database record.
+  const normName = normalise(name);
+  const tokens   = normName.split(" ").filter(Boolean);
+  if (tokens.length === 1) {
+    const hits = data.filter((row) => normalise(row.firstname) === normName);
+    if (hits.length === 1) {
+      const row      = hits[0];
+      const fullName = `${row.firstname ?? ""} ${row.lastname ?? ""}`.trim();
+      return {
+        matchedName: fullName,
+        prefix     : row.prefix      ?? "",
+        department : row.department  ?? "",
+        index      : row.index,
+        similarity : 0.95, // high-confidence firstname-only match
+      };
+    }
+  }
+
+  // ── Normal fuzzy matching ──────────────────────────────────────────────────
   let best = null;
 
   for (const row of data) {
