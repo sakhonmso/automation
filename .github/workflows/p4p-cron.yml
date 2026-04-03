@@ -29,6 +29,8 @@ jobs:
           GOOGLE_CLIENT_SECRET  : ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REFRESH_TOKEN  : ${{ secrets.GOOGLE_REFRESH_TOKEN }}
           ANTHROPIC_API_KEY     : ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BASE_URL    : ${{ secrets.ANTHROPIC_BASE_URL }}
+          CLAUDE_MODEL          : ${{ secrets.CLAUDE_MODEL }}
           SUPABASE_URL          : ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY          : ${{ secrets.SUPABASE_KEY }}
           TELEGRAM_BOT_TOKEN    : ${{ secrets.TELEGRAM_BOT_TOKEN }}
