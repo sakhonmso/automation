@@ -423,7 +423,10 @@ export async function analyseJson(jsonData, filename = "data.json") {
     : `BE year: unknown — use "0000".`;
 
   // Resolve score in JS first — gives Claude a reliable anchor
-  const { score: jsScore, method: jsMethod } = extractScoreFromRows(rows);
+  // Use resolveScore (not extractScoreFromRows directly) so that files where
+  // fix_p4p_score.py wrote uncached =SUM(...) formulas fall through the
+  // two-tier fallback instead of returning the largest plain number (e.g. 2200).
+  const { score: jsScore, method: jsMethod } = resolveScore(rows);
   console.log(`│        🔢  JS score pre-scan: ${jsScore !== null ? jsScore.toFixed(2) : "null"} (${jsMethod})`);
 
   const scoreHint = jsScore !== null
