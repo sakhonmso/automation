@@ -711,6 +711,59 @@ async function main() {
     const otherAtts = attachments.filter((a) => !isExcelFile(a.mimeType, a.filename));
 
     if (xlsxAtts.length === 0) {
+      // ── Thread search: look for xlsx in earlier messages of this thread ──
+      let threadXlsx = null; // { messageId, att }
+      if (msg.threadId) {
+        try {
+          const threadMsgs = await gmail.getThreadMessages(msg.threadId);
+          // Iterate newest-first so we pick the most recent xlsx in the thread
+          for (const tm of [...threadMsgs].reverse()) {
+            if (tm.msg.id === id) continue; // already checked current message
+            const found = tm.attachments.filter((a) => isExcelFile(a.mimeType, a.filename));
+            if (found.length > 0) {
+              threadXlsx = { messageId: tm.msg.id, atts: found };
+              break;
+            }
+          }
+        } catch (err) {
+          console.warn(`│  ⚠️   Thread search failed: ${err.message}`);
+        }
+      }
+
+      if (threadXlsx) {
+        console.log(`│  🔍  No xlsx in this message — found xlsx in thread (message ${threadXlsx.messageId})`);
+        console.log(`│  📎  ${threadXlsx.atts.length} xlsx attachment(s) from thread:`);
+        const context = {
+          subject  : msg.subject,
+          body     : msgBody,
+          replyTo  : fromEmail,
+          messageId: id,
+        };
+        const results = await Promise.allSettled(
+          threadXlsx.atts.map((att) => processAttachment(att, threadXlsx.messageId, context, gmail))
+        );
+        processedAnyAttachment = results.some(
+          (r) => r.status === "fulfilled" && r.value === true
+        );
+        results.forEach((r, idx) => {
+          if (r.status === "rejected") {
+            console.error(`│      ❌  Thread attachment[${idx}] threw: ${r.reason?.message ?? r.reason}`);
+          }
+        });
+        if (processedAnyAttachment) {
+          const addLabels    = ["STARRED", ...(p4pLabelId ? [p4pLabelId] : [])];
+          const removeLabels = ["UNREAD", _sourceLabel];
+          try {
+            await gmail.modifyMessage(id, addLabels, removeLabels);
+            console.log(`│  🏷️   Marked: read · starred · archived · "${P4P_LABEL_NAME}"`);
+          } catch (err) {
+            console.error(`│  ❌  Failed to update message labels: ${err.message}`);
+          }
+        }
+        console.log(`└────────────────────────────────────────────────────────────\n`);
+        continue;
+      }
+
       let alertSent = false;
       if (CLOUD_LINK_RE.test(msgBody)) {
         // Sender pasted a cloud-storage link instead of attaching the file

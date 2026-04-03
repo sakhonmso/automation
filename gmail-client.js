@@ -79,7 +79,7 @@ export function createGmailClient() {
 
     const msg = {
       id:       raw.id,
-      threadId: raw.threadId,
+      threadId: raw.threadId ?? null,
       subject:  headers["subject"] ?? "(no subject)",
       from:     headers["from"]    ?? "",
       to:       headers["to"]      ?? "",
@@ -276,11 +276,43 @@ export function createGmailClient() {
     return labels.filter((l) => l.name.toLowerCase().includes(q));
   }
 
+  /**
+   * Fetch all messages in a thread and return them with decoded fields and
+   * attachments — same shape as getMessageWithAttachments, one entry per message.
+   * Messages are returned in chronological order (oldest first).
+   *
+   * @param {string} threadId
+   * @returns {Promise<Array<{ msg: object, attachments: Array }>>}
+   */
+  async function getThreadMessages(threadId) {
+    const res = await gmail.users.threads.get({
+      userId: "me",
+      id: threadId,
+      format: "full",
+    });
+    return (res.data.messages ?? []).map((raw) => {
+      const headers = Object.fromEntries(
+        (raw.payload?.headers ?? []).map((h) => [h.name.toLowerCase(), h.value])
+      );
+      const msg = {
+        id:       raw.id,
+        threadId: raw.threadId ?? null,
+        subject:  headers["subject"] ?? "(no subject)",
+        from:     headers["from"]    ?? "",
+        date:     headers["date"]    ?? "",
+        body:     extractBody(raw.payload),
+      };
+      const attachments = [];
+      collectAttachments(raw.payload, attachments);
+      return { msg, attachments };
+    });
+  }
+
   return {
     listMessages, getMessage, getMessageWithAttachments,
     readMessage, listAttachments,
     sendMessage, modifyMessage, markAsRead, archive,
-    getProfile, downloadAttachment, listLabels,
+    getProfile, downloadAttachment, listLabels, getThreadMessages,
   };
 }
 
