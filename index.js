@@ -460,7 +460,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     console.log(`│        ✅  Physician : ${analysis.name}`);
     console.log(`│        ✅  Date      : ${analysis.date}`);
     console.log(`│        ✅  Score     : ${analysis.score.toFixed(2)}`);
-    if (analysis.score === 0) throw new Error("Score is 0 — cannot save a zero score.");
+    if (analysis.score <= 0) throw new Error("Score is 0 — cannot save a zero score.");
   } catch (err) {
     console.error(`│        ❌  Claude analysis failed: ${err.message}`);
     await sendTelegram(formatErrorMessage(err.message, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));

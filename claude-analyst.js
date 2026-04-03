@@ -521,7 +521,7 @@ ${rowsJson}`;
       ? rawScore
       : parseFloat(String(rawScore).replace(/,/g, ""));
   }
-  if (isNaN(numeric) || numeric === 0) {
+  if (isNaN(numeric) || numeric <= 0) {
     if (jsScore !== null && jsScore > 0) {
       console.log(`│        ⚠️  Claude returned "${rawScore}" — using JS score ${jsScore.toFixed(2)} (${jsMethod})`);
       numeric = jsScore;
