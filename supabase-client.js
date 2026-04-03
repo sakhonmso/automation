@@ -106,25 +106,34 @@ export async function matchName(name, date, threshold = SIMILARITY_THRESHOLD) {
   if (error) throw new Error(`Supabase query error on table "${date}": ${error.message}`);
   if (!data || data.length === 0) return null;
 
-  // ── Firstname-only shortcut ────────────────────────────────────────────────
+  // ── Single-token (firstname-only) fast path ──────────────────────────────
   // When the extracted name is a single token (no last name supplied), check
   // whether exactly one row shares that first name.  If unambiguous, auto-
   // assign the last name from the database record.
+  //   • Exactly 1 row matches → safe to use (unique firstname in this table)
+  //   • 2+ rows match         → ambiguous, return null (safer than wrong match)
+  //   • 0 rows match          → fall through to Levenshtein
   const normName = normalise(name);
   const tokens   = normName.split(" ").filter(Boolean);
   if (tokens.length === 1) {
-    const hits = data.filter((row) => normalise(row.firstname) === normName);
+    const hits = data.filter((row) => normalise(row.firstname ?? "") === normName);
     if (hits.length === 1) {
       const row      = hits[0];
       const fullName = `${row.firstname ?? ""} ${row.lastname ?? ""}`.trim();
+      console.log(`        🔤  Single-token firstname match: "${normName}" → "${fullName}" (unique)`);
       return {
         matchedName: fullName,
-        prefix     : row.prefix      ?? "",
-        department : row.department  ?? "",
+        prefix     : row.prefix     ?? "",
+        department : row.department ?? "",
         index      : row.index,
-        similarity : 0.95, // high-confidence firstname-only match
+        similarity : 0.95, // high-confidence — unique firstname in this table
       };
     }
+    if (hits.length > 1) {
+      console.warn(`        ⚠️  Single-token "${normName}" matches ${hits.length} rows — ambiguous, skipping`);
+      return null;
+    }
+    // 0 exact firstname matches → fall through to Levenshtein
   }
 
   // ── Normal fuzzy matching ──────────────────────────────────────────────────
