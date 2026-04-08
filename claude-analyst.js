@@ -488,8 +488,9 @@ Return ONLY this JSON, nothing else:
 ${nameHint}
 Firstname + " " + lastname only. Strip all titles: นพ. พญ. นายแพทย์ แพทย์หญิง ทพ. ดร. Dr. Prof. Mr. Mrs.
 IMPORTANT: Thai month names are NOT lastnames — ignore them: มกราคม กุมภาพันธ์ มีนาคม เมษายน พฤษภาคม มิถุนายน กรกฎาคม สิงหาคม กันยายน ตุลาคม พฤศจิกายน ธันวาคม
-If the filename contains "ชื่อ เดือน" (e.g. "ศาศวัต มีนาคม"), only "ศาศวัต" is the name — search row data for the real lastname.
-If pre-resolved name above is provided, use it. Otherwise search: (1) filename, (2) subject/body, (3) row data.
+IMPORTANT: The word "เดือน" means "month" in Thai — it is NEVER a lastname. Do NOT use it as a name component.
+If the pre-resolved name above is a single firstname (no space), the physician may have only one name — do NOT search row data for a lastname and do NOT append "เดือน" or any month-related word.
+If pre-resolved name above is provided, use it as-is. Otherwise search: (1) filename, (2) subject/body, (3) row data.
 
 ━━ 2. date ━━
 ${yearHint}
