@@ -504,33 +504,40 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
   // ── Upload to Google Drive (must succeed before saving score / archiving) ─
   const drive = getDrive();
   if (drive) {
-    const uploadName = match?.matchedName ?? analysis.name;
-    console.log(`│        📤  Preparing first-sheet buffer for Drive upload…`);
-    try {
-      const uploadBuffer = await extractFirstSheetBuffer(buffer);
-
-      if (!uploadBuffer) {
-        const msg = "First sheet is blank — Drive upload aborted.";
-        console.warn(`│        ⚠️  ${msg}`);
-        await sendTelegram(formatErrorMessage(msg, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
-        await otherReply();
-        return "replied";
-      }
-
-      console.log(`│        📤  Uploading as "${uploadName}"…`);
-      const { fileName, replaced } = await drive.uploadFile(
-        uploadBuffer,
-        uploadName,
-        analysis.date
-      );
-      console.log(`│        ✅  Drive upload: "${fileName}" (${replaced ? "replaced existing" : "new file"})`);
-    } catch (driveErr) {
-      console.error(`│        ❌  Drive upload failed: ${driveErr.message}`);
+    if (!match) {
+      console.warn(`│        ⚠️  Name mismatch — Drive upload skipped for "${analysis.name}".`);
       await sendTelegram(
-        formatErrorMessage(`Drive upload failed: ${driveErr.message}`, filename)
+        formatErrorMessage(`Name mismatch: "${analysis.name}" not found in table "${analysis.date}" — Drive upload skipped.`, filename)
       ).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
-      await otherReply();
-      return "replied";  // ← do not archive, do not save score
+    } else {
+      const uploadName = match.matchedName;
+      console.log(`│        📤  Preparing first-sheet buffer for Drive upload…`);
+      try {
+        const uploadBuffer = await extractFirstSheetBuffer(buffer);
+
+        if (!uploadBuffer) {
+          const msg = "First sheet is blank — Drive upload aborted.";
+          console.warn(`│        ⚠️  ${msg}`);
+          await sendTelegram(formatErrorMessage(msg, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
+          await otherReply();
+          return "replied";
+        }
+
+        console.log(`│        📤  Uploading as "${uploadName}"…`);
+        const { fileName, replaced } = await drive.uploadFile(
+          uploadBuffer,
+          uploadName,
+          analysis.date
+        );
+        console.log(`│        ✅  Drive upload: "${fileName}" (${replaced ? "replaced existing" : "new file"})`);
+      } catch (driveErr) {
+        console.error(`│        ❌  Drive upload failed: ${driveErr.message}`);
+        await sendTelegram(
+          formatErrorMessage(`Drive upload failed: ${driveErr.message}`, filename)
+        ).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
+        await otherReply();
+        return "replied";  // ← do not archive, do not save score
+      }
     }
   }
 
