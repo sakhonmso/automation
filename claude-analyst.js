@@ -195,7 +195,11 @@ const TOTAL_LABELS = [...GRAND_TOTAL_LABELS, ...SUBTOTAL_LABELS];
 
 /** True if n looks like a calendar year and not a score. */
 function isYearLike(n) {
-  return (n >= 1900 && n <= 2099) || (n >= 2400 && n <= 2699);
+  if (n >= 1900 && n <= 2099) return true;
+  // BE year range (2400–2699): years are always whole numbers, so fractional
+  // values like 2408.56 are scores, not years.
+  if (n >= 2400 && n <= 2699 && Number.isInteger(n)) return true;
+  return false;
 }
 
 /**
