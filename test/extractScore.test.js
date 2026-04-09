@@ -66,3 +66,18 @@ test("extracts score when label and number share one cell", () => {
   assert.equal(score, 11011.5);
   assert.match(method, /grand-total/);
 });
+
+test("score in BE-year range (2400–2699) with decimals is not filtered as year-like", () => {
+  // Bug: isYearLike(2408.56) was returning true because 2408 falls in the BE
+  // range 2400–2699. But 2408.56 is a score (years are always integers).
+  // The app was returning 2200 (threshold) instead of 2408.56.
+  const rows = [
+    { col_1: "เกณฑ์ขั้นต้น", col_2: 2200, col_3: "คะแนน" },
+    { col_1: "item A", col_5: 1200.5 },
+    { col_1: "item B", col_5: 1208.06 },
+    { col_1: "รวมทั้งหมด", col_5: 2408.56 },
+  ];
+  const { score, method } = extractScoreFromRows(rows);
+  assert.equal(score, 2408.56);
+  assert.match(method, /grand-total/);
+});
