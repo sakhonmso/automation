@@ -191,8 +191,8 @@ async function stripFormulasFromBuffer(inputBuffer) {
       // Remove cm="1" attribute (dynamic array marker) from <c> tag
       const cleanAttrs = attrs.replace(/\s*cm="1"/, "");
 
-      // Extract cached value from <v>...</v>
-      const vMatch = inner.match(/<v>([^<]*)<\/v>/);
+      // Extract cached value from <v>...</v> (allow optional whitespace in tag, e.g. <v >)
+      const vMatch = inner.match(/<v[^>]*>([^<]*)<\/v>/);
       const vTag   = vMatch ? `<v>${vMatch[1]}</v>` : "";
 
       // Reconstruct cell with no formula, just the cached value
@@ -263,19 +263,29 @@ async function extractFirstSheetBuffer(buffer) {
   // ── Step 2: transplant original sheet XML into a new single-sheet zip ──
   const origZip = await JSZip.loadAsync(buffer);
 
-  // Find all sheet XML paths in order (sheet1.xml, sheet2.xml, …)
-  const sheetPaths = Object.keys(origZip.files)
-    .filter((p) => /^xl\/worksheets\/sheet\d+\.xml$/.test(p))
-    .sort((a, b) => {
-      const na = parseInt(a.match(/(\d+)/)[1]);
-      const nb = parseInt(b.match(/(\d+)/)[1]);
-      return na - nb;
-    });
+  // Resolve the correct sheet XML file via workbook.xml + rels.
+  // Sorting sheetN.xml filenames by number is NOT reliable — Excel can reorder
+  // sheets visually without renumbering the underlying XML files, so
+  // sheetPaths[sheetIndex] can point to the wrong sheet in reordered workbooks.
+  const wbXml   = await origZip.files["xl/workbook.xml"].async("string");
+  const relsXml = await origZip.files["xl/_rels/workbook.xml.rels"].async("string");
 
-  if (sheetIndex >= sheetPaths.length) return null;
+  const sheetsBlockM = wbXml.match(/<sheets>([\s\S]*?)<\/sheets>/);
+  if (!sheetsBlockM) return null;
 
-  const targetSheetPath = sheetPaths[sheetIndex]; // e.g. "xl/worksheets/sheet2.xml"
-  const targetSheetNum  = sheetIndex + 1;          // 1-based, for internal XML references
+  // r:id values for each sheet in visual order (as listed in workbook.xml)
+  const sheetRIds = [...sheetsBlockM[1].matchAll(/r:id="([^"]+)"/g)].map((m) => m[1]);
+  if (sheetIndex >= sheetRIds.length) return null;
+
+  const targetRId = sheetRIds[sheetIndex];
+  const relM = relsXml.match(new RegExp(`Id="${targetRId}"[^>]+Target="([^"]+)"`));
+  if (!relM) return null;
+
+  const targetRelPath   = relM[1];               // e.g. "worksheets/sheet2.xml"
+  const targetSheetPath = `xl/${targetRelPath}`; // e.g. "xl/worksheets/sheet2.xml"
+  const sheetNumM       = targetRelPath.match(/sheet(\d+)\.xml$/i);
+  if (!sheetNumM) return null;
+  const targetSheetNum  = parseInt(sheetNumM[1]); // 1-based, for internal XML references
 
   // Build output zip: copy everything except the other sheet XMLs and their rels
   const outZip = new JSZip();
@@ -431,7 +441,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
   }
 
   console.log(`│        All sheets : ${allSheets.join(", ")}`);
-  console.log(`│        Using sheet: "${chosenSheet}" (first sheet)`);
+  console.log(`│        Using sheet: "${chosenSheet}"`);
   console.log(`│        Rows       : ${rows.length}`);
 
   // ── Corruption checks ────────────────────────────────────────────────
@@ -505,7 +515,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
       await sendAlertReply({
         errorType   : "wrong_date",
         safeFilename: escapeHtml(filename ?? ""),
-        detectedDate: analysis.date,
+        detectedDate: escapeHtml(analysis.date),
         replyTo, messageId, gmail,
       });
       await sendTelegram(formatErrorMessage(`Table "${analysis.date}" not found — wrong date extracted from ${filename}`, filename))

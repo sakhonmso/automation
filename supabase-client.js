@@ -120,7 +120,7 @@ export async function matchName(name, date, threshold = SIMILARITY_THRESHOLD) {
     if (hits.length === 1) {
       const row      = hits[0];
       const fullName = `${row.firstname ?? ""} ${row.lastname ?? ""}`.trim();
-      console.log(`        🔤  Single-token firstname match: "${normName}" → "${fullName}" (unique)`);
+      console.log(`│        🔤  Single-token firstname match: "${normName}" → "${fullName}" (unique)`);
       return {
         matchedName: fullName,
         prefix     : row.prefix     ?? "",
@@ -130,7 +130,7 @@ export async function matchName(name, date, threshold = SIMILARITY_THRESHOLD) {
       };
     }
     if (hits.length > 1) {
-      console.warn(`        ⚠️  Single-token "${normName}" matches ${hits.length} rows — ambiguous, skipping`);
+      console.warn(`│        ⚠️  Single-token "${normName}" matches ${hits.length} rows — ambiguous, skipping`);
       return null;
     }
     // 0 exact firstname matches → fall through to Levenshtein

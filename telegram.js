@@ -53,15 +53,14 @@ export async function sendTelegram(text, { parseMode } = {}) {
       body    : JSON.stringify(body),
       signal  : controller.signal,
     });
+    const json = await res.json();
+    if (!json.ok) {
+      throw new Error(`Telegram API error: ${json.description ?? JSON.stringify(json)}`);
+    }
+    return json;
   } finally {
     clearTimeout(timer);
   }
-
-  const json = await res.json();
-  if (!json.ok) {
-    throw new Error(`Telegram API error: ${json.description ?? JSON.stringify(json)}`);
-  }
-  return json;
 }
 
 /**
