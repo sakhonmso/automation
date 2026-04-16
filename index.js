@@ -94,7 +94,22 @@ async function firstSheetToRows(buffer) {
   const allSheets = workbook.worksheets.map((ws) => ws.name);
   if (allSheets.length === 0) throw new Error("Workbook has no sheets.");
 
-  const worksheet = workbook.worksheets[0];
+  function nonNullCount(ws) {
+    let count = 0;
+    ws.eachRow((row) => {
+      row.eachCell({ includeEmpty: false }, (cell) => {
+        if (cell.value !== null && cell.value !== undefined) count++;
+      });
+    });
+    return count;
+  }
+
+  let wsIndex = 0;
+  if (nonNullCount(workbook.worksheets[0]) < 3 && workbook.worksheets.length > 1) {
+    wsIndex = 1;
+  }
+
+  const worksheet = workbook.worksheets[wsIndex];
   const rows = [];
 
   worksheet.eachRow((row) => {
@@ -136,7 +151,7 @@ async function firstSheetToRows(buffer) {
     if (Object.keys(obj).length > 0) rows.push(obj);
   });
 
-  return { rows, allSheets, chosenSheet: allSheets[0] };
+  return { rows, allSheets, chosenSheet: allSheets[wsIndex] };
 }
 
 /**
