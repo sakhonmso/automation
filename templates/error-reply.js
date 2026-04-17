@@ -5,11 +5,12 @@
  * Content is driven by errorType — no raw technical details are exposed to the user.
  *
  * @param {object} data
- * @param {string} data.safeFilename  Attachment filename(s), HTML-escaped (may be empty)
- * @param {"wrong_extension"|"file_link"|"wrong_date"|"other"} data.errorType
+ * @param {string} data.safeFilename    Attachment filename(s), HTML-escaped (may be empty)
+ * @param {"wrong_extension"|"file_link"|"wrong_date"|"physician_not_found"|"other"} data.errorType
  * @param {string} [data.detectedDate]  Date string extracted from file, shown when errorType="wrong_date"
+ * @param {string} [data.detectedName]  Name extracted from file, shown when errorType="physician_not_found"
  */
-export function buildHtmlErrorReply({ safeFilename = "", errorType = "other", detectedDate = "" }) {
+export function buildHtmlErrorReply({ safeFilename = "", errorType = "other", detectedDate = "", detectedName = "" }) {
   const CONTENT = {
     wrong_extension: {
       bannerTitle  : "ประเภทไฟล์ไม่ถูกต้อง",
@@ -30,6 +31,11 @@ export function buildHtmlErrorReply({ safeFilename = "", errorType = "other", de
       bannerTitle  : "วันที่/เดือน/ปี ในไฟล์ไม่ถูกต้อง",
       bannerBody   : "ระบบไม่พบข้อมูลสำหรับช่วงเวลาที่ระบุในไฟล์<br>กรุณาตรวจสอบว่าไฟล์ P4P ตรงกับเดือนและปีที่ถูกต้อง",
       instruction  : "กรุณาตรวจสอบชื่อไฟล์และข้อมูลภายในว่าระบุเดือน/ปีถูกต้อง แล้วส่งไฟล์ใหม่อีกครั้ง",
+    },
+    physician_not_found: {
+      bannerTitle  : "ไม่พบชื่อแพทย์ในระบบ",
+      bannerBody   : "ระบบไม่สามารถจับคู่ชื่อแพทย์จากไฟล์ที่ส่งมากับฐานข้อมูลได้<br>ไฟล์ยังไม่ถูกจัดเก็บและยังไม่มีการบันทึกคะแนน",
+      instruction  : "กรุณาตรวจสอบว่าชื่อในไฟล์ตรงกับชื่อที่ลงทะเบียนในระบบ หากพบปัญหา กรุณาติดต่อเจ้าหน้าที่องค์กรแพทย์",
     },
     other: {
       bannerTitle  : "เกิดข้อผิดพลาดในการประมวลผล",
@@ -54,7 +60,14 @@ export function buildHtmlErrorReply({ safeFilename = "", errorType = "other", de
         </tr>`
     : "";
 
-  const detailRows = filenameRow + dateRow;
+  const nameRow = detectedName
+    ? `<tr>
+          <td>ชื่อที่ตรวจพบ</td>
+          <td>${detectedName}</td>
+        </tr>`
+    : "";
+
+  const detailRows = filenameRow + dateRow + nameRow;
 
   return `<!DOCTYPE html>
 <html lang="th">

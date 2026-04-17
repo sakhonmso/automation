@@ -108,14 +108,26 @@ function extractNameFromText(text) {
 
   // Normalise dotted title abbreviations ONLY (before Pattern 1) so that both
   // "นพ." and "น.พ." / "พญ." and "พ.ญ." etc. are matched by the same regex.
-  // This is a targeted replacement of known titles — NOT the general month-dot
-  // collapsing (which runs later, after Pattern 1).
+  // Also collapse dotted Thai month abbreviations here so Pattern 1 sees "มีค"
+  // (which is in NON_NAME_THAI) instead of the bare "มี" fragment before the dot.
   const titleNorm = text
     .replace(/น\.พ\./g,    "นพ.")
     .replace(/พ\.ญ\./g,    "พญ.")
     .replace(/ท\.พ\./g,    "ทพ.")
     .replace(/ท\.พ\.ญ\./g, "ทพญ.")
-    .replace(/ด\.ร\./g,    "ดร.");
+    .replace(/ด\.ร\./g,    "ดร.")
+    .replace(/ม\.ค\.?/g,   "มค")
+    .replace(/ก\.พ\.?/g,   "กพ")
+    .replace(/มี\.ค\.?/g,  "มีค")
+    .replace(/เม\.ย\.?/g,  "เมย")
+    .replace(/พ\.ค\.?/g,   "พค")
+    .replace(/มิ\.ย\.?/g,  "มิย")
+    .replace(/ก\.ค\.?/g,   "กค")
+    .replace(/ส\.ค\.?/g,   "สค")
+    .replace(/ก\.ย\.?/g,   "กย")
+    .replace(/ต\.ค\.?/g,   "ตค")
+    .replace(/พ\.ย\.?/g,   "พย")
+    .replace(/ธ\.ค\.?/g,   "ธค");
 
   // Pattern 1: run on titleNorm so title dots are intact but dotted variants
   // are already collapsed ("พ.ญ.ศาศวัต" → "พญ.ศาศวัต" → matched correctly).

@@ -367,10 +367,11 @@ async function extractFirstSheetBuffer(buffer) {
 // ── Alert reply helper ────────────────────────────────────────────────────
 
 const ALERT_SUBJECTS = {
-  wrong_extension : "[แจ้งข้อผิดพลาด] ประเภทไฟล์ไม่ถูกต้อง",
-  file_link       : "[แจ้งข้อผิดพลาด] ตรวจพบลิงก์ไฟล์แทนไฟล์จริง",
-  zero_score      : "[แจ้งข้อผิดพลาด] คะแนนรวมเป็นศูนย์",
-  wrong_date      : "[แจ้งข้อผิดพลาด] วันที่/เดือน/ปีในไฟล์ไม่ถูกต้อง",
+  wrong_extension     : "[แจ้งข้อผิดพลาด] ประเภทไฟล์ไม่ถูกต้อง",
+  file_link           : "[แจ้งข้อผิดพลาด] ตรวจพบลิงก์ไฟล์แทนไฟล์จริง",
+  zero_score          : "[แจ้งข้อผิดพลาด] คะแนนรวมเป็นศูนย์",
+  wrong_date          : "[แจ้งข้อผิดพลาด] วันที่/เดือน/ปีในไฟล์ไม่ถูกต้อง",
+  physician_not_found : "[แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ",
   other           : "[แจ้งข้อผิดพลาด] ไม่สามารถประมวลผลไฟล์ P4P ได้",
 };
 
@@ -378,20 +379,22 @@ const ALERT_SUBJECTS = {
  * Send an alert-themed HTML reply to the original sender.
  * Silently no-ops if replyTo or messageId is missing.
  *
- * @param {"wrong_extension"|"file_link"|"other"} errorType
- * @param {string} safeFilename  HTML-escaped filename (may be empty)
- * @param {string} replyTo       Sender email address
- * @param {string} messageId     Gmail message ID for thread reply
- * @param {object} gmail         Shared Gmail client
+ * @param {"wrong_extension"|"file_link"|"wrong_date"|"physician_not_found"|"other"} errorType
+ * @param {string} safeFilename   HTML-escaped filename (may be empty)
+ * @param {string} [detectedDate] Shown for wrong_date errors
+ * @param {string} [detectedName] Shown for physician_not_found errors
+ * @param {string} replyTo        Sender email address
+ * @param {string} messageId      Gmail message ID for thread reply
+ * @param {object} gmail          Shared Gmail client
  */
-async function sendAlertReply({ errorType = "other", safeFilename = "", detectedDate = "", replyTo, messageId, gmail }) {
+async function sendAlertReply({ errorType = "other", safeFilename = "", detectedDate = "", detectedName = "", replyTo, messageId, gmail }) {
   if (!SEND_ERROR_REPLIES) {
     console.log(`│        ⏸️   Alert reply [${errorType}] suppressed (SEND_ERROR_REPLIES=false)`);
     return;
   }
   if (!replyTo || !messageId) return;
   const subject  = ALERT_SUBJECTS[errorType] ?? ALERT_SUBJECTS.other;
-  const htmlReply = buildHtmlErrorReply({ safeFilename, errorType, detectedDate });
+  const htmlReply = buildHtmlErrorReply({ safeFilename, errorType, detectedDate, detectedName });
   try {
     await gmail.sendMessage({
       to              : replyTo,
@@ -509,21 +512,25 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     }
   } catch (dbErr) {
     console.error(`│        ❌  Supabase match error: ${dbErr.message}`);
-    // Table not found → the extracted date is wrong; tell the sender
-    if (/does not exist|undefined_table|42P01/i.test(dbErr.message)) {
+    const isTableMissing = /does not exist|undefined_table|42P01|schema cache/i.test(dbErr.message);
+    if (isTableMissing) {
       console.log(`│        📅  Table "${analysis.date}" not found — sending wrong_date reply`);
-      await sendAlertReply({
-        errorType   : "wrong_date",
-        safeFilename: escapeHtml(filename ?? ""),
-        detectedDate: escapeHtml(analysis.date),
-        replyTo, messageId, gmail,
-      });
-      await sendTelegram(formatErrorMessage(`Table "${analysis.date}" not found — wrong date extracted from ${filename}`, filename))
-        .catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
-      return "replied";
     }
-    await sendTelegram(formatErrorMessage(`Supabase match error: ${dbErr.message}`, filename))
-      .catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
+    await sendAlertReply({
+      errorType   : isTableMissing ? "wrong_date" : "other",
+      safeFilename: escapeHtml(filename ?? ""),
+      detectedDate: isTableMissing ? escapeHtml(analysis.date) : "",
+      replyTo, messageId, gmail,
+    });
+    await sendTelegram(
+      formatErrorMessage(
+        isTableMissing
+          ? `Table "${analysis.date}" not found — wrong date extracted from ${filename}`
+          : `Supabase match error: ${dbErr.message}`,
+        filename
+      )
+    ).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
+    return "replied";
   }
 
   // ── Upload to Google Drive (must succeed before saving score / archiving) ─
@@ -596,39 +603,47 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
 
   // ── Auto-reply to sender ──────────────────────────────────────────────
   if (replyTo && messageId) {
-    const [beYear, monthNum] = analysis.date.split("_");
-    const thaiMonth  = THAI_MONTHS[parseInt(monthNum, 10)] || monthNum;
-    const displayDate = `${thaiMonth} ${beYear}`;
-
-    // Build display name: "prefix firstname  lastname" (1 space after prefix, 2 between names)
-    const prefix = match?.prefix ? `${match.prefix.trim()} ` : "";
-    const baseName = match?.matchedName ?? analysis.name;
-    const nameParts = baseName.trim().split(/\s+/);
-    const spacedName = nameParts.length >= 2
-      ? `${nameParts[0]}  ${nameParts.slice(1).join("  ")}`
-      : baseName;
-    const displayName    = `${prefix}${spacedName}`;
-    const department     = match?.department ?? "";
-    // Escape all user-derived values before HTML interpolation (XSS prevention)
-    const safeDisplayName = escapeHtml(displayName);
-    const safeDepartment  = escapeHtml(department);
-    const safeDisplayDate = escapeHtml(displayDate);
-    const safeScore       = escapeHtml(analysis.score.toFixed(2));
-
-    const htmlReply = buildHtmlReply({ displayName: safeDisplayName, safeDepartment, safeDisplayDate, safeScore });
-
-    console.log(`│        📧  Sending auto-reply to ${replyTo}…`);
-    try {
-      await gmail.sendMessage({
-        to              : replyTo,
-        subject         : `องค์กรแพทย์ รพ. สค.`,
-        html            : htmlReply,
-        body            : `เรียน ${displayName}\n\nองค์กรแพทย์ โรงพยาบาลสมุทรสาคร ได้จัดเก็บไฟล์ P4P ของท่านแล้ว\n\nชื่อแพทย์: ${displayName}\nเดือน/ปี: ${displayDate}\nคะแนนรวม: ${analysis.score.toFixed(2)}\n\nขอบคุณที่ให้ความร่วมมือเป็นอย่างดี`,  // plain text — no escaping needed
-        replyToMessageId: messageId,
+    if (!match) {
+      await sendAlertReply({
+        errorType   : "physician_not_found",
+        safeFilename: escapeHtml(filename ?? ""),
+        detectedName: escapeHtml(analysis.name ?? ""),
+        replyTo, messageId, gmail,
       });
-      console.log(`│        ✅  Auto-reply sent to ${replyTo}`);
-    } catch (replyErr) {
-      console.error(`│        ❌  Auto-reply failed: ${replyErr.message}`);
+    } else {
+      const [beYear, monthNum] = analysis.date.split("_");
+      const thaiMonth  = THAI_MONTHS[parseInt(monthNum, 10)] || monthNum;
+      const displayDate = `${thaiMonth} ${beYear}`;
+
+      // Build display name: "prefix firstname  lastname" (1 space after prefix, 2 between names)
+      const prefix = match.prefix ? `${match.prefix.trim()} ` : "";
+      const nameParts = match.matchedName.trim().split(/\s+/);
+      const spacedName = nameParts.length >= 2
+        ? `${nameParts[0]}  ${nameParts.slice(1).join("  ")}`
+        : match.matchedName;
+      const displayName    = `${prefix}${spacedName}`;
+      const department     = match.department ?? "";
+      // Escape all user-derived values before HTML interpolation (XSS prevention)
+      const safeDisplayName = escapeHtml(displayName);
+      const safeDepartment  = escapeHtml(department);
+      const safeDisplayDate = escapeHtml(displayDate);
+      const safeScore       = escapeHtml(analysis.score.toFixed(2));
+
+      const htmlReply = buildHtmlReply({ displayName: safeDisplayName, safeDepartment, safeDisplayDate, safeScore });
+
+      console.log(`│        📧  Sending auto-reply to ${replyTo}…`);
+      try {
+        await gmail.sendMessage({
+          to              : replyTo,
+          subject         : `องค์กรแพทย์ รพ. สค.`,
+          html            : htmlReply,
+          body            : `เรียน ${displayName}\n\nองค์กรแพทย์ โรงพยาบาลสมุทรสาคร ได้จัดเก็บไฟล์ P4P ของท่านแล้ว\n\nชื่อแพทย์: ${displayName}\nเดือน/ปี: ${displayDate}\nคะแนนรวม: ${analysis.score.toFixed(2)}\n\nขอบคุณที่ให้ความร่วมมือเป็นอย่างดี`,  // plain text — no escaping needed
+          replyToMessageId: messageId,
+        });
+        console.log(`│        ✅  Auto-reply sent to ${replyTo}`);
+      } catch (replyErr) {
+        console.error(`│        ❌  Auto-reply failed: ${replyErr.message}`);
+      }
     }
   }
 
