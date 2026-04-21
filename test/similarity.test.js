@@ -30,3 +30,12 @@ test("case-insensitive for latin chars", () => {
 test("empty strings return 1.0 (both empty = same)", () => {
   assert.equal(similarity("", ""), 1.0);
 });
+
+test("abbreviated lastname prefix (≥3 chars) scores 0.9", () => {
+  // "หยิบ" is a 3-char prefix of "หยิบทรงศิริกุล" — real-world abbreviated filename
+  assert.equal(similarity("ศศิมา หยิบ", "ศศิมา หยิบทรงศิริกุล"), 0.9);
+});
+
+test("2-char prefix does NOT get 0.9 bonus (too ambiguous)", () => {
+  assert.ok(similarity("สมชาย ใจ", "สมชาย ใจดี") < 0.9);
+});

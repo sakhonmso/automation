@@ -59,7 +59,11 @@ export function similarity(a, b) {
   const tokB = nb.split(" ").filter(Boolean);
   const shorter = tokA.length <= tokB.length ? tokA : tokB;
   const longer  = tokA.length <= tokB.length ? tokB : tokA;
-  const allMatch = shorter.every((t) => longer.includes(t));
+  // A token matches if it's an exact hit OR a prefix of a longer token (min 3 chars).
+  // This handles abbreviated lastnames in filenames, e.g. "หยิบ" → "หยิบทรงศิริกุล".
+  const tokenMatches = (t) =>
+    longer.includes(t) || (t.length >= 3 && longer.some((l) => l.startsWith(t)));
+  const allMatch = shorter.every(tokenMatches);
   // Require ≥ 2 tokens to avoid a single first-name token matching any physician
   // with the same first name but a different last name (false-positive at 0.9).
   if (allMatch && shorter.length >= 2) return 0.9;
