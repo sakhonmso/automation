@@ -149,19 +149,33 @@ function extractNameFromText(text) {
   //   "เม.ย."  →  "เมย."
   const text2 = text.replace(/([\u0E00-\u0E7F]+)\.(?=[\u0E00-\u0E7F])/g, "$1");
 
+  // Split compound เดือน<monthname> tokens so each part is checked individually.
+  // เดือนมกราคม → เดือน มกราคม — both are in NON_NAME_THAI and get rejected below.
+  const text3 = text2.replace(
+    /เดือน(มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม)/g,
+    "เดือน $1"
+  );
+
   // Pattern 2: two consecutive Thai-character sequences (min 2 chars each),
   // separated by one of: space, underscore, dash, dot — but NOT a digit boundary.
   // Both words must not be in the NON_NAME_THAI exclusion set.
   const twoWordRe = /([\u0E00-\u0E7F]{2,})[\s_\-.]+([\u0E00-\u0E7F]{2,})/g;
   let m2;
-  while ((m2 = twoWordRe.exec(text2)) !== null) {
+  let singleTokenFallback = null; // best firstname when no full pair is found
+  while ((m2 = twoWordRe.exec(text3)) !== null) {
     const first = m2[1];
     const last  = m2[2];
     if (!NON_NAME_THAI.has(first) && !NON_NAME_THAI.has(last)) {
       return `${first} ${last}`;
     }
+    // When first is valid but second is a non-name token (e.g. a month), record
+    // it as a single-token candidate — mirrors Pattern 1's firstname-only return.
+    if (!singleTokenFallback && !NON_NAME_THAI.has(first) && NON_NAME_THAI.has(last)) {
+      singleTokenFallback = first;
+    }
   }
 
+  if (singleTokenFallback) return singleTokenFallback;
   return null;
 }
 
