@@ -81,3 +81,18 @@ test("score in BE-year range (2400–2699) with decimals is not filtered as year
   assert.equal(score, 2408.56);
   assert.match(method, /grand-total/);
 });
+
+test("integer score in BE-year range on a grand-total label row is not filtered", () => {
+  // Bug: 2607 is an integer in the BE range (2400–2699), so isYearLike(2607)
+  // returned true and the grand-total row was ignored. The app fell back to 2200.
+  // Fix: year filter is skipped when the row is a confirmed grand-total label row.
+  const rows = [
+    { col_1: "เกณฑ์ขั้นต้น", col_2: 2200, col_3: "คะแนน" },
+    { col_1: "item A", col_5: 800 },
+    { col_1: "item B", col_5: 1807 },
+    { col_1: "รวมแต้มทั้งหมด", col_5: 2607 },
+  ];
+  const { score, method } = extractScoreFromRows(rows);
+  assert.equal(score, 2607);
+  assert.match(method, /grand-total/);
+});

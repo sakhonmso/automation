@@ -231,12 +231,14 @@ function isYearLike(n) {
 /**
  * Extract all positive, non-year numbers embedded in a mixed text+number string.
  * Handles cells like "รวมทั้งหมด  = 11011.5" where label and score share one cell.
+ * @param {*} val
+ * @param {boolean} [skipYearFilter] - when true, accept year-like integers as scores
  */
-function numsFromText(val) {
+function numsFromText(val, skipYearFilter = false) {
   const s = String(val ?? "").replace(/,/g, "");
   return [...s.matchAll(/\d+(?:\.\d+)?/g)]
     .map((m) => parseFloat(m[0]))
-    .filter((n) => !isNaN(n) && n > 0 && !isYearLike(n));
+    .filter((n) => !isNaN(n) && n > 0 && (skipYearFilter || !isYearLike(n)));
 }
 
 /** Coerce any cell value to a number. Returns NaN if not numeric. */
@@ -255,14 +257,17 @@ function toNum(val) {
  * Collect all positive, non-year numbers from a set of rows.
  * NOTE: row-ID filtering is intentionally NOT applied here — it caused
  * false negatives when a score value happened to equal the row index.
+ * @param {object[]} rows
+ * @param {boolean} [skipYearFilter] - when true, accept numbers in the year range
+ *   (used for confirmed grand-total label rows where the score itself may be year-like)
  */
-function collectCandidates(rows) {
+function collectCandidates(rows, skipYearFilter = false) {
   const results = [];
   for (const row of rows) {
     for (const val of Object.values(row)) {
       const n = toNum(val);
       if (isNaN(n) || n <= 0) continue;
-      if (isYearLike(n))      continue;
+      if (!skipYearFilter && isYearLike(n)) continue;
       results.push(n);
     }
   }
@@ -297,11 +302,13 @@ export function extractScoreFromRows(rows) {
       GRAND_TOTAL_LABELS.some((label) => s.includes(label))
     );
     if (labelCells.length > 0) {
-      const nums = collectCandidates([row]);
+      // Skip year filter: this row is confirmed to be a grand-total row, so any
+      // number in it is a score even if it falls in a year-like integer range (e.g. 2607).
+      const nums = collectCandidates([row], true);
       // Also extract numbers embedded inside the label cells themselves.
       // Handles the case where label and score share one cell, e.g.:
       //   "รวมทั้งหมด  = 11011.5"
-      const embedded = labelCells.flatMap((s) => numsFromText(s));
+      const embedded = labelCells.flatMap((s) => numsFromText(s, true));
       grandCandidates.push(...nums, ...embedded);
     }
   }
