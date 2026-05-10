@@ -556,6 +556,12 @@ ${rowsJson}`;
     messages  : [{ role: "user", content: prompt }],
   });
 
+  if (!Array.isArray(message?.content)) {
+    throw new Error(
+      `Claude API returned unexpected response (content=${JSON.stringify(message?.content ?? null)}). ` +
+      `stop_reason=${message?.stop_reason ?? "unknown"}`
+    );
+  }
   const raw = message.content
     .filter((b) => b.type === "text")
     .map((b) => b.text)

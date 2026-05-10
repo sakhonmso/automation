@@ -121,16 +121,30 @@ async function firstSheetToRows(buffer) {
       const key = `col_${colNumber}`;
 
       const val = cell.value;
-      const isFormula = val !== null && typeof val === "object" && "formula" in val;
+      // ExcelJS represents shared-formula cells in two forms:
+      //   Master cell: { formula: "=A1*B1", result: 42, shared: true, si: 0 }  → "formula" in val
+      //   Clone cell:  { sharedFormula: "A1", result: 42 }                      → "sharedFormula" in val, no "formula"
+      // Without handling clones, their raw objects leak into rows as { sharedFormula: "..." }
+      // which bloats the JSON and prevents correct numeric extraction.
+      const isMasterFormula = val !== null && typeof val === "object" && "formula" in val;
+      const isCloneFormula  = val !== null && typeof val === "object" && "sharedFormula" in val && !("formula" in val);
 
-      if (isFormula) {
+      if (isMasterFormula || isCloneFormula) {
         const r = cell.result;
-        if (r === null || r === undefined) {
-          obj[key] = null;
-        } else if (r instanceof Date) {
-          obj[key] = r.toISOString();
+        if (isCloneFormula) {
+          // Clone cells: keep only numeric results (computed scores/counts).
+          // Text results are repeated merged-cell display text that adds no analytical value
+          // and would be duplicated across every column in the merged range.
+          obj[key] = (typeof r === "number") ? r : null;
         } else {
-          obj[key] = r;
+          // Master formula cells: extract result normally
+          if (r === null || r === undefined) {
+            obj[key] = null;
+          } else if (r instanceof Date) {
+            obj[key] = r.toISOString();
+          } else {
+            obj[key] = r;
+          }
         }
         return;
       }
