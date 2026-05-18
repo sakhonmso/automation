@@ -93,6 +93,20 @@ const NON_NAME_THAI = new Set([
   "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม",
   // Thai month abbreviations (no dots — dots are stripped by the Thai-char regex)
   "มค", "กพ", "มีค", "เมย", "พค", "มิย", "กค", "กย", "ตค", "พย", "ธค",
+  // Extended month truncations that appear in filenames (e.g. "เมษ 69", "เมษา 69")
+  // Without these, e.g. "เมษ" would be mistaken for a lastname.
+  "เมษ", "เมษา",   // เมษายน  (April)
+  "มกรา", "มกร",   // มกราคม  (January)
+  "กุมภา", "กุมภ", // กุมภาพันธ์ (February)
+  "มีนา", "มีน",   // มีนาคม  (March)
+  "พฤษภ", "พฤษ",   // พฤษภาคม (May)
+  "มิถุน", "มิถุ", // มิถุนายน (June)
+  "กรกฎ", "กรก",   // กรกฎาคม (July)
+  "สิงหา", "สิงห", // สิงหาคม (August)
+  "กันยา", "กันย", // กันยายน (September)
+  "ตุลา", "ตุล",   // ตุลาคม  (October)
+  "พฤศจิ", "พฤศ",  // พฤศจิกายน (November)
+  "ธันวา", "ธันว", // ธันวาคม (December)
 ]);
 
 /**
@@ -535,7 +549,7 @@ ${yearHint}
 Month sources — Subject: "${subject}" | Body: "${bodyPreview}" | Filename: "${file}"
 Priority: (1) subject/body, (2) filename, (3) row data.
 ม.ค./มค/มกราคม/Jan/January=01    ก.พ./กพ/กุมภาพันธ์/Feb/February=02
-มี.ค./มีค/มีนาคม/Mar/March=03     เม.ย./เมย/เมษายน/Apr/April=04
+มี.ค./มีค/มีนาคม/Mar/March=03     เม.ย./เมย/เมษ/เมษา/เมษายน/Apr/April=04
 พ.ค./พค/พฤษภาคม/May=05            มิ.ย./มิย/มิถุนายน/Jun/June=06
 ก.ค./กค/กรกฎาคม/Jul/July=07      ส.ค./สค/สิงหาคม/Aug/August=08
 ก.ย./กย/กันยายน/Sep/September=09  ต.ค./ตค/ตุลาคม/Oct/October=10
