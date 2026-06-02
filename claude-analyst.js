@@ -190,6 +190,16 @@ function extractNameFromText(text) {
   }
 
   if (singleTokenFallback) return singleTokenFallback;
+
+  // Pattern 3 (last resort): a single valid Thai token surrounded by non-Thai text.
+  // Handles filenames like "P4P จิรภัทร May 69 (1) (4) (1)" where there is only
+  // one Thai word and Pattern 2 never fires (it needs two Thai tokens to match).
+  // Only returns if exactly one non-excluded Thai word exists — avoids false positives
+  // when multiple Thai words are present but none formed a valid pair.
+  const soloRe = /[฀-๿]{2,}/g;
+  const soloHits = [...text3.matchAll(soloRe)].map((m) => m[0]).filter((t) => !NON_NAME_THAI.has(t));
+  if (soloHits.length === 1) return soloHits[0];
+
   return null;
 }
 
