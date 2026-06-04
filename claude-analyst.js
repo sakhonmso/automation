@@ -79,6 +79,50 @@ export function resolveBeYear(filename, subject, body) {
   return null;
 }
 
+// ── JS-side month resolver ────────────────────────────────────────────────
+// Returns 1–12 from any text source (filename / subject / body).
+// Used to select the correct sheet in multi-sheet workbooks.
+
+const MONTH_TOKEN_MAP = (() => {
+  // Pairs of [token, monthNumber]. Longer tokens listed first so that
+  // e.g. "มกราคม" is matched before the shorter "มกรา" / "มกร".
+  const entries = [
+    ["มกราคม",1],["January",1],["มกรา",1],["มกร",1],["มค",1],
+    ["กุมภาพันธ์",2],["February",2],["กุมภา",2],["กุมภ",2],["กพ",2],
+    ["มีนาคม",3],["March",3],["มีนา",3],["มีน",3],["มีค",3],
+    ["เมษายน",4],["April",4],["เมษา",4],["เมษ",4],["เมย",4],
+    ["พฤษภาคม",5],["May",5],["พฤษภ",5],["พฤษ",5],["พค",5],
+    ["มิถุนายน",6],["June",6],["มิถุน",6],["มิถุ",6],["มิย",6],
+    ["กรกฎาคม",7],["July",7],["กรกฎ",7],["กรก",7],["กค",7],
+    ["สิงหาคม",8],["August",8],["สิงหา",8],["สิงห",8],["สค",8],
+    ["กันยายน",9],["September",9],["กันยา",9],["กันย",9],["กย",9],
+    ["ตุลาคม",10],["October",10],["ตุลา",10],["ตุล",10],["ตค",10],
+    ["พฤศจิกายน",11],["November",11],["พฤศจิ",11],["พฤศ",11],["พย",11],
+    ["ธันวาคม",12],["December",12],["ธันวา",12],["ธันว",12],["ธค",12],
+  ];
+  return entries; // order matters — scan longest-first within each month
+})();
+
+/**
+ * Extract the month number (1–12) from filename / subject / body.
+ * Sources checked in order: subject → body → filename.
+ * Returns null if not found.
+ */
+export function resolveBeMonth(filename, subject, body) {
+  const sources = [subject ?? "", body ?? "", filename ?? ""];
+  for (const t of sources) {
+    for (const [token, mo] of MONTH_TOKEN_MAP) {
+      // Latin tokens: require word boundary to avoid "May" inside "Maybe"
+      if (/^[A-Za-z]+$/.test(token)) {
+        if (new RegExp(`\\b${token}\\b`, "i").test(t)) return mo;
+      } else if (t.includes(token)) {
+        return mo;
+      }
+    }
+  }
+  return null;
+}
+
 // ── JS-side physician name resolver ───────────────────────────────────────
 // Thai title prefixes to strip before returning a name
 const TITLE_PREFIX_RE = /^(?:นพ\.|พญ\.|นายแพทย์\s*|แพทย์หญิง\s*|ทพ\.|ทพญ\.|ดร\.|Dr\.\s*|Prof\.\s*|Mr\.\s*|Mrs\.\s*)/;

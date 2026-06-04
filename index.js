@@ -11,7 +11,7 @@
 
 import { createGmailClient }             from "./gmail-client.js";
 import { createDriveClient }             from "./drive-client.js";
-import { analyseJson }                   from "./claude-analyst.js";
+import { analyseJson, resolveBeMonth }   from "./claude-analyst.js";
 import { matchName, saveScore }          from "./supabase-client.js";
 import { sendTelegram, formatResultMessage, formatErrorMessage } from "./telegram.js";
 import { buildHtmlReply }               from "./templates/reply.js";
@@ -80,14 +80,18 @@ function escapeHtml(s) {
 // Replacing either library would require reimplementing the other's role.
 
 /**
- * Load any Excel buffer with ExcelJS and convert the FIRST sheet to row objects.
+ * Load any Excel buffer with ExcelJS and convert the correct sheet to row objects.
  *
  * Uses row.eachCell (not row.values) so we access the real Cell object and can
  * call cell.result directly. This fixes cm="1" (Excel 365 dynamic array formula)
  * cells where row.values returns a formula-object with result=0 even when the
  * actual cached <v> element contains the correct non-zero value.
+ *
+ * @param {Buffer} buffer
+ * @param {{ targetMonth?: number|null }} [opts]  targetMonth 1–12 hints which sheet to use
+ *   in multi-sheet workbooks (e.g. physician accumulated all months in one file).
  */
-async function firstSheetToRows(buffer) {
+async function firstSheetToRows(buffer, { targetMonth = null } = {}) {
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(buffer);
 
@@ -104,9 +108,45 @@ async function firstSheetToRows(buffer) {
     return count;
   }
 
+  // ── Sheet selection ──────────────────────────────────────────────────────
+  // Default: first non-empty sheet (existing behaviour).
+  // When targetMonth is known, prefer the sheet whose name contains a month
+  // token matching that month number — handles multi-month workbooks where a
+  // physician accumulates all months in one file.
   let wsIndex = 0;
   if (nonNullCount(workbook.worksheets[0]) < 3 && workbook.worksheets.length > 1) {
     wsIndex = 1;
+  }
+
+  if (targetMonth !== null && workbook.worksheets.length > 1) {
+    // Build a month-number → list of Thai/English tokens map for matching
+    const MONTH_TOKENS_BY_NUM = {
+      1:  ["มกราคม","มกรา","มกร","มค","january","jan"],
+      2:  ["กุมภาพันธ์","กุมภา","กุมภ","กพ","february","feb"],
+      3:  ["มีนาคม","มีนา","มีน","มีค","march","mar"],
+      4:  ["เมษายน","เมษา","เมษ","เมย","april","apr"],
+      5:  ["พฤษภาคม","พฤษภ","พฤษ","พค","may"],
+      6:  ["มิถุนายน","มิถุน","มิถุ","มิย","june","jun"],
+      7:  ["กรกฎาคม","กรกฎ","กรก","กค","july","jul"],
+      8:  ["สิงหาคม","สิงหา","สิงห","สค","august","aug"],
+      9:  ["กันยายน","กันยา","กันย","กย","september","sep"],
+      10: ["ตุลาคม","ตุลา","ตุล","ตค","october","oct"],
+      11: ["พฤศจิกายน","พฤศจิ","พฤศ","พย","november","nov"],
+      12: ["ธันวาคม","ธันวา","ธันว","ธค","december","dec"],
+    };
+    const targetTokens = MONTH_TOKENS_BY_NUM[targetMonth] ?? [];
+
+    const matched = workbook.worksheets.findIndex((ws) => {
+      const name = ws.name.toLowerCase();
+      return targetTokens.some((tok) => name.includes(tok));
+    });
+
+    if (matched !== -1 && nonNullCount(workbook.worksheets[matched]) >= 3) {
+      if (matched !== wsIndex) {
+        console.log(`│        📋  Multi-sheet workbook: target month ${targetMonth} → sheet "${workbook.worksheets[matched].name}" (index ${matched}) over default "${allSheets[wsIndex]}"`);
+      }
+      wsIndex = matched;
+    }
   }
 
   const worksheet = workbook.worksheets[wsIndex];
@@ -446,10 +486,14 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
     replyTo, messageId, gmail,
   });
 
+  // Resolve target month from filename/subject/body before parsing workbook —
+  // needed to pick the correct sheet in multi-month workbooks.
+  const targetMonth = resolveBeMonth(filename ?? "", subject, body);
+
   // Parse workbook
   let rows, allSheets, chosenSheet;
   try {
-    ({ rows, allSheets, chosenSheet } = await firstSheetToRows(buffer));
+    ({ rows, allSheets, chosenSheet } = await firstSheetToRows(buffer, { targetMonth }));
   } catch (err) {
     console.error(`│        ❌  Failed to parse workbook: ${err.message}`);
     await sendTelegram(formatErrorMessage(`Workbook parse failed: ${err.message}`, filename)).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
