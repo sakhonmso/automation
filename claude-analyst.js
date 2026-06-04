@@ -40,39 +40,40 @@ function stripFences(str) {
  * Returns null if no year found.
  */
 export function resolveBeYear(filename, subject, body) {
-  // Try each source independently, highest confidence first.
-  // This prevents a day number in the body (e.g. "วันที่ 28") from
-  // being misread as a short CE year (28 → 2028 → BE 2571).
-  const sources = [
-    subject  ?? "",
-    body     ?? "",
-    filename ?? "",
-  ];
+  // Use (?<!\d) / (?!\d) instead of \b so that underscore-delimited numbers
+  // in filenames like "P4P_2569_02.xlsx" are matched correctly.
+  // (\b does NOT fire between _ and a digit because _ is a \w character.)
+  //
+  // Scan by CONFIDENCE TIER across all sources rather than all tiers within one source.
+  // This prevents a weak match (e.g. "15" → short CE 2558) in the subject from winning
+  // over a strong match ("2569" → full BE) in the filename.
+  // Within each tier, source priority is: subject > body > filename.
+  const all    = [subject ?? "", body ?? "", filename ?? ""];
+  const noBody = [subject ?? "", filename ?? ""];   // body excluded from short-CE scan (day numbers)
 
-  for (const t of sources) {
-    // Use (?<!\d) / (?!\d) instead of \b so that underscore-delimited numbers
-    // in filenames like "P4P_2569_02.xlsx" are matched correctly.
-    // (\b does NOT fire between _ and a digit because _ is a \w character.)
+  // Tier 1 — full BE year 25xx (unambiguous — always wins)
+  for (const t of all) {
+    const m = t.match(/(?<!\d)(25\d{2})(?!\d)/);
+    if (m) return parseInt(m[1], 10);
+  }
 
-    // 1. Full BE year: 25xx (2500–2599)
-    const mFullBE = t.match(/(?<!\d)(25\d{2})(?!\d)/);
-    if (mFullBE) return parseInt(mFullBE[1], 10);
+  // Tier 2 — full CE year 20xx
+  for (const t of all) {
+    const m = t.match(/(?<!\d)(20\d{2})(?!\d)/);
+    if (m) return parseInt(m[1], 10) + 543;
+  }
 
-    // 2. Full CE year: 20xx (2000–2099)
-    const mFullCE = t.match(/(?<!\d)(20\d{2})(?!\d)/);
-    if (mFullCE) return parseInt(mFullCE[1], 10) + 543;
+  // Tier 3 — 2-digit short BE 43–99 (e.g. 69 → 2569)
+  for (const t of all) {
+    const m = t.match(/(?<!\d)([4-9]\d)(?!\d)/);
+    if (m) return 2500 + parseInt(m[1], 10);
+  }
 
-    // 3. 2-digit 43–99 → short BE (e.g. 69 → 2569).
-    const mShortBE = t.match(/(?<!\d)([4-9]\d)(?!\d)/);
-    if (mShortBE) return 2500 + parseInt(mShortBE[1], 10);
-
-    // 4. 2-digit 00–42 → short CE (e.g. 26 → 2026 → BE 2569).
-    //    Only applied per-source so body day numbers don't pollute filename results.
-    //    Skip if this source is the body (too noisy — day numbers are common).
-    if (t !== body) {
-      const mShortCE = t.match(/(?<!\d)([0-3]\d)(?!\d)/);
-      if (mShortCE) return 2000 + parseInt(mShortCE[1], 10) + 543;
-    }
+  // Tier 4 — 2-digit short CE 00–42 (e.g. 26 → 2026 → 2569)
+  // Body excluded: day numbers like "วันที่ 15" are too noisy.
+  for (const t of noBody) {
+    const m = t.match(/(?<!\d)([0-3]\d)(?!\d)/);
+    if (m) return 2000 + parseInt(m[1], 10) + 543;
   }
 
   return null;
