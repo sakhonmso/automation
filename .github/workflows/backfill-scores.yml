@@ -1,0 +1,64 @@
+name: 📊 Backfill P4P Scores from Drive
+
+on:
+  workflow_dispatch:
+    inputs:
+      year:
+        description: 'BE year (e.g. 2569)'
+        required: true
+        default: '2569'
+        type: string
+      month:
+        description: 'Month number (1 = มกราคม … 12 = ธันวาคม)'
+        required: true
+        default: '3'
+        type: choice
+        options:
+          - '1'
+          - '2'
+          - '3'
+          - '4'
+          - '5'
+          - '6'
+          - '7'
+          - '8'
+          - '9'
+          - '10'
+          - '11'
+          - '12'
+      dry_run:
+        description: 'Dry run — extract scores but do NOT write to Supabase'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  backfill:
+    name: Backfill ${{ inputs.year }} month ${{ inputs.month }}${{ inputs.dry_run && ' [DRY RUN]' || '' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run backfill script
+        env:
+          GOOGLE_CLIENT_ID:     ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          P4P_FOLDER_ID:        ${{ secrets.P4P_FOLDER_ID }}
+          SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY:         ${{ secrets.SUPABASE_KEY }}
+          TARGET_YEAR:          ${{ inputs.year }}
+          TARGET_MONTH:         ${{ inputs.month }}
+          DRY_RUN:              ${{ inputs.dry_run }}
+        run: node scripts/backfill-drive-scores.mjs
