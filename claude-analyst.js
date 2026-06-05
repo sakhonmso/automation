@@ -91,13 +91,16 @@ const MONTH_TOKEN_MAP = (() => {
     ["กุมภาพันธ์",2],["February",2],["กุมภา",2],["กุมภ",2],["กพ",2],
     ["มีนาคม",3],["March",3],["มีนา",3],["มีน",3],["มีค",3],
     ["เมษายน",4],["April",4],["เมษา",4],["เมษ",4],["เมย",4],
+    ["เมศายน",4],["เมศา",4],["เมศ",4],                          // ษ→ศ typo variants
     ["พฤษภาคม",5],["May",5],["พฤษภ",5],["พฤษ",5],["พค",5],
+    ["พฤศภาคม",5],["พฤศภ",5],                                    // ษ→ศ typo variants
     ["มิถุนายน",6],["June",6],["มิถุน",6],["มิถุ",6],["มิย",6],
     ["กรกฎาคม",7],["July",7],["กรกฎ",7],["กรก",7],["กค",7],
     ["สิงหาคม",8],["August",8],["สิงหา",8],["สิงห",8],["สค",8],
     ["กันยายน",9],["September",9],["กันยา",9],["กันย",9],["กย",9],
     ["ตุลาคม",10],["October",10],["ตุลา",10],["ตุล",10],["ตค",10],
     ["พฤศจิกายน",11],["November",11],["พฤศจิ",11],["พฤศ",11],["พย",11],
+    ["พฤษจิกายน",11],["พฤษจิ",11],                               // ศ→ษ typo variants
     ["ธันวาคม",12],["December",12],["ธันวา",12],["ธันว",12],["ธค",12],
   ];
   return entries; // order matters — scan longest-first within each month
@@ -152,6 +155,13 @@ const NON_NAME_THAI = new Set([
   "ตุลา", "ตุล",   // ตุลาคม  (October)
   "พฤศจิ", "พฤศ",  // พฤศจิกายน (November)
   "ธันวา", "ธันว", // ธันวาคม (December)
+  // ── ษ ↔ ศ misspellings ──────────────────────────────────────────────────
+  // Thai writers frequently swap ษ (tho phuthao) and ศ (so sala) — they are
+  // visually similar and share the same romanisation.  The misspelled forms
+  // are NOT real lastnames, so they must be excluded just like the correct ones.
+  "พฤศภาคม", "พฤศภ",         // misspelling of พฤษภาคม / พฤษภ (May)
+  "เมศายน", "เมศา", "เมศ",   // misspelling of เมษายน / เมษา / เมษ (April)
+  "พฤษจิกายน", "พฤษจิ",      // misspelling of พฤศจิกายน / พฤศจิ (November)
 ]);
 
 /**
