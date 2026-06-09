@@ -115,7 +115,7 @@ export function createGmailClient() {
    * @param {string}   [opts.from]              Defaults to authenticated account
    * @param {string}   [opts.replyToMessageId]  Thread reply support
    */
-  async function sendMessage({ to, subject, body, html, from, replyToMessageId } = {}) {
+  async function sendMessage({ to, subject, body, html, from, replyToMessageId, attachments = [] } = {}) {
     if (!to || !subject || (!body && !html)) throw new Error("`to`, `subject`, and `body` or `html` are required.");
 
     // Encode non-ASCII header values per RFC 2047 (e.g. Thai text in subject)
@@ -156,11 +156,66 @@ export function createGmailClient() {
       return orig.threadId ?? null;
     }
 
-    // Build MIME message — multipart/alternative when both html and plain text provided,
+    // Build MIME message — multipart/mixed when attachments present,
+    // multipart/alternative when both html and plain text provided,
     // single part otherwise.
     // Content-Transfer-Encoding: 8bit declares that parts contain UTF-8 (8-bit) bytes.
     // Without it the implicit encoding is 7bit (ASCII only), which can corrupt Thai text
     // in email clients that strictly follow RFC 2822.
+
+    // ── Path: attachments → multipart/mixed wrapping multipart/alternative ──
+    if (attachments.length > 0) {
+      const outerBnd = `mixed_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+      const innerBnd = `alt_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+      const plainText = body || "กรุณาเปิดอีเมลด้วยโปรแกรมที่รองรับ HTML";
+
+      const headerLines = [
+        `MIME-Version: 1.0`,
+        `Content-Type: multipart/mixed; boundary="${outerBnd}"`,
+        `To: ${encodeAddressHeader(to)}`,
+        `Subject: ${encodeHeader(subject)}`,
+        ...(from ? [`From: ${encodeAddressHeader(from)}`] : []),
+      ];
+
+      const threadId = await resolveThreadHeaders(headerLines);
+
+      let mime = headerLines.join("\r\n") + "\r\n\r\n";
+
+      // Inner body (multipart/alternative: plain + html)
+      mime += `--${outerBnd}\r\n`;
+      mime += `Content-Type: multipart/alternative; boundary="${innerBnd}"\r\n\r\n`;
+      mime += `--${innerBnd}\r\n`;
+      mime += `Content-Type: text/plain; charset=utf-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n`;
+      mime += plainText + "\r\n";
+      if (html) {
+        mime += `--${innerBnd}\r\n`;
+        mime += `Content-Type: text/html; charset=utf-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n`;
+        mime += html + "\r\n";
+      }
+      mime += `--${innerBnd}--\r\n`;
+
+      // Attachment parts — base64, line-wrapped at 76 chars per RFC 2045
+      for (const att of attachments) {
+        const b64    = att.buffer.toString("base64").match(/.{1,76}/g).join("\r\n");
+        const safeFilename = encodeHeader(att.filename);
+        mime += `--${outerBnd}\r\n`;
+        mime += `Content-Type: ${att.mimeType}; name="${safeFilename}"\r\n`;
+        mime += `Content-Disposition: attachment; filename="${safeFilename}"\r\n`;
+        mime += `Content-Transfer-Encoding: base64\r\n\r\n`;
+        mime += b64 + "\r\n";
+      }
+      mime += `--${outerBnd}--`;
+
+      const raw = Buffer.from(mime).toString("base64")
+        .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+
+      const res = await gmail.users.messages.send({
+        userId: "me",
+        requestBody: { raw, ...(threadId ? { threadId } : {}) },
+      });
+      return res.data;
+    }
+
     if (html) {
       const boundary = `boundary_${Date.now().toString(36)}`;
       const plainText = body || "กรุณาเปิดอีเมลด้วยโปรแกรมที่รองรับ HTML";
