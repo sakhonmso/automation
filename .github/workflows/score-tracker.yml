@@ -61,9 +61,9 @@ jobs:
           # Supabase
           SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY:         ${{ secrets.SUPABASE_KEY }}
-          # Single email address that receives all department score reports.
-          # Add this as a GitHub Secret named DEPT_HEAD_EMAIL when ready.
-          DEPT_HEAD_EMAIL:      ${{ secrets.DEPT_HEAD_EMAIL }}
+          # JSON object mapping department name → head's email (null = no email).
+          # e.g. {"ศัลยกรรม":"dr@hosp.com","อายุรกรรม":"dr@hosp.com","เวชกรรมฟื้นฟู":null}
+          DEPT_HEADS_JSON:      ${{ secrets.DEPT_HEADS_JSON }}
           # Dry-run flag
           DRY_RUN:              ${{ inputs.dry_run || 'false' }}
         run: node scripts/score-tracker.mjs

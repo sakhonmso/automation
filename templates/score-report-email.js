@@ -2,98 +2,59 @@
  * templates/score-report-email.js
  *
  * Builds the HTML notification email sent to a department head when P4P scores
- * are newly complete for one or more months.  Blue professional theme — mirrors
- * the card/table structure of reply.js.
+ * are newly complete.  One email per unique head (a single head may oversee
+ * multiple departments — all are included in one email).
+ * Blue professional theme mirroring reply.js.
  *
- * @param {object}   data
- * @param {string}   data.dept                     Department name (e.g. "OPD")
- * @param {string[]} data.newlyCompletedMonths      Display names of newly-completed months
- * @param {Array}    data.monthsSummary             Array of { displayName, status } covering all 4 months
- *   status = null  → table had no rows for this dept
- *   status = { total, filled, missing, complete }
- * @param {string}   data.reportDate               Thai date string (e.g. "1 มิถุนายน 2569")
+ * @param {object} data
+ * @param {Array}  data.depts        Array of per-department objects:
+ *   {
+ *     dept:                  string,    // department name
+ *     newlyCompletedMonths:  string[],  // display names of newly-completed months
+ *     monthsSummary:         Array<{ displayName: string, status: object|null }>
+ *   }
+ * @param {string} data.reportDate   Thai date string (e.g. "1 มิถุนายน 2569")
  */
-export function buildScoreReportEmail({ dept, newlyCompletedMonths, monthsSummary, reportDate }) {
+export function buildScoreReportEmail({ depts, reportDate }) {
+  const allNewlyCompleted = [...new Set(
+    depts.flatMap(d => d.newlyCompletedMonths)
+  )];
 
-  // ── Summary table rows ──────────────────────────────────────────────────
-  const tableRows = monthsSummary.map(({ displayName, status }) => {
-    if (!status) {
+  // ── Per-department summary sections ────────────────────────────────────
+  const deptSections = depts.map(({ dept, newlyCompletedMonths, monthsSummary }) => {
+    const completedListHtml = newlyCompletedMonths
+      .map(m => `<li style="padding:3px 0;color:#1e3a8a;font-weight:600">${m}</li>`)
+      .join("");
+
+    const tableRows = monthsSummary.map(({ displayName, status }) => {
+      if (!status) {
+        return `<tr>
+          <td>${displayName}</td>
+          <td colspan="3" style="text-align:center;color:#94a3b8;font-style:italic">ไม่พบข้อมูล</td>
+          <td style="text-align:center"><span style="color:#94a3b8">—</span></td>
+        </tr>`;
+      }
+      const badge = status.complete
+        ? `<span style="background:#dcfce7;color:#16a34a;border-radius:6px;padding:2px 9px;font-size:12px;font-weight:700;white-space:nowrap">✓ ครบถ้วน</span>`
+        : `<span style="background:#fee2e2;color:#dc2626;border-radius:6px;padding:2px 9px;font-size:12px;font-weight:700;white-space:nowrap">✗ ค้าง ${status.missing} คน</span>`;
       return `<tr>
         <td>${displayName}</td>
-        <td colspan="3" style="text-align:center;color:#94a3b8;font-style:italic">ไม่พบข้อมูล</td>
-        <td style="text-align:center"><span style="color:#94a3b8">—</span></td>
+        <td style="text-align:center;font-weight:600">${status.total}</td>
+        <td style="text-align:center;font-weight:700;color:#16a34a">${status.filled}</td>
+        <td style="text-align:center;font-weight:700;color:${status.missing > 0 ? "#dc2626" : "#64748b"}">${status.missing}</td>
+        <td style="text-align:center">${badge}</td>
       </tr>`;
-    }
-    const badge = status.complete
-      ? `<span style="background:#dcfce7;color:#16a34a;border-radius:6px;padding:2px 9px;font-size:12px;font-weight:700;white-space:nowrap">✓ ครบถ้วน</span>`
-      : `<span style="background:#fee2e2;color:#dc2626;border-radius:6px;padding:2px 9px;font-size:12px;font-weight:700;white-space:nowrap">✗ ค้าง ${status.missing} คน</span>`;
-    return `<tr>
-      <td>${displayName}</td>
-      <td style="text-align:center;font-weight:600">${status.total}</td>
-      <td style="text-align:center;font-weight:700;color:#16a34a">${status.filled}</td>
-      <td style="text-align:center;font-weight:700;color:${status.missing > 0 ? "#dc2626" : "#64748b"}">${status.missing}</td>
-      <td style="text-align:center">${badge}</td>
-    </tr>`;
-  }).join("");
+    }).join("");
 
-  // ── Newly-completed month list ───────────────────────────────────────────
-  const completedListHtml = newlyCompletedMonths
-    .map(m => `<li style="padding:3px 0;color:#1e3a8a;font-weight:600">${m}</li>`)
-    .join("");
+    return `
+    <div class="dept-section">
+      <div class="dept-heading">${dept}</div>
 
-  return `<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:#eff6ff;font-family:'Sarabun',sans-serif;font-size:15px;color:#1e293b;padding:32px 16px}
-  .card{background:#fff;max-width:600px;margin:0 auto;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(30,58,138,.15)}
-  .header{background:linear-gradient(135deg,#1e3a8a,#2563eb);padding:28px 32px}
-  .header h1{color:#fff;font-size:19px;font-weight:600;letter-spacing:.2px;line-height:1.45}
-  .header p{color:#bfdbfe;font-size:13px;margin-top:5px;font-weight:400}
-  .body{padding:28px 32px}
-  .greeting{font-size:17px;color:#1d4ed8;font-weight:600;margin-bottom:14px}
-  .intro{line-height:1.8;color:#334155;margin-bottom:20px;font-size:15px}
-  .complete-banner{background:#eff6ff;border:1.5px solid #93c5fd;border-radius:10px;padding:14px 18px;margin-bottom:22px}
-  .complete-banner-title{font-size:14px;font-weight:700;color:#1d4ed8;margin-bottom:7px}
-  .complete-banner ul{padding-left:20px;margin:0;list-style:disc}
-  .detail-card{background:#eff6ff;border-left:4px solid #2563eb;border-radius:0 10px 10px 0;padding:18px 22px;margin-bottom:24px}
-  .detail-title{font-size:11.5px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.7px;margin-bottom:13px}
-  table.summary{width:100%;border-collapse:collapse}
-  table.summary th{padding:9px 8px;font-size:12px;font-weight:700;color:#1d4ed8;text-align:left;border-bottom:2px solid #bfdbfe;background:#dbeafe}
-  table.summary th:not(:first-child){text-align:center}
-  table.summary td{padding:9px 8px;font-size:14px;vertical-align:middle;border-bottom:1px solid #dbeafe}
-  table.summary tr:last-child td{border-bottom:none}
-  .thanks{color:#334155;line-height:1.8;font-size:15px;margin-bottom:8px}
-  .note-box{margin-top:18px;font-size:13px;color:#64748b;line-height:1.7;border-top:1px solid #dbeafe;padding-top:16px;font-style:italic}
-  .footer{border-top:1px solid #dbeafe;padding:15px 32px;background:#f0f9ff;text-align:center;font-size:12px;color:#60a5fa}
-</style>
-</head>
-<body>
-<div class="card">
+      ${newlyCompletedMonths.length ? `<div class="complete-banner">
+        <div class="complete-banner-title">🎉 เดือนที่ครบถ้วนแล้ว (ใหม่)</div>
+        <ul style="padding-left:20px;margin:0;list-style:disc">${completedListHtml}</ul>
+      </div>` : ""}
 
-  <div class="header">
-    <h1>รายงานสถานะคะแนน P4P<br>กลุ่มงาน ${dept}</h1>
-    <p>โรงพยาบาลสมุทรสาคร &nbsp;·&nbsp; ${reportDate}</p>
-  </div>
-
-  <div class="body">
-    <p class="greeting">เรียน หัวหน้ากลุ่มงาน ${dept}</p>
-    <p class="intro">
-      ระบบได้ตรวจสอบสถานะการส่งคะแนน P4P ของกลุ่มงาน <strong>${dept}</strong> เรียบร้อยแล้ว<br>
-      สรุปผล 4 เดือนล่าสุดแสดงอยู่ด้านล่าง และมีรายละเอียดครบถ้วนในไฟล์ PDF ที่แนบมาด้วย
-    </p>
-
-    ${newlyCompletedMonths.length ? `<div class="complete-banner">
-      <div class="complete-banner-title">🎉 เดือนที่ครบถ้วนแล้ว (ใหม่)</div>
-      <ul>${completedListHtml}</ul>
-    </div>` : ""}
-
-    <div class="detail-card">
-      <div class="detail-title">สรุปสถานะ 4 เดือนล่าสุด</div>
       <table class="summary">
         <thead>
           <tr>
@@ -104,13 +65,74 @@ export function buildScoreReportEmail({ dept, newlyCompletedMonths, monthsSummar
             <th style="width:26%">สถานะ</th>
           </tr>
         </thead>
-        <tbody>
-          ${tableRows}
-        </tbody>
+        <tbody>${tableRows}</tbody>
       </table>
-    </div>
+    </div>`;
+  }).join("<hr class=\"dept-divider\">");
 
-    <p class="thanks">ดูรายชื่อแพทย์ที่ค้างส่งได้ในเอกสาร PDF ที่แนบมาพร้อมอีเมลนี้</p>
+  // Subject hint for the greeting — list all dept names
+  const deptNames = depts.map(d => d.dept).join(", ");
+  const headerTitle = depts.length === 1
+    ? `รายงานสถานะคะแนน P4P<br>กลุ่มงาน ${depts[0].dept}`
+    : `รายงานสถานะคะแนน P4P<br>กลุ่มงาน ${deptNames}`;
+
+  return `<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#eff6ff;font-family:'Sarabun',sans-serif;font-size:15px;color:#1e293b;padding:32px 16px}
+  .card{background:#fff;max-width:620px;margin:0 auto;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(30,58,138,.15)}
+  .header{background:linear-gradient(135deg,#1e3a8a,#2563eb);padding:28px 32px}
+  .header h1{color:#fff;font-size:19px;font-weight:600;letter-spacing:.2px;line-height:1.45}
+  .header p{color:#bfdbfe;font-size:13px;margin-top:5px;font-weight:400}
+  .body{padding:28px 32px}
+  .greeting{font-size:17px;color:#1d4ed8;font-weight:600;margin-bottom:14px}
+  .intro{line-height:1.8;color:#334155;margin-bottom:20px;font-size:15px}
+  .dept-section{margin-bottom:4px}
+  .dept-heading{font-size:15px;font-weight:700;color:#1e3a8a;
+    background:#eff6ff;border-left:4px solid #2563eb;
+    padding:9px 14px;border-radius:0 8px 8px 0;margin-bottom:12px}
+  .complete-banner{background:#eff6ff;border:1.5px solid #93c5fd;border-radius:10px;
+    padding:12px 16px;margin-bottom:12px}
+  .complete-banner-title{font-size:13px;font-weight:700;color:#1d4ed8;margin-bottom:6px}
+  table.summary{width:100%;border-collapse:collapse;margin-bottom:4px}
+  table.summary th{padding:8px 7px;font-size:12px;font-weight:700;color:#1d4ed8;
+    text-align:left;border-bottom:2px solid #bfdbfe;background:#dbeafe}
+  table.summary th:not(:first-child){text-align:center}
+  table.summary td{padding:8px 7px;font-size:14px;vertical-align:middle;border-bottom:1px solid #dbeafe}
+  table.summary tr:last-child td{border-bottom:none}
+  hr.dept-divider{border:none;border-top:1.5px solid #dbeafe;margin:20px 0}
+  .note-box{margin-top:20px;font-size:13px;color:#64748b;line-height:1.7;
+    border-top:1px solid #dbeafe;padding-top:16px;font-style:italic}
+  .footer{border-top:1px solid #dbeafe;padding:15px 32px;background:#f0f9ff;
+    text-align:center;font-size:12px;color:#60a5fa}
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="header">
+    <h1>${headerTitle}</h1>
+    <p>โรงพยาบาลสมุทรสาคร &nbsp;·&nbsp; ${reportDate}</p>
+  </div>
+
+  <div class="body">
+    <p class="greeting">เรียน หัวหน้ากลุ่มงาน</p>
+    <p class="intro">
+      ระบบได้ตรวจสอบสถานะการส่งคะแนน P4P เรียบร้อยแล้ว<br>
+      สรุปผล 4 เดือนล่าสุดของแต่ละกลุ่มงานแสดงอยู่ด้านล่าง
+      และมีไฟล์ PDF รายละเอียดแนบมาด้วย
+    </p>
+
+    ${deptSections}
+
+    <p style="margin-top:16px;color:#334155;font-size:14px">
+      ดูรายชื่อแพทย์ที่ค้างส่งได้ในไฟล์ PDF ที่แนบมา
+    </p>
 
     <div class="note-box">
       <strong style="color:#1d4ed8;font-style:normal">หมายเหตุ</strong>
