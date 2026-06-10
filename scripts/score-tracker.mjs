@@ -19,8 +19,7 @@
  * Required env vars (GitHub Secrets):
  *   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN
  *   SUPABASE_URL, SUPABASE_KEY
- *   DEPT_HEADS_JSON   — JSON object mapping dept name → head email address
- *                       e.g. {"OPD":"head@hospital.com","IPD":"ipd@hospital.com"}
+ *   DEPT_HEAD_EMAIL   — single email address that receives all department reports
  * Optional:
  *   DRY_RUN           — "true" → check & report but do NOT send emails or log
  */
@@ -39,12 +38,9 @@ dotenvConfig({ override: true });
 const __dir = dirname(fileURLToPath(import.meta.url));
 
 // ── Configuration ─────────────────────────────────────────────────────────
-const DRY_RUN     = process.env.DRY_RUN === "true";
-const DEPT_HEADS  = (() => {
-  try { return JSON.parse(process.env.DEPT_HEADS_JSON || "{}"); }
-  catch (e) { console.warn("⚠️  Could not parse DEPT_HEADS_JSON:", e.message); return {}; }
-})();
-const EXEMPT_DEPTS = new Set(["INTERN"]);
+const DRY_RUN        = process.env.DRY_RUN === "true";
+const DEPT_HEAD_EMAIL = process.env.DEPT_HEAD_EMAIL ?? "";
+const EXEMPT_DEPTS   = new Set(["INTERN"]);
 const CHECK_COUNT  = 4;
 
 // ── Thai locale data ───────────────────────────────────────────────────────
@@ -411,11 +407,11 @@ async function main() {
     const pdfFilename = `P4P_รายงาน_${dept}_${nowTag}.pdf`;
     console.log(`│   📄 PDF: ${pdfFilename} (${(pdfBuf.length / 1024).toFixed(0)} KB)`);
 
-    // Look up dept head email
-    const headEmail = DEPT_HEADS[dept];
+    // Single head email shared across all departments
+    const headEmail = DEPT_HEAD_EMAIL;
 
     if (!headEmail) {
-      console.log(`│   ⚠️  ยังไม่ได้กำหนดอีเมลหัวหน้ากลุ่มงาน "${dept}" ใน DEPT_HEADS_JSON`);
+      console.log(`│   ⚠️  ยังไม่ได้กำหนด DEPT_HEAD_EMAIL`);
       summaryRows.push({ dept, newlyCount: newlyComplete.length, emailed: false, note: "ไม่พบอีเมลหัวหน้า" });
     } else if (DRY_RUN) {
       console.log(`│   🔍 DRY RUN — would send to ${headEmail}`);
