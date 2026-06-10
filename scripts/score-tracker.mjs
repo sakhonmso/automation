@@ -43,7 +43,7 @@ const DEPT_HEADS = (() => {
   catch (e) { console.warn("⚠️  Could not parse DEPT_HEADS_JSON:", e.message); return {}; }
 })();
 const EXEMPT_DEPTS = new Set(["INTERN"]);
-const CHECK_COUNT  = 4;
+const CHECK_COUNT  = 3;
 
 // ── Thai locale data ───────────────────────────────────────────────────────
 const THAI_MONTHS = {
