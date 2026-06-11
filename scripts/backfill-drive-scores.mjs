@@ -18,6 +18,7 @@
  */
 
 import { google }   from "googleapis";
+import { createClient } from "@supabase/supabase-js";
 import ExcelJS      from "exceljs";
 import { appendFileSync } from "fs";
 import { config as dotenvConfig } from "dotenv";
@@ -182,6 +183,21 @@ async function main() {
   if (!files.length) {
     console.log("No files to process.");
     return;
+  }
+
+  // ── Clear all scores for this month before re-processing ──────────────
+  if (DRY_RUN) {
+    console.log("🔍 Dry run — skipping score clear\n");
+  } else {
+    const { SUPABASE_URL, SUPABASE_KEY } = process.env;
+    if (!SUPABASE_URL || !SUPABASE_KEY) throw new Error("Missing SUPABASE_URL or SUPABASE_KEY");
+    const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+    const { error: clearError } = await sb
+      .from(DATE_KEY)
+      .update({ score: null })
+      .not("index", "is", null);
+    if (clearError) throw new Error(`Failed to clear scores in "${DATE_KEY}": ${clearError.message}`);
+    console.log(`🧹 Cleared all score values in table "${DATE_KEY}"\n`);
   }
 
   // ── Process each file ──────────────────────────────────────────────────
