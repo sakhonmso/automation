@@ -118,7 +118,7 @@ export function buildScoreReportEmail({ depts, reportDate }) {
   table.physician-table{width:100%;border-collapse:collapse}
   table.physician-table th{padding:7px 10px;font-size:15px;font-weight:600;color:#1d4ed8;
     text-align:left;border-bottom:2px solid #bfdbfe;background:#dbeafe}
-  table.physician-table td{padding:7px 10px;font-size:15px;vertical-align:middle;
+  table.physician-table td{padding:11px 10px;font-size:15px;vertical-align:middle;
     border-bottom:1px solid #eff6ff}
   table.physician-table tr:last-child td{border-bottom:none}
   .note-box{margin-top:20px;font-size:13px;color:#64748b;line-height:1.7;
