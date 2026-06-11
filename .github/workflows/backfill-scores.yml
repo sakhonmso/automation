@@ -27,7 +27,7 @@ on:
           - '11'
           - '12'
       dry_run:
-        description: 'Dry run — extract scores but do NOT write to Supabase'
+        description: 'Dry run — read from Drive but do NOT clear scores or write to Supabase'
         required: false
         default: false
         type: boolean
