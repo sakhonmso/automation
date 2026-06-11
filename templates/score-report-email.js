@@ -28,15 +28,17 @@ export function buildScoreReportEmail({ depts, reportDate }) {
   // ── Per-department sections ───────────────────────────────────────────────
   const deptSections = depts.map(({ dept, monthsSummary }) => {
 
-    const monthBlocks = monthsSummary.map(({ displayName, status }) => {
+    const monthBlocks = monthsSummary.map(({ displayName, status }, idx) => {
+      const openAttr = idx === 0 ? " open" : "";
+
       if (!status) {
         return `
-      <div class="month-block">
-        <div class="month-header">
+      <details class="month-block"${openAttr}>
+        <summary class="month-header">
           <span class="month-name">${displayName}</span>
           <span class="badge badge-none">ไม่พบข้อมูล</span>
-        </div>
-      </div>`;
+        </summary>
+      </details>`;
       }
 
       const badgeHtml = status.complete
@@ -57,11 +59,11 @@ export function buildScoreReportEmail({ depts, reportDate }) {
       }).join("");
 
       return `
-      <div class="month-block">
-        <div class="month-header">
+      <details class="month-block"${openAttr}>
+        <summary class="month-header">
           <span class="month-name">${displayName}</span>
           ${badgeHtml}
-        </div>
+        </summary>
         <table class="physician-table">
           <thead>
             <tr>
@@ -71,7 +73,7 @@ export function buildScoreReportEmail({ depts, reportDate }) {
           </thead>
           <tbody>${rowsHtml}</tbody>
         </table>
-      </div>`;
+      </details>`;
     }).join("");
 
     return `
@@ -107,7 +109,12 @@ export function buildScoreReportEmail({ depts, reportDate }) {
   .dept-heading{font-size:15px;font-weight:700;color:#1e3a8a;background:#eff6ff;
     border-left:4px solid #2563eb;padding:9px 14px;border-radius:0 8px 8px 0;margin-bottom:14px}
   hr.dept-divider{border:none;border-top:1.5px solid #dbeafe;margin:20px 0}
-  .month-block{margin-bottom:16px}
+  details.month-block{margin-bottom:16px}
+  details.month-block summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;margin-bottom:4px;user-select:none}
+  details.month-block summary::-webkit-details-marker{display:none}
+  details.month-block[open] summary{margin-bottom:8px}
+  details.month-block summary .month-name::before{content:"▶ ";font-size:11px;color:#93c5fd}
+  details.month-block[open] summary .month-name::before{content:"▼ ";font-size:11px;color:#2563eb}
   .month-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
   .month-name{font-size:17px;font-weight:600;color:#1e3a8a;background:#dbeafe;
     padding:3px 10px;border-radius:6px}
