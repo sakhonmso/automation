@@ -109,16 +109,16 @@ export function buildScoreReportEmail({ depts, reportDate }) {
   hr.dept-divider{border:none;border-top:1.5px solid #dbeafe;margin:20px 0}
   .month-block{margin-bottom:16px}
   .month-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .month-name{font-size:13px;font-weight:600;color:#1e3a8a;background:#dbeafe;
+  .month-name{font-size:17px;font-weight:600;color:#1e3a8a;background:#dbeafe;
     padding:3px 10px;border-radius:6px}
   .badge{font-size:12px;font-weight:600;padding:2px 9px;border-radius:6px}
   .badge-ok{background:#dcfce7;color:#15803d}
   .badge-warn{background:#fee2e2;color:#b91c1c}
   .badge-none{background:#f1f5f9;color:#64748b}
   table.physician-table{width:100%;border-collapse:collapse}
-  table.physician-table th{padding:7px 10px;font-size:12px;font-weight:600;color:#1d4ed8;
+  table.physician-table th{padding:7px 10px;font-size:16px;font-weight:600;color:#1d4ed8;
     text-align:left;border-bottom:2px solid #bfdbfe;background:#dbeafe}
-  table.physician-table td{padding:7px 10px;font-size:13px;vertical-align:middle;
+  table.physician-table td{padding:7px 10px;font-size:16px;vertical-align:middle;
     border-bottom:1px solid #eff6ff}
   table.physician-table tr:last-child td{border-bottom:none}
   .note-box{margin-top:20px;font-size:13px;color:#64748b;line-height:1.7;
@@ -138,8 +138,7 @@ export function buildScoreReportEmail({ depts, reportDate }) {
   <div class="body">
     <p class="greeting">เรียน หัวหน้ากลุ่มงาน</p>
     <p class="intro">
-      ระบบได้รวบรวมสถานะการส่งคะแนน P4P ของ 3 เดือนล่าสุดแล้ว<br>
-      กดชื่อแพทย์เพื่อเปิดไฟล์ Excel บน Google Drive
+      ระบบได้รวบรวมสถานะการส่งคะแนน P4P ของ 3 เดือนล่าสุดแล้ว กดชื่อแพทย์เพื่อเปิดไฟล์ Excel บน Google Drive
     </p>
 
     ${deptSections}
