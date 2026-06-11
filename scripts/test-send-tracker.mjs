@@ -13,6 +13,7 @@
 import { createClient }          from "@supabase/supabase-js";
 import { config as dotenvConfig } from "dotenv";
 import { createGmailClient }     from "../gmail-client.js";
+import { createDriveClient }     from "../drive-client.js";
 import { buildScoreReportEmail } from "../templates/score-report-email.js";
 
 dotenvConfig({ override: true });
@@ -52,10 +53,10 @@ function todayThaiStr() {
 }
 
 // ── Supabase ───────────────────────────────────────────────────────────────
-async function getDeptStatus(sb, tableKey, dept) {
+async function getDeptStatus(sb, tableKey, dept, driveFileMap = null) {
   const { data, error } = await sb
     .from(tableKey)
-    .select("firstname, lastname, score, drive_file_id")
+    .select("firstname, lastname, score")
     .eq("department", dept);
   if (error) throw new Error(`[${tableKey}/${dept}] ${error.message}`);
   if (!data?.length) return null;
@@ -71,11 +72,10 @@ async function getDeptStatus(sb, tableKey, dept) {
       if (b.score === null) return -1;
       return b.score - a.score;
     })
-    .map(r => ({
-      name       : `${r.firstname ?? ""} ${r.lastname ?? ""}`.trim(),
-      score      : r.score,
-      driveFileId: r.drive_file_id ?? null,
-    }));
+    .map(r => {
+      const name = `${r.firstname ?? ""} ${r.lastname ?? ""}`.trim();
+      return { name, score: r.score, driveFileId: driveFileMap?.get(name) ?? null };
+    });
 
   const missingNames = rows.filter(r => r.score === null).map(r => r.name);
   return { total, filled, missing, complete: missing === 0, missingNames, rows };
@@ -98,9 +98,26 @@ async function main() {
   const sb    = createClient(SUPABASE_URL, SUPABASE_KEY);
   const gmail = createGmailClient();
 
+  // Build Drive file maps (one API call per month)
+  const drive = process.env.P4P_FOLDER_ID ? createDriveClient() : null;
+  const driveFileMaps = new Map();
+  if (drive) {
+    for (const key of months) {
+      try {
+        const fileMap = await drive.listMonthFiles(key);
+        driveFileMaps.set(key, fileMap);
+        console.log(`  📁 Drive ${tableKeyToDisplay(key)}: ${fileMap.size} files`);
+      } catch (e) {
+        console.warn(`  ⚠️  Drive lookup failed for ${tableKeyToDisplay(key)}: ${e.message}`);
+      }
+    }
+  } else {
+    console.log(`  ℹ️  P4P_FOLDER_ID not set — skipping Drive lookup (names won't be linked)`);
+  }
+
   const monthsData = [];
   for (const key of months) {
-    const status = await getDeptStatus(sb, key, TEST_DEPT);
+    const status = await getDeptStatus(sb, key, TEST_DEPT, driveFileMaps.get(key) ?? null);
     const display = tableKeyToDisplay(key);
     monthsData.push({ key, displayName: display, status });
     if (!status) {

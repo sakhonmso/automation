@@ -150,7 +150,38 @@ export function createDriveClient() {
     return { fileId: res.data.id, fileName, replaced: false };
   }
 
-  return { uploadFile };
+  /**
+   * List all files in the month folder for a given date key.
+   * Returns a Map<physicianName, fileId> — one entry per file.
+   * Returns an empty Map (silently) if the folder doesn't exist.
+   *
+   * @param {string} date  e.g. "2569_05"
+   * @returns {Promise<Map<string, string>>}
+   */
+  async function listMonthFiles(date) {
+    let folderId;
+    try {
+      folderId = await resolveTargetFolder(date);
+    } catch {
+      return new Map();
+    }
+
+    const res = await drive.files.list({
+      q        : `'${folderId}' in parents and trashed=false and mimeType!='application/vnd.google-apps.folder'`,
+      fields   : "files(id, name)",
+      pageSize : 1000,
+      supportsAllDrives: true,
+      includeItemsFromAllDrives: true,
+    });
+
+    const map = new Map();
+    for (const f of res.data.files ?? []) {
+      map.set(f.name, f.id);
+    }
+    return map;
+  }
+
+  return { uploadFile, listMonthFiles };
 }
 
 // ── Helper: convert Buffer to a Node.js Readable stream ───────────────────

@@ -25,6 +25,7 @@ import { createClient }          from "@supabase/supabase-js";
 import { config as dotenvConfig } from "dotenv";
 import { appendFileSync }        from "fs";
 import { createGmailClient }     from "../gmail-client.js";
+import { createDriveClient }     from "../drive-client.js";
 import { buildScoreReportEmail } from "../templates/score-report-email.js";
 
 dotenvConfig({ override: true });
@@ -77,10 +78,10 @@ function createSB() {
   return createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
-async function getDeptStatus(sb, tableKey, dept) {
+async function getDeptStatus(sb, tableKey, dept, driveFileMap = null) {
   const { data, error } = await sb
     .from(tableKey)
-    .select("firstname, lastname, prefix, score, drive_file_id")
+    .select("firstname, lastname, score")
     .eq("department", dept);
   if (error) throw new Error(`[${tableKey}/${dept}] Supabase: ${error.message}`);
   if (!data?.length) return null;
@@ -97,11 +98,10 @@ async function getDeptStatus(sb, tableKey, dept) {
       if (b.score === null) return -1;
       return b.score - a.score;
     })
-    .map(r => ({
-      name       : `${r.firstname ?? ""} ${r.lastname ?? ""}`.trim(),
-      score      : r.score,
-      driveFileId: r.drive_file_id ?? null,
-    }));
+    .map(r => {
+      const name = `${r.firstname ?? ""} ${r.lastname ?? ""}`.trim();
+      return { name, score: r.score, driveFileId: driveFileMap?.get(name) ?? null };
+    });
 
   const missingNames = rows.filter(r => r.score === null).map(r => r.name);
   return { total, filled, missing, complete: missing === 0, missingNames, rows };
@@ -135,6 +135,22 @@ async function main() {
 
   console.log(`📅  Months: ${months.map(tableKeyToDisplay).join("  •  ")}\n`);
 
+  // ── Build Drive file maps (one API call per month, shared across all depts)
+  const drive = process.env.P4P_FOLDER_ID ? createDriveClient() : null;
+  const driveFileMaps = new Map(); // tableKey → Map<physicianName, fileId>
+  if (drive) {
+    for (const key of months) {
+      try {
+        const fileMap = await drive.listMonthFiles(key);
+        driveFileMaps.set(key, fileMap);
+        console.log(`📁  Drive ${tableKeyToDisplay(key)}: ${fileMap.size} files`);
+      } catch (e) {
+        console.warn(`⚠️  Drive lookup failed for ${key}: ${e.message}`);
+      }
+    }
+    console.log();
+  }
+
   const depts = await getDistinctDepts(sb, months);
   if (!depts.length) { console.log("⚠️  No departments found — nothing to do."); return; }
   console.log(`🏥  Departments: ${depts.join(", ")}\n`);
@@ -147,7 +163,7 @@ async function main() {
     console.log(`┌─ ${dept}`);
     const monthsData = [];
     for (const key of months) {
-      const status = await getDeptStatus(sb, key, dept);
+      const status = await getDeptStatus(sb, key, dept, driveFileMaps.get(key) ?? null);
       monthsData.push({ key, displayName: tableKeyToDisplay(key), status });
       const icon = !status ? "—" : status.complete ? "✓" : `✗ ค้าง ${status.missing}/${status.total}`;
       console.log(`│   ${tableKeyToDisplay(key)}: ${icon}`);

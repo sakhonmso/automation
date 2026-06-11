@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run — check scores and generate PDF but do NOT send emails or log'
+        description: 'Dry run — check scores but do NOT send emails'
         required: false
         default: false
         type: boolean
@@ -33,7 +33,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      # ── 3. Dependencies (includes pdfkit) ────────────────────────────────
+      # ── 3. Dependencies ──────────────────────────────────────────────────
       - name: Install dependencies
         run: npm ci
 
@@ -50,6 +50,8 @@ jobs:
           # JSON object mapping department name → head's email (null = no email).
           # e.g. {"ศัลยกรรม":"dr@hosp.com","อายุรกรรม":"dr@hosp.com","เวชกรรมฟื้นฟู":null}
           DEPT_HEADS_JSON:      ${{ secrets.DEPT_HEADS_JSON }}
+          # Google Drive root folder ID for P4P files (used to resolve per-physician links)
+          P4P_FOLDER_ID:        ${{ secrets.P4P_FOLDER_ID }}
           # Dry-run flag
           DRY_RUN:              ${{ inputs.dry_run || 'false' }}
         run: node scripts/score-tracker.mjs
