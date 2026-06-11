@@ -111,7 +111,7 @@ export function buildScoreReportEmail({ depts, reportDate }) {
   .month-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
   .month-name{font-size:17px;font-weight:600;color:#1e3a8a;background:#dbeafe;
     padding:3px 10px;border-radius:6px}
-  .badge{font-size:12px;font-weight:600;padding:2px 9px;border-radius:6px}
+  .badge{font-size:12px;font-weight:600;padding:4px 9px;border-radius:6px;display:inline-block;line-height:1.4;vertical-align:middle}
   .badge-ok{background:#dcfce7;color:#15803d}
   .badge-warn{background:#fee2e2;color:#b91c1c}
   .badge-none{background:#f1f5f9;color:#64748b}
