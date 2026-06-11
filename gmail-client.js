@@ -196,7 +196,7 @@ export function createGmailClient() {
 
       // Attachment parts — base64, line-wrapped at 76 chars per RFC 2045
       for (const att of attachments) {
-        const b64    = att.buffer.toString("base64").match(/.{1,76}/g).join("\r\n");
+        const b64    = (att.buffer.toString("base64").match(/.{1,76}/g) ?? []).join("\r\n");
         const safeFilename = encodeHeader(att.filename);
         mime += `--${outerBnd}\r\n`;
         mime += `Content-Type: ${att.mimeType}; name="${safeFilename}"\r\n`;
