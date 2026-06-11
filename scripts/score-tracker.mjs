@@ -5,7 +5,7 @@
  * Triggered on the 1st of every month by GitHub Actions.
  *
  * Logic:
- *  Phase 1 — Per-department: compute 4-month status, find newly-complete months.
+ *  Phase 1 — Per-department: compute 3-month status, find newly-complete months.
  *  Phase 2 — Group by head email: departments sharing the same head email are
  *             batched into ONE email (one email per person, not per department).
  *  Phase 3 — Send: one email per unique address with one PDF attachment per
@@ -90,7 +90,7 @@ function createSB() {
 async function getDeptStatus(sb, tableKey, dept) {
   const { data, error } = await sb
     .from(tableKey)
-    .select("firstname, lastname, prefix, score")
+    .select("firstname, lastname, prefix, score, drive_file_id")
     .eq("department", dept);
   if (error) throw new Error(`[${tableKey}/${dept}] Supabase: ${error.message}`);
   if (!data?.length) return null;
@@ -98,10 +98,23 @@ async function getDeptStatus(sb, tableKey, dept) {
   const total   = data.length;
   const filled  = data.filter(r => r.score !== null).length;
   const missing = total - filled;
-  const missingNames = data
-    .filter(r => r.score === null)
-    .map(r => `${r.prefix ?? ""}${r.firstname ?? ""} ${r.lastname ?? ""}`.trim());
-  return { total, filled, missing, complete: missing === 0, missingNames };
+
+  // Sort: score DESC, nulls last
+  const rows = [...data]
+    .sort((a, b) => {
+      if (a.score === null && b.score === null) return 0;
+      if (a.score === null) return 1;
+      if (b.score === null) return -1;
+      return b.score - a.score;
+    })
+    .map(r => ({
+      name       : `${r.prefix ?? ""}${r.firstname ?? ""} ${r.lastname ?? ""}`.trim(),
+      score      : r.score,
+      driveFileId: r.drive_file_id ?? null,
+    }));
+
+  const missingNames = rows.filter(r => r.score === null).map(r => r.name);
+  return { total, filled, missing, complete: missing === 0, missingNames, rows };
 }
 
 async function getDistinctDepts(sb, tableKeys) {
@@ -116,22 +129,6 @@ async function getDistinctDepts(sb, tableKeys) {
   return [...deptSet].sort();
 }
 
-async function checkAlreadySent(sb, tableKey, dept) {
-  const { data } = await sb
-    .from("email_sent_log")
-    .select("id")
-    .eq("table_name", tableKey)
-    .eq("department", dept)
-    .limit(1);
-  return (data?.length ?? 0) > 0;
-}
-
-async function logSent(sb, tableKey, dept) {
-  const { error } = await sb
-    .from("email_sent_log")
-    .insert({ table_name: tableKey, department: dept });
-  if (error) console.warn(`⚠️  email_sent_log insert failed ${tableKey}/${dept}: ${error.message}`);
-}
 
 // ── PDF generation ─────────────────────────────────────────────────────────
 async function generatePDF(dept, monthsData, todayStr) {
@@ -175,7 +172,7 @@ async function generatePDF(dept, monthsData, todayStr) {
     doc.font(REG).fontSize(11).fill("#bfdbfe")
        .text(`โรงพยาบาลสมุทรสาคร  ·  จัดทำเมื่อ ${todayStr}`, L, 50, { width: CW, lineBreak: false });
     doc.font(REG).fontSize(10).fill("#93c5fd")
-       .text("ตรวจสอบ 4 เดือนล่าสุด (ไม่รวมเดือนปัจจุบัน)", L, 68, { width: CW, lineBreak: false });
+       .text("ตรวจสอบ 3 เดือนล่าสุด (ไม่รวมเดือนปัจจุบัน)", L, 68, { width: CW, lineBreak: false });
 
     // Summary table
     const TY  = 105;
@@ -291,52 +288,28 @@ async function main() {
   if (!depts.length) { console.log("⚠️  No departments found — nothing to do."); return; }
   console.log(`🏥  Departments: ${depts.join(", ")}\n`);
 
-  // ── Phase 1: gather per-dept completion data ────────────────────────────
-  // pending: dept → { monthsData, newlyComplete }
-  const pending = new Map();
+  // ── Phase 1: gather per-dept status for all 3 months ───────────────────
+  // deptData: dept → { monthsData }
+  const deptData = new Map();
 
   for (const dept of depts) {
     console.log(`┌─ ${dept}`);
-
     const monthsData = [];
     for (const key of months) {
       const status = await getDeptStatus(sb, key, dept);
       monthsData.push({ key, displayName: tableKeyToDisplay(key), status });
-    }
-
-    for (const { displayName, status } of monthsData) {
       const icon = !status ? "—" : status.complete ? "✓" : `✗ ค้าง ${status.missing}/${status.total}`;
-      console.log(`│   ${displayName}: ${icon}`);
+      console.log(`│   ${tableKeyToDisplay(key)}: ${icon}`);
     }
-
-    const newlyComplete = [];
-    for (const { key, displayName, status } of monthsData) {
-      if (!status?.complete) continue;
-      if (!(await checkAlreadySent(sb, key, dept))) newlyComplete.push({ key, displayName });
-    }
-
-    if (!newlyComplete.length) {
-      console.log(`└─ ไม่มีเดือนใหม่ที่ครบถ้วน\n`);
-      continue;
-    }
-
-    console.log(`│   🎉 ครบถ้วนใหม่: ${newlyComplete.map(m => m.displayName).join(", ")}`);
     console.log(`└─ รอส่งอีเมล\n`);
-    pending.set(dept, { monthsData, newlyComplete });
-  }
-
-  if (!pending.size) {
-    console.log("ℹ️  ไม่มีเดือนใหม่ที่ครบถ้วนในทุกกลุ่มงาน\n");
-    writeSummary([], months, todayStr, DRY_RUN);
-    return;
+    deptData.set(dept, { monthsData });
   }
 
   // ── Phase 2: group departments by head email ────────────────────────────
-  // byEmail: email → [{ dept, monthsData, newlyComplete }]
-  const byEmail   = new Map();
-  const noEmail   = [];
+  const byEmail = new Map();
+  const noEmail = [];
 
-  for (const [dept, data] of pending) {
+  for (const [dept, data] of deptData) {
     const email = (DEPT_HEADS[dept] ?? DEPT_HEADS[dept.trim()]) ?? null;
     if (!email) {
       console.log(`⚠️  "${dept}": ไม่มีอีเมลหัวหน้า — ข้ามการส่ง`);
@@ -352,14 +325,13 @@ async function main() {
 
   for (const [email, deptList] of byEmail) {
     const deptNames = deptList.map(d => d.dept).join(", ");
-    const allNewMonths = [...new Set(deptList.flatMap(d => d.newlyComplete.map(m => m.displayName)))];
     console.log(`\n📧  ${email}`);
     console.log(`    กลุ่มงาน: ${deptNames}`);
 
     if (DRY_RUN) {
       console.log(`    🔍 DRY RUN — ไม่ส่งอีเมลจริง`);
-      for (const { dept, newlyComplete } of deptList) {
-        summaryRows.push({ dept, newlyCount: newlyComplete.length, emailed: false, note: `Dry run → ${email}` });
+      for (const { dept } of deptList) {
+        summaryRows.push({ dept, emailed: false, note: `Dry run → ${email}` });
       }
       continue;
     }
@@ -379,30 +351,25 @@ async function main() {
     // Build combined HTML email
     const html = buildScoreReportEmail({
       depts: deptList.map(d => ({
-        dept               : d.dept,
-        newlyCompletedMonths: d.newlyComplete.map(m => m.displayName),
-        monthsSummary      : d.monthsData.map(({ displayName, status }) => ({ displayName, status })),
+        dept        : d.dept,
+        monthsSummary: d.monthsData.map(({ displayName, status }) => ({ displayName, status })),
       })),
       reportDate: todayStr,
     });
 
-    const subject = `รายงานสถานะ P4P ${deptNames} — ${allNewMonths.join(", ")}`;
-    const plainBody = `รายงานสถานะ P4P\nกลุ่มงาน: ${deptNames}\nเดือนที่ครบถ้วน: ${allNewMonths.join(", ")}\nดูรายละเอียดในไฟล์ PDF ที่แนบ`;
+    const subject   = `รายงานสถานะ P4P ${deptNames} — ${todayStr}`;
+    const plainBody = `รายงานสถานะ P4P\nกลุ่มงาน: ${deptNames}\nดูรายละเอียดในไฟล์ PDF ที่แนบ`;
 
     await gmail.sendMessage({ to: email, subject, body: plainBody, html, attachments });
     console.log(`    ✉️  ส่งแล้ว (${attachments.length} PDF แนบ)`);
 
-    // Log sent status for each (month, dept)
-    for (const { dept, newlyComplete } of deptList) {
-      for (const { key } of newlyComplete) await logSent(sb, key, dept);
-      summaryRows.push({ dept, newlyCount: newlyComplete.length, emailed: true, note: email });
+    for (const { dept } of deptList) {
+      summaryRows.push({ dept, emailed: true, note: email });
     }
   }
 
-  // Rows for depts with no email
   for (const dept of noEmail) {
-    const { newlyComplete } = pending.get(dept);
-    summaryRows.push({ dept, newlyCount: newlyComplete.length, emailed: false, note: "ไม่มีอีเมลหัวหน้า" });
+    summaryRows.push({ dept, emailed: false, note: "ไม่มีอีเมลหัวหน้า" });
   }
 
   writeSummary(summaryRows, months, todayStr, DRY_RUN);
@@ -416,13 +383,13 @@ function writeSummary(rows, months, todayStr, isDry) {
   md += `**เดือนที่ตรวจสอบ:** ${monthLabels}\n\n`;
 
   if (!rows.length) {
-    md += "_ไม่มีเดือนใหม่ที่ครบถ้วนในรอบนี้_\n";
+    md += "_ไม่พบกลุ่มงานในช่วงนี้_\n";
   } else {
-    md += `| กลุ่มงาน | เดือนครบถ้วนใหม่ | ส่งอีเมล | หมายเหตุ |\n`;
-    md += `|---|:---:|:---:|---|\n`;
+    md += `| กลุ่มงาน | ส่งอีเมล | หมายเหตุ |\n`;
+    md += `|---|:---:|---|\n`;
     for (const r of rows) {
-      const icon = r.emailed ? "✅" : (isDry && r.newlyCount > 0 ? "🔍" : "—");
-      md += `| ${r.dept} | ${r.newlyCount} | ${icon} | ${r.note} |\n`;
+      const icon = r.emailed ? "✅" : (isDry ? "🔍" : "—");
+      md += `| ${r.dept} | ${icon} | ${r.note} |\n`;
     }
   }
 

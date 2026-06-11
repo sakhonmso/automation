@@ -169,7 +169,7 @@ export async function matchName(name, date, threshold = SIMILARITY_THRESHOLD) {
  * @param {number|string} index  Primary key value (column "index")
  * @param {number}        score  Score to save (float8)
  */
-export async function saveScore(date, index, score) {
+export async function saveScore(date, index, score, driveFileId = null) {
   if (!isValidDate(date)) {
     throw new Error(`Cannot save score — invalid date key: "${date}"`);
   }
@@ -181,9 +181,10 @@ export async function saveScore(date, index, score) {
   }
 
   const supabase = getSupabase();
+  const payload = driveFileId !== null ? { score, drive_file_id: driveFileId } : { score };
   const { error } = await supabase
     .from(date)
-    .update({ score })
+    .update(payload)
     .eq("index", index);
 
   if (error) throw new Error(`Supabase update error on table "${date}": ${error.message}`);
