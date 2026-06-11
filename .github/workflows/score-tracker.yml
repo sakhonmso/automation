@@ -37,21 +37,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # ── 4. Thai fonts for PDF rendering ──────────────────────────────────
-      # Sarabun is a Google Fonts Thai typeface that covers the full Thai Unicode
-      # block (U+0E00–U+0E7F) including all combining vowel marks.
-      - name: Download Sarabun font
-        run: |
-          mkdir -p fonts
-          curl -fsSL \
-            "https://github.com/google/fonts/raw/main/ofl/sarabun/Sarabun-Regular.ttf" \
-            -o fonts/Sarabun-Regular.ttf
-          curl -fsSL \
-            "https://github.com/google/fonts/raw/main/ofl/sarabun/Sarabun-Bold.ttf" \
-            -o fonts/Sarabun-Bold.ttf
-          echo "✅ Fonts downloaded"
-
-      # ── 5. Run tracker ───────────────────────────────────────────────────
+      # ── 4. Run tracker ───────────────────────────────────────────────────
       - name: Run score tracker
         env:
           # Gmail OAuth (shared with main pipeline)

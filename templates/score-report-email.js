@@ -43,17 +43,14 @@ export function buildScoreReportEmail({ depts, reportDate }) {
         ? `<span class="badge badge-ok">ครบถ้วน ${status.total} คน</span>`
         : `<span class="badge badge-warn">ค้าง ${status.missing} / ${status.total} คน</span>`;
 
-      let rank = 1;
       const rowsHtml = status.rows.map(({ name, score, driveFileId }) => {
         const hasScore = score !== null;
-        const rankCell = hasScore ? String(rank++) : "—";
-        const scoreCell = hasScore ? String(score) : "—";
+        const scoreCell = hasScore ? String(Math.round(score)) : "—";
         const nameHtml = driveFileId
           ? `<a href="${driveLink(driveFileId)}" style="color:#1d4ed8;text-decoration:none">${name}</a>`
           : name;
         const rowStyle = hasScore ? "" : `style="background:#fef2f2"`;
         return `<tr ${rowStyle}>
-            <td style="text-align:center;color:#94a3b8">${rankCell}</td>
             <td>${nameHtml}</td>
             <td style="text-align:center;font-weight:${hasScore ? "600" : "400"};color:${hasScore ? "#1e293b" : "#94a3b8"}">${scoreCell}</td>
           </tr>`;
@@ -68,7 +65,6 @@ export function buildScoreReportEmail({ depts, reportDate }) {
         <table class="physician-table">
           <thead>
             <tr>
-              <th style="width:36px;text-align:center">#</th>
               <th>ชื่อ-สกุล</th>
               <th style="width:80px;text-align:center">คะแนน</th>
             </tr>
@@ -143,7 +139,7 @@ export function buildScoreReportEmail({ depts, reportDate }) {
     <p class="greeting">เรียน หัวหน้ากลุ่มงาน</p>
     <p class="intro">
       ระบบได้รวบรวมสถานะการส่งคะแนน P4P ของ 3 เดือนล่าสุดแล้ว<br>
-      กดที่ชื่อแพทย์เพื่อเปิดไฟล์ Excel บน Google Drive
+      กดชื่อแพทย์เพื่อเปิดไฟล์ Excel บน Google Drive
     </p>
 
     ${deptSections}
@@ -151,7 +147,6 @@ export function buildScoreReportEmail({ depts, reportDate }) {
     <div class="note-box">
       <strong style="color:#1d4ed8;font-style:normal">หมายเหตุ</strong>
       อีเมลนี้ส่งอัตโนมัติทุกวันที่ 1 ของเดือน
-      ดูรายละเอียดเพิ่มเติมได้ในไฟล์ PDF ที่แนบมา
     </div>
   </div>
 

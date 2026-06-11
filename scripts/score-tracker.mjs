@@ -5,11 +5,10 @@
  * Triggered on the 1st of every month by GitHub Actions.
  *
  * Logic:
- *  Phase 1 — Per-department: compute 3-month status, find newly-complete months.
+ *  Phase 1 — Per-department: gather 3-month status (all months, regardless of completeness).
  *  Phase 2 — Group by head email: departments sharing the same head email are
  *             batched into ONE email (one email per person, not per department).
- *  Phase 3 — Send: one email per unique address with one PDF attachment per
- *             department, then log each (month, dept) to email_sent_log.
+ *  Phase 3 — Send: one email per unique address.
  *
  * Required env vars (GitHub Secrets):
  *   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN
@@ -19,21 +18,16 @@
  *                       (script trims whitespace when matching).
  *                       Example: {"ศัลยกรรม":"dr@h.com","เวชกรรมฟื้นฟู":null}
  * Optional:
- *   DRY_RUN           — "true" → check & report but do NOT send emails or log
+ *   DRY_RUN           — "true" → check & report but do NOT send emails
  */
 
 import { createClient }          from "@supabase/supabase-js";
-import PDFDocument               from "pdfkit";
 import { config as dotenvConfig } from "dotenv";
-import { existsSync, appendFileSync } from "fs";
-import { join, dirname }         from "path";
-import { fileURLToPath }         from "url";
+import { appendFileSync }        from "fs";
 import { createGmailClient }     from "../gmail-client.js";
 import { buildScoreReportEmail } from "../templates/score-report-email.js";
 
 dotenvConfig({ override: true });
-
-const __dir = dirname(fileURLToPath(import.meta.url));
 
 // ── Configuration ─────────────────────────────────────────────────────────
 const DRY_RUN    = process.env.DRY_RUN === "true";
@@ -51,10 +45,6 @@ const THAI_MONTHS = {
   "05":"พฤษภาคม","06":"มิถุนายน","07":"กรกฎาคม","08":"สิงหาคม",
   "09":"กันยายน","10":"ตุลาคม","11":"พฤศจิกายน","12":"ธันวาคม",
 };
-
-// ── Font paths (downloaded by the workflow step) ───────────────────────────
-const FONT_REG  = join(__dir, "../fonts/Sarabun-Regular.ttf");
-const FONT_BOLD = join(__dir, "../fonts/Sarabun-Bold.ttf");
 
 // ── Date helpers ───────────────────────────────────────────────────────────
 function getPreviousMonths(count) {
@@ -108,7 +98,7 @@ async function getDeptStatus(sb, tableKey, dept) {
       return b.score - a.score;
     })
     .map(r => ({
-      name       : `${r.prefix ?? ""}${r.firstname ?? ""} ${r.lastname ?? ""}`.trim(),
+      name       : `${r.firstname ?? ""} ${r.lastname ?? ""}`.trim(),
       score      : r.score,
       driveFileId: r.drive_file_id ?? null,
     }));
@@ -130,148 +120,9 @@ async function getDistinctDepts(sb, tableKeys) {
 }
 
 
-// ── PDF generation ─────────────────────────────────────────────────────────
-async function generatePDF(dept, monthsData, todayStr) {
-  return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({
-      size: "A4",
-      margins: { top: 50, bottom: 50, left: 50, right: 50 },
-      autoFirstPage: true,
-    });
-
-    const chunks = [];
-    doc.on("data",  c  => chunks.push(c));
-    doc.on("end",   () => resolve(Buffer.concat(chunks)));
-    doc.on("error", reject);
-
-    const hasReg  = existsSync(FONT_REG);
-    const hasBold = existsSync(FONT_BOLD);
-    if (!hasReg) console.warn("⚠️  Sarabun-Regular.ttf not found — Thai text may not render");
-    if (hasReg)  doc.registerFont("SarabunReg",  FONT_REG);
-    if (hasBold) doc.registerFont("SarabunBold", FONT_BOLD);
-    const REG  = hasReg  ? "SarabunReg"  : "Helvetica";
-    const BOLD = hasBold ? "SarabunBold" : "Helvetica-Bold";
-
-    const PW  = doc.page.width;
-    const PH  = doc.page.height;
-    const L   = 50;
-    const CW  = PW - 100;
-
-    const BLUE_D  = "#1e3a8a";
-    const BLUE_L  = "#dbeafe";
-    const BLUE_BG = "#eff6ff";
-    const DARK    = "#1e293b";
-    const GRAY    = "#64748b";
-    const GREEN   = "#16a34a";
-    const RED     = "#dc2626";
-
-    // Header band
-    doc.rect(0, 0, PW, 90).fill(BLUE_D);
-    doc.font(BOLD).fontSize(17).fill("#fff")
-       .text(`รายงานสถานะ P4P — กลุ่มงาน ${dept}`, L, 18, { width: CW });
-    doc.font(REG).fontSize(11).fill("#bfdbfe")
-       .text(`โรงพยาบาลสมุทรสาคร  ·  จัดทำเมื่อ ${todayStr}`, L, 50, { width: CW, lineBreak: false });
-    doc.font(REG).fontSize(10).fill("#93c5fd")
-       .text("ตรวจสอบ 3 เดือนล่าสุด (ไม่รวมเดือนปัจจุบัน)", L, 68, { width: CW, lineBreak: false });
-
-    // Summary table
-    const TY  = 105;
-    const HDH = 26;
-    const RH  = 28;
-
-    const COLS = [
-      { label: "เดือน",          w: 165, align: "left"   },
-      { label: "แพทย์ทั้งหมด", w: 82,  align: "center" },
-      { label: "ส่งแล้ว",       w: 80,  align: "center" },
-      { label: "ค้างส่ง",       w: 78,  align: "center" },
-      { label: "สถานะ",         w: 90,  align: "center" },
-    ];
-
-    doc.rect(L, TY, CW, HDH).fill(BLUE_L);
-    let cx = L;
-    doc.font(BOLD).fontSize(11).fill(BLUE_D);
-    for (const col of COLS) {
-      doc.text(col.label, cx + 5, TY + 7, { width: col.w - 10, align: col.align, lineBreak: false });
-      cx += col.w;
-    }
-
-    let ry = TY + HDH;
-    for (let i = 0; i < monthsData.length; i++) {
-      const { displayName, status } = monthsData[i];
-      doc.rect(L, ry, CW, RH).fill(i % 2 === 0 ? "#fff" : BLUE_BG);
-      cx = L;
-      const CY = ry + 8;
-
-      doc.font(REG).fontSize(12).fill(DARK)
-         .text(displayName, cx + 5, CY, { width: COLS[0].w - 10, lineBreak: false });
-      cx += COLS[0].w;
-
-      if (!status) {
-        doc.fill(GRAY).fontSize(11)
-           .text("ไม่พบข้อมูล", cx + 5, CY, { width: CW - COLS[0].w - 10, align: "center", lineBreak: false });
-      } else {
-        doc.font(REG).fill(DARK).fontSize(12)
-           .text(String(status.total), cx + 5, CY, { width: COLS[1].w - 10, align: "center", lineBreak: false });
-        cx += COLS[1].w;
-        doc.font(BOLD).fill(GREEN)
-           .text(String(status.filled), cx + 5, CY, { width: COLS[2].w - 10, align: "center", lineBreak: false });
-        cx += COLS[2].w;
-        doc.fill(status.missing > 0 ? RED : DARK).font(status.missing > 0 ? BOLD : REG)
-           .text(String(status.missing), cx + 5, CY, { width: COLS[3].w - 10, align: "center", lineBreak: false });
-        cx += COLS[3].w;
-        doc.fill(status.complete ? GREEN : RED).font(BOLD).fontSize(11)
-           .text(status.complete ? "✓ ครบถ้วน" : "✗ ยังไม่ครบ", cx + 5, CY,
-                 { width: COLS[4].w - 10, align: "center", lineBreak: false });
-      }
-
-      doc.moveTo(L, ry + RH).lineTo(L + CW, ry + RH).strokeColor("#e2e8f0").lineWidth(0.5).stroke();
-      ry += RH;
-    }
-    doc.rect(L, TY, CW, HDH + RH * monthsData.length).strokeColor(BLUE_L).lineWidth(1).stroke();
-
-    // Incomplete names section
-    const incomplete = monthsData.filter(
-      m => m.status && !m.status.complete && m.status.missingNames?.length > 0
-    );
-    if (incomplete.length > 0) {
-      let y = ry + 22;
-      doc.font(BOLD).fontSize(12).fill(BLUE_D)
-         .text("รายชื่อแพทย์ที่ยังไม่ส่งคะแนน", L, y, { width: CW, lineBreak: false });
-      y += 20;
-
-      for (const { displayName, status } of incomplete) {
-        doc.rect(L, y, CW, 22).fill(BLUE_L);
-        doc.font(BOLD).fontSize(11).fill(BLUE_D)
-           .text(displayName, L + 8, y + 5, { width: CW - 16, lineBreak: false });
-        y += 26;
-
-        doc.font(REG).fontSize(11).fill(DARK);
-        const halfW = (CW - 24) / 2;
-        for (let i = 0; i < status.missingNames.length; i += 2) {
-          doc.text(`• ${status.missingNames[i]}`, L + 12, y, { width: halfW, lineBreak: false });
-          if (status.missingNames[i + 1]) {
-            doc.text(`• ${status.missingNames[i + 1]}`, L + 12 + halfW + 10, y,
-                     { width: halfW, lineBreak: false });
-          }
-          y += 18;
-        }
-        y += 8;
-      }
-    }
-
-    // Footer
-    doc.font(REG).fontSize(9).fill(GRAY)
-       .text("เอกสารนี้สร้างโดยระบบอัตโนมัติ — โรงพยาบาลสมุทรสาคร",
-             L, PH - 38, { width: CW, align: "center", lineBreak: false });
-
-    doc.end();
-  });
-}
-
 // ── Main ───────────────────────────────────────────────────────────────────
 async function main() {
   const todayStr = todayThaiStr();
-  const nowTag   = new Date().toISOString().slice(0, 7); // "2026-06"
 
   console.log(`\n${"═".repeat(62)}`);
   console.log(`  P4P Score Tracker${DRY_RUN ? "  [DRY RUN]" : ""}  —  ${todayStr}`);
@@ -336,18 +187,6 @@ async function main() {
       continue;
     }
 
-    // Generate one PDF per department
-    const attachments = [];
-    for (const { dept, monthsData } of deptList) {
-      const buf = await generatePDF(dept, monthsData, todayStr);
-      attachments.push({
-        filename: `P4P_รายงาน_${dept}_${nowTag}.pdf`,
-        mimeType: "application/pdf",
-        buffer: buf,
-      });
-      console.log(`    📄 PDF: P4P_รายงาน_${dept}_${nowTag}.pdf (${(buf.length / 1024).toFixed(0)} KB)`);
-    }
-
     // Build combined HTML email
     const html = buildScoreReportEmail({
       depts: deptList.map(d => ({
@@ -358,10 +197,10 @@ async function main() {
     });
 
     const subject   = `รายงานสถานะ P4P ${deptNames} — ${todayStr}`;
-    const plainBody = `รายงานสถานะ P4P\nกลุ่มงาน: ${deptNames}\nดูรายละเอียดในไฟล์ PDF ที่แนบ`;
+    const plainBody = `รายงานสถานะ P4P\nกลุ่มงาน: ${deptNames}`;
 
-    await gmail.sendMessage({ to: email, subject, body: plainBody, html, attachments });
-    console.log(`    ✉️  ส่งแล้ว (${attachments.length} PDF แนบ)`);
+    await gmail.sendMessage({ to: email, subject, body: plainBody, html });
+    console.log(`    ✉️  ส่งแล้ว`);
 
     for (const { dept } of deptList) {
       summaryRows.push({ dept, emailed: true, note: email });
