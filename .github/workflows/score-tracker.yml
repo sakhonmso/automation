@@ -8,17 +8,11 @@ on:
 
   # Allow manual runs (useful for testing or catching up after an outage)
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: 'Dry run — check scores but do NOT send emails'
-        required: false
-        default: false
-        type: boolean
 
 # ── Job ─────────────────────────────────────────────────────────────────────
 jobs:
   score-tracker:
-    name: Check completion & notify dept heads${{ inputs.dry_run && ' [DRY RUN]' || '' }}
+    name: Check completion & notify dept heads
     runs-on: ubuntu-latest
 
     steps:
@@ -52,6 +46,4 @@ jobs:
           DEPT_HEADS_JSON:      ${{ secrets.DEPT_HEADS_JSON }}
           # Google Drive root folder ID for P4P files (used to resolve per-physician links)
           P4P_FOLDER_ID:        ${{ secrets.P4P_FOLDER_ID }}
-          # Dry-run flag
-          DRY_RUN:              ${{ inputs.dry_run || 'false' }}
         run: node scripts/score-tracker.mjs
