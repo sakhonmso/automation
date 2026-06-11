@@ -28,17 +28,15 @@ export function buildScoreReportEmail({ depts, reportDate }) {
   // ── Per-department sections ───────────────────────────────────────────────
   const deptSections = depts.map(({ dept, monthsSummary }) => {
 
-    const monthBlocks = monthsSummary.map(({ displayName, status }, idx) => {
-      const openAttr = idx === 0 ? " open" : "";
-
+    const monthBlocks = monthsSummary.map(({ displayName, status }) => {
       if (!status) {
         return `
-      <details class="month-block"${openAttr}>
-        <summary class="month-header">
+      <div class="month-block">
+        <div class="month-header">
           <span class="month-name">${displayName}</span>
           <span class="badge badge-none">ไม่พบข้อมูล</span>
-        </summary>
-      </details>`;
+        </div>
+      </div>`;
       }
 
       const badgeHtml = status.complete
@@ -59,11 +57,11 @@ export function buildScoreReportEmail({ depts, reportDate }) {
       }).join("");
 
       return `
-      <details class="month-block"${openAttr}>
-        <summary class="month-header">
+      <div class="month-block">
+        <div class="month-header">
           <span class="month-name">${displayName}</span>
           ${badgeHtml}
-        </summary>
+        </div>
         <table class="physician-table">
           <thead>
             <tr>
@@ -73,7 +71,7 @@ export function buildScoreReportEmail({ depts, reportDate }) {
           </thead>
           <tbody>${rowsHtml}</tbody>
         </table>
-      </details>`;
+      </div>`;
     }).join("");
 
     return `
@@ -109,23 +107,18 @@ export function buildScoreReportEmail({ depts, reportDate }) {
   .dept-heading{font-size:15px;font-weight:700;color:#1e3a8a;background:#eff6ff;
     border-left:4px solid #2563eb;padding:9px 14px;border-radius:0 8px 8px 0;margin-bottom:14px}
   hr.dept-divider{border:none;border-top:1.5px solid #dbeafe;margin:20px 0}
-  details.month-block{margin-bottom:16px}
-  details.month-block summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;margin-bottom:4px;user-select:none}
-  details.month-block summary::-webkit-details-marker{display:none}
-  details.month-block[open] summary{margin-bottom:8px}
-  details.month-block summary .month-name::before{content:"▶ ";font-size:11px;color:#93c5fd}
-  details.month-block[open] summary .month-name::before{content:"▼ ";font-size:11px;color:#2563eb}
-  .month-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .month-name{font-size:17px;font-weight:600;color:#1e3a8a;background:#dbeafe;
+  .month-block{margin-bottom:18px;border:1.5px solid #bfdbfe;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(30,58,138,.08)}
+  .month-header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f0f7ff}
+  .month-name{font-size:16px;font-weight:600;color:#1e3a8a;background:#dbeafe;
     padding:3px 10px;border-radius:6px}
   .badge{font-size:12px;font-weight:600;padding:4px 9px;border-radius:6px;display:inline-block;line-height:1.4;vertical-align:middle}
   .badge-ok{background:#dcfce7;color:#15803d}
   .badge-warn{background:#fee2e2;color:#b91c1c}
   .badge-none{background:#f1f5f9;color:#64748b}
   table.physician-table{width:100%;border-collapse:collapse}
-  table.physician-table th{padding:7px 10px;font-size:16px;font-weight:600;color:#1d4ed8;
+  table.physician-table th{padding:7px 10px;font-size:15px;font-weight:600;color:#1d4ed8;
     text-align:left;border-bottom:2px solid #bfdbfe;background:#dbeafe}
-  table.physician-table td{padding:7px 10px;font-size:16px;vertical-align:middle;
+  table.physician-table td{padding:7px 10px;font-size:15px;vertical-align:middle;
     border-bottom:1px solid #eff6ff}
   table.physician-table tr:last-child td{border-bottom:none}
   .note-box{margin-top:20px;font-size:13px;color:#64748b;line-height:1.7;
