@@ -17,8 +17,6 @@
  *                       Keys must match the department values in Supabase exactly
  *                       (script trims whitespace when matching).
  *                       Example: {"ศัลยกรรม":"dr@h.com","เวชกรรมฟื้นฟู":null}
- * Optional:
- *   DRY_RUN           — "true" → check & report but do NOT send emails
  */
 
 import { createClient }          from "@supabase/supabase-js";
@@ -31,7 +29,6 @@ import { buildScoreReportEmail } from "../templates/score-report-email.js";
 dotenvConfig({ override: true });
 
 // ── Configuration ─────────────────────────────────────────────────────────
-const DRY_RUN    = process.env.DRY_RUN === "true";
 // Dept names are trimmed at lookup time so trailing spaces in the JSON don't matter.
 const DEPT_HEADS = (() => {
   try { return JSON.parse(process.env.DEPT_HEADS_JSON || "{}"); }
@@ -125,7 +122,7 @@ async function main() {
   const todayStr = todayThaiStr();
 
   console.log(`\n${"═".repeat(62)}`);
-  console.log(`  P4P Score Tracker${DRY_RUN ? "  [DRY RUN]" : ""}  —  ${todayStr}`);
+  console.log(`  P4P Score Tracker  —  ${todayStr}`);
   console.log(`  Checking last ${CHECK_COUNT} months`);
   console.log(`${"═".repeat(62)}\n`);
 
@@ -195,14 +192,6 @@ async function main() {
     console.log(`\n📧  ${email}`);
     console.log(`    กลุ่มงาน: ${deptNames}`);
 
-    if (DRY_RUN) {
-      console.log(`    🔍 DRY RUN — ไม่ส่งอีเมลจริง`);
-      for (const { dept } of deptList) {
-        summaryRows.push({ dept, emailed: false, note: `Dry run → ${email}` });
-      }
-      continue;
-    }
-
     // Build combined HTML email
     const html = buildScoreReportEmail({
       depts: deptList.map(d => ({
@@ -227,13 +216,13 @@ async function main() {
     summaryRows.push({ dept, emailed: false, note: "ไม่มีอีเมลหัวหน้า" });
   }
 
-  writeSummary(summaryRows, months, todayStr, DRY_RUN);
+  writeSummary(summaryRows, months, todayStr);
 }
 
 // ── Step summary helper ────────────────────────────────────────────────────
-function writeSummary(rows, months, todayStr, isDry) {
+function writeSummary(rows, months, todayStr) {
   const monthLabels = months.map(tableKeyToDisplay).join(" · ");
-  let md = `# 📈 P4P Score Tracker${isDry ? " *(Dry Run)*" : ""}\n\n`;
+  let md = `# 📈 P4P Score Tracker\n\n`;
   md += `**วันที่:** ${todayStr}  \n`;
   md += `**เดือนที่ตรวจสอบ:** ${monthLabels}\n\n`;
 
@@ -243,8 +232,7 @@ function writeSummary(rows, months, todayStr, isDry) {
     md += `| กลุ่มงาน | ส่งอีเมล | หมายเหตุ |\n`;
     md += `|---|:---:|---|\n`;
     for (const r of rows) {
-      const icon = r.emailed ? "✅" : (isDry ? "🔍" : "—");
-      md += `| ${r.dept} | ${icon} | ${r.note} |\n`;
+      md += `| ${r.dept} | ${r.emailed ? "✅" : "—"} | ${r.note} |\n`;
     }
   }
 
