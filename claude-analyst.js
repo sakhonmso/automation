@@ -162,6 +162,18 @@ const NON_NAME_THAI = new Set([
   "พฤศภาคม", "พฤศภ",         // misspelling of พฤษภาคม / พฤษภ (May)
   "เมศายน", "เมศา", "เมศ",   // misspelling of เมษายน / เมษา / เมษ (April)
   "พฤษจิกายน", "พฤษจิ",      // misspelling of พฤศจิกายน / พฤศจิ (November)
+  // ── Name-label words ─────────────────────────────────────────────────────
+  // Header labels that sit next to the real name in a "ชื่อแพทย์" cell — they
+  // are never name components and must not be picked up as a first/last name.
+  "ชื่อแพทย์", "ชื่อ", "นามสกุล", "สกุล", "ชื่อสกุล", "กลุ่มงาน",
+  // ── Department names (single-token) ──────────────────────────────────────
+  // Senders sometimes put the department where the surname should go in the
+  // filename (e.g. "P4P วราวุธ อายุรกรรม เม.ย.69.xlsx").  These are department
+  // names, never lastnames — exclude so the firstname-only fallback fires.
+  "อายุรกรรม", "ศัลยกรรม", "กุมารเวชกรรม", "จักษุวิทยา", "นิติเวช",
+  "รังสีวิทยา", "วิสัญญีวิทยา", "เวชกรรมฟื้นฟู", "เวชกรรมสังคม",
+  "อาชีวเวชกรรม", "ศัลยกรรมออร์โธปิดิกส์", "ออร์โธปิดิกส์",
+  "เวชศาสตร์ฉุกเฉิน", "ผู้ป่วยนอก", "จิตเวช",
 ]);
 
 /**
@@ -281,6 +293,54 @@ export function resolvePhysicianName(filename, subject, body) {
   }
 
   return null;
+}
+
+/**
+ * Fallback name resolver — extract physician-name candidates from inside the
+ * workbook itself (sheet content + tab name).
+ *
+ * Used only when the filename/subject/body pre-scan produced a name that did
+ * NOT match any physician in the database.  In practice the real name is still
+ * written correctly inside the file even when the sender mis-named it:
+ *   • a "ชื่อแพทย์ นพ. วราวุธ เมธีศิริวัฒน์" header cell, or
+ *   • the worksheet tab name ("ปัทมิกา เจียรวุฒิสาร เมย.69").
+ *
+ * Returns an ordered, de-duplicated list of "firstname lastname" candidates
+ * (titles stripped), most-reliable first.  Caller tries matchName on each.
+ *
+ * @param {object[]} rows       Sheet rows ({ col_1, col_2, ... })
+ * @param {string}   sheetName  The chosen worksheet's tab name
+ * @returns {string[]}
+ */
+export function resolvePhysicianNameFromSheet(rows = [], sheetName = "") {
+  const candidates = [];
+  const add = (n) => { if (n && !candidates.includes(n)) candidates.push(n); };
+
+  // Cells whose text identifies the physician-name row.
+  const NAME_LABEL_RE = /ชื่อ\s*[-–]?\s*สกุล|ชื่อแพทย์|ชื่อ\s*นามสกุล|^\s*ชื่อ\b|นามสกุล/;
+
+  // 1. Scan the first few rows for a "ชื่อแพทย์ …" header cell.
+  const seen = new Set();
+  for (const row of (rows ?? []).slice(0, 10)) {
+    for (const val of Object.values(row ?? {})) {
+      const s = String(val ?? "").trim();
+      if (!s || seen.has(s)) continue;
+      seen.add(s);
+      if (!NAME_LABEL_RE.test(s)) continue;
+      // Try the raw cell first (title-anchored Pattern 1 handles "นพ. X Y"),
+      // then a label-stripped, dot-stripped variant for untitled names.
+      add(extractNameFromText(s));
+      const stripped = s
+        .replace(/ชื่อแพทย์|ชื่อ\s*[-–]?\s*สกุล|ชื่อ\s*นามสกุล|นามสกุล|ชื่อ/g, " ")
+        .replace(/[.…]+/g, " ");
+      add(extractNameFromText(stripped));
+    }
+  }
+
+  // 2. Worksheet tab name (e.g. "ปัทมิกา เจียรวุฒิสาร เมย.69").
+  add(extractNameFromText(sheetName ?? ""));
+
+  return candidates;
 }
 
 // Labels that only appear as grand-total row markers — safe to search ALL columns

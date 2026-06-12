@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert   from "node:assert/strict";
-import { resolvePhysicianName } from "../claude-analyst.js";
+import { resolvePhysicianName, resolvePhysicianNameFromSheet } from "../claude-analyst.js";
 
 // ── Compound เดือน<month> should not be treated as a lastname ────────────────
 
@@ -58,4 +58,38 @@ test("title prefix with firstname only and month discards month", () => {
     resolvePhysicianName("P4P นพ.ศุภศรัณย์ มีนาคม 2569.xlsx", "", ""),
     "ศุภศรัณย์"
   );
+});
+
+// ── Department name in filename is not treated as a lastname ──────────────────
+// Real case: sender named the file "P4P วราวุธ อายุรกรรม เม.ย. 69.xlsx",
+// putting the department ("อายุรกรรม") where the surname should go.
+
+test("department word after firstname returns firstname only", () => {
+  assert.equal(
+    resolvePhysicianName("P4P วราวุธ อายุรกรรม เม.ย. 69.xlsx", "", ""),
+    "วราวุธ"
+  );
+});
+
+// ── Sheet-based fallback resolver ────────────────────────────────────────────
+
+test("recovers titled name from a ชื่อแพทย์ header cell", () => {
+  // Real case: filename mis-named, but the cell holds the correct name.
+  const rows = [{ col_1: "ชื่อแพทย์ นพ. วราวุธ เมธีศิริวัฒน์" }];
+  const got = resolvePhysicianNameFromSheet(rows, "รายงานP4Pสำหรับแพทย์");
+  assert.ok(got.includes("วราวุธ เมธีศิริวัฒน์"), `got ${JSON.stringify(got)}`);
+});
+
+test("recovers name from the worksheet tab name", () => {
+  // Real case: cell label is just dotted placeholder; name is the sheet tab.
+  const rows = [{ col_1: "ชื่อแพทย์........................." }];
+  const got = resolvePhysicianNameFromSheet(rows, "ปัทมิกา เจียรวุฒิสาร เมย.69");
+  assert.ok(got.includes("ปัทมิกา เจียรวุฒิสาร"), `got ${JSON.stringify(got)}`);
+});
+
+test("dotted ชื่อแพทย์ placeholder yields no junk candidate", () => {
+  // The label word itself must never become a candidate name.
+  const rows = [{ col_1: "ชื่อแพทย์........................." }];
+  const got = resolvePhysicianNameFromSheet(rows, "Sheet1");
+  assert.ok(!got.includes("ชื่อแพทย์"), `got ${JSON.stringify(got)}`);
 });

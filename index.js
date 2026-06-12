@@ -11,7 +11,7 @@
 
 import { createGmailClient }             from "./gmail-client.js";
 import { createDriveClient }             from "./drive-client.js";
-import { analyseJson, resolveBeMonth }   from "./claude-analyst.js";
+import { analyseJson, resolveBeMonth, resolvePhysicianNameFromSheet } from "./claude-analyst.js";
 import { matchName, saveScore }          from "./supabase-client.js";
 import { sendTelegram, formatResultMessage, formatErrorMessage } from "./telegram.js";
 import { buildHtmlReply }               from "./templates/reply.js";
@@ -589,6 +589,29 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
       )
     ).catch((e) => console.warn(`│        ⚠️  Telegram notify failed: ${e.message}`));
     return "replied";
+  }
+
+  // ── Fallback: filename name missed — try names from inside the workbook ──
+  // The filename/subject/body pre-scan can yield a wrong name when the sender
+  // mis-names the file (department word or month abbrev instead of surname).
+  // The correct name is usually still written inside the sheet (a ชื่อแพทย์
+  // header cell) or in the sheet tab — retry the match against those before
+  // declaring a mismatch.
+  if (!match) {
+    const fallbackNames = resolvePhysicianNameFromSheet(rows, chosenSheet);
+    for (const candidate of fallbackNames) {
+      if (candidate === analysis.name) continue;
+      let alt;
+      try {
+        alt = await matchName(candidate, analysis.date);
+      } catch { continue; } // table/DB errors already surfaced by the primary match
+      if (alt) {
+        console.log(`│        🔁  Filename name "${analysis.name}" missed — recovered "${candidate}" from sheet → matched "${alt.matchedName}" (${(alt.similarity * 100).toFixed(0)}%)`);
+        analysis.name = candidate;
+        match = alt;
+        break;
+      }
+    }
   }
 
   // ── Upload to Google Drive (must succeed before saving score / archiving) ─
