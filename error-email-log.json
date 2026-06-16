@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-16T14:50:34.996Z",
+  "generatedAt": "2026-06-16T15:03:52.883Z",
   "workflowName": "P4P Gmail Processor",
   "totalRunsScanned": 1073,
   "filesScanned": 2152,
@@ -19,7 +19,13 @@
       "errorType": "physician_not_found",
       "line": "│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ",
       "email": "sakhonmso@gmail.com",
-      "context": "│  Date:     Fri, 12 Jun 2026 03:24:54 -0500\n│  From:     Samut Sakhon Medical Staff Organization <sakhonmso@gmail.com>\n│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ\n│  Body:     เรียนผู้ส่ง  ระบบไม่สามารถประมวลผลไฟล์ P4P ที่ท่านส่งมาได้ กรุณาตรวจสอบและส่งใหม่อีกครั้ง\n│  🔄  Relay sender — searching thread for xlsx from original messages…\n│  📎  Found xlsx in thread — original sender: Patika J <patika_j@yahoo.com>"
+      "context": "│  Date:     Fri, 12 Jun 2026 03:24:54 -0500\n│  From:     Samut Sakhon Medical Staff Organization <sakhonmso@gmail.com>\n│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ\n│  Body:     เรียนผู้ส่ง  ระบบไม่สามารถประมวลผลไฟล์ P4P ที่ท่านส่งมาได้ กรุณาตรวจสอบและส่งใหม่อีกครั้ง\n│  🔄  Relay sender — searching thread for xlsx from original messages…\n│  📎  Found xlsx in thread — original sender: Patika J <patika_j@yahoo.com>",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 27404010904,
@@ -29,7 +35,13 @@
       "errorType": "physician_not_found",
       "line": "│        📧  Alert reply [physician_not_found] sent to warawutmatee@gmail.com",
       "email": "warawutmatee@gmail.com",
-      "context": "│        📤  Uploading as \"วราวุธ เมธีศิริวัฒน์\"…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to warawutmatee@gmail.com\n│        ✅  Drive upload: \"วราวุธ เมธีศิริวัฒน์\" (new file)\n│        💾  Score 7353.82 saved → table \"2569_05\", row bf445e42-a734-4cae-8ff6-f624bfb27fd8\n│        📨  Sending to Telegram…"
+      "context": "│        📤  Uploading as \"วราวุธ เมธีศิริวัฒน์\"…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to warawutmatee@gmail.com\n│        ✅  Drive upload: \"วราวุธ เมธีศิริวัฒน์\" (new file)\n│        💾  Score 7353.82 saved → table \"2569_05\", row bf445e42-a734-4cae-8ff6-f624bfb27fd8\n│        📨  Sending to Telegram…",
+      "threadId": "19ebab233484b170",
+      "originalSubject": "P4P วราวุธ 4-5/69",
+      "originalFilename": "P4P วราวุธ อายุรกรรม เม.ย. 69.xlsx",
+      "originalFrom": "Warawut Mateesiriwat <warawutmatee@gmail.com>",
+      "rootCause": "wrong_filename_pattern",
+      "testResult": null
     },
     {
       "runId": 27404010904,
@@ -39,7 +51,13 @@
       "errorType": "physician_not_found",
       "line": "│        📧  Alert reply [physician_not_found] sent to patika_j@yahoo.com",
       "email": "patika_j@yahoo.com",
-      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to patika_j@yahoo.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────"
+      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to patika_j@yahoo.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────",
+      "threadId": "19eba818326e0089",
+      "originalSubject": "ส่งp4pเมย.69",
+      "originalFilename": "P4P แพทย์เมย69.xlsx",
+      "originalFrom": "Patika J <patika_j@yahoo.com>",
+      "rootCause": "wrong_filename_pattern",
+      "testResult": null
     },
     {
       "runId": 27016533420,
@@ -49,7 +67,13 @@
       "errorType": "physician_not_found",
       "line": "│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ",
       "email": "sakhonmso@gmail.com",
-      "context": "│  Date:     Fri, 5 Jun 2026 00:10:08 -0700\n│  From:     Samut Sakhon Medical Staff Organization <sakhonmso@gmail.com>\n│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ\n│  Body:     เรียนผู้ส่ง  ระบบไม่สามารถประมวลผลไฟล์ P4P ที่ท่านส่งมาได้ กรุณาตรวจสอบและส่งใหม่อีกครั้ง\n│  🔄  Relay sender — searching thread for xlsx from original messages…\n│  📎  Found xlsx in thread — original sender: sib poongklom <my_fatty@hotmail.com>"
+      "context": "│  Date:     Fri, 5 Jun 2026 00:10:08 -0700\n│  From:     Samut Sakhon Medical Staff Organization <sakhonmso@gmail.com>\n│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ\n│  Body:     เรียนผู้ส่ง  ระบบไม่สามารถประมวลผลไฟล์ P4P ที่ท่านส่งมาได้ กรุณาตรวจสอบและส่งใหม่อีกครั้ง\n│  🔄  Relay sender — searching thread for xlsx from original messages…\n│  📎  Found xlsx in thread — original sender: sib poongklom <my_fatty@hotmail.com>",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 27000931571,
@@ -59,7 +83,13 @@
       "errorType": "physician_not_found",
       "line": "│        📧  Alert reply [physician_not_found] sent to my_fatty@hotmail.com",
       "email": "my_fatty@hotmail.com",
-      "context": "│        📤  Preparing first-sheet buffer for Drive upload…\n│        📤  Uploading as \"สฤษดิ์ชัย หริมเทพาธิป\"…\n│        📧  Alert reply [physician_not_found] sent to my_fatty@hotmail.com\n│        ✅  Drive upload: \"สฤษดิ์ชัย หริมเทพาธิป\" (new file)\n│        ✅  Drive upload: \"สฤษดิ์ชัย หริมเทพาธิป\" (new file)\n│        💾  Score 4730.00 saved → table \"2569_04\", row aacbe387-bf7a-477e-9e58-092593576193"
+      "context": "│        📤  Preparing first-sheet buffer for Drive upload…\n│        📤  Uploading as \"สฤษดิ์ชัย หริมเทพาธิป\"…\n│        📧  Alert reply [physician_not_found] sent to my_fatty@hotmail.com\n│        ✅  Drive upload: \"สฤษดิ์ชัย หริมเทพาธิป\" (new file)\n│        ✅  Drive upload: \"สฤษดิ์ชัย หริมเทพาธิป\" (new file)\n│        💾  Score 4730.00 saved → table \"2569_04\", row aacbe387-bf7a-477e-9e58-092593576193",
+      "threadId": "19e964bfb0ded2d5",
+      "originalSubject": "",
+      "originalFilename": "สฤษดิ์ชัย มีนาคม 2569 .xlsx",
+      "originalFrom": "sib poongklom <my_fatty@hotmail.com>",
+      "rootCause": "wrong_filename_pattern",
+      "testResult": null
     },
     {
       "runId": 26939696283,
@@ -69,7 +99,13 @@
       "errorType": "supabase_error",
       "line": "│        ❌  Supabase match error: Supabase query error on table \"2558_05\": Could not find the table 'public.2558_05' in the schema cache",
       "email": null,
-      "context": "│        ✅  Score     : 11880.00\n│        🔍  Fuzzy-matching name in Supabase table \"2558_05\"…\n│        ❌  Supabase match error: Supabase query error on table \"2558_05\": Could not find the table 'public.2558_05' in the schema cache\n│        📅  Table \"2558_05\" not found — sending wrong_date reply\n│        ✅  Best match : \"วรรธนัย ฤทธิรงค์วัฒนา\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…"
+      "context": "│        ✅  Score     : 11880.00\n│        🔍  Fuzzy-matching name in Supabase table \"2558_05\"…\n│        ❌  Supabase match error: Supabase query error on table \"2558_05\": Could not find the table 'public.2558_05' in the schema cache\n│        📅  Table \"2558_05\" not found — sending wrong_date reply\n│        ✅  Best match : \"วรรธนัย ฤทธิรงค์วัฒนา\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 26939696283,
@@ -79,7 +115,13 @@
       "errorType": "wrong_date",
       "line": "│        📅  Table \"2558_05\" not found — sending wrong_date reply",
       "email": null,
-      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2558_05\"…\n│        ❌  Supabase match error: Supabase query error on table \"2558_05\": Could not find the table 'public.2558_05' in the schema cache\n│        📅  Table \"2558_05\" not found — sending wrong_date reply\n│        ✅  Best match : \"วรรธนัย ฤทธิรงค์วัฒนา\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…\n│        ✅  Best match : \"วรรธนัย ฤทธิรงค์วัฒนา\" (100% similar)"
+      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2558_05\"…\n│        ❌  Supabase match error: Supabase query error on table \"2558_05\": Could not find the table 'public.2558_05' in the schema cache\n│        📅  Table \"2558_05\" not found — sending wrong_date reply\n│        ✅  Best match : \"วรรธนัย ฤทธิรงค์วัฒนา\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…\n│        ✅  Best match : \"วรรธนัย ฤทธิรงค์วัฒนา\" (100% similar)",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 26939696283,
@@ -89,7 +131,13 @@
       "errorType": "supabase_error",
       "line": "│        ❌  Supabase match error: Supabase query error on table \"2558_04\": Could not find the table 'public.2558_04' in the schema cache",
       "email": "pwtn_@docchula.com",
-      "context": "│        ✅  Best match : \"วรรธนัย ฤทธิรงค์วัฒนา\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…\n│        ❌  Supabase match error: Supabase query error on table \"2558_04\": Could not find the table 'public.2558_04' in the schema cache\n│        📅  Table \"2558_04\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to pwtn_@docchula.com\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…"
+      "context": "│        ✅  Best match : \"วรรธนัย ฤทธิรงค์วัฒนา\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…\n│        ❌  Supabase match error: Supabase query error on table \"2558_04\": Could not find the table 'public.2558_04' in the schema cache\n│        📅  Table \"2558_04\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to pwtn_@docchula.com\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…",
+      "threadId": "19e917653d05c9ba",
+      "originalSubject": "p4p 15 วรรธนัย ฤทธิรงค์วัฒนา",
+      "originalFilename": "15. วรรธนัย ฤทธิรงค์วัฒนา P4P มี.ค. 2569.xlsx",
+      "originalFrom": "Wattanai Rittirongwattana <pwtn_@docchula.com>",
+      "rootCause": "supabase_table_not_found",
+      "testResult": null
     },
     {
       "runId": 26939696283,
@@ -99,7 +147,13 @@
       "errorType": "wrong_date",
       "line": "│        📅  Table \"2558_04\" not found — sending wrong_date reply",
       "email": "pwtn_@docchula.com",
-      "context": "│        📤  Preparing first-sheet buffer for Drive upload…\n│        ❌  Supabase match error: Supabase query error on table \"2558_04\": Could not find the table 'public.2558_04' in the schema cache\n│        📅  Table \"2558_04\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to pwtn_@docchula.com\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…"
+      "context": "│        📤  Preparing first-sheet buffer for Drive upload…\n│        ❌  Supabase match error: Supabase query error on table \"2558_04\": Could not find the table 'public.2558_04' in the schema cache\n│        📅  Table \"2558_04\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to pwtn_@docchula.com\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…",
+      "threadId": "19e917653d05c9ba",
+      "originalSubject": "p4p 15 วรรธนัย ฤทธิรงค์วัฒนา",
+      "originalFilename": "15. วรรธนัย ฤทธิรงค์วัฒนา P4P มี.ค. 2569.xlsx",
+      "originalFrom": "Wattanai Rittirongwattana <pwtn_@docchula.com>",
+      "rootCause": "wrong_date_in_file",
+      "testResult": null
     },
     {
       "runId": 26939696283,
@@ -109,7 +163,13 @@
       "errorType": "wrong_date",
       "line": "│        📧  Alert reply [wrong_date] sent to pwtn_@docchula.com",
       "email": "pwtn_@docchula.com",
-      "context": "│        ❌  Supabase match error: Supabase query error on table \"2558_04\": Could not find the table 'public.2558_04' in the schema cache\n│        📅  Table \"2558_04\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to pwtn_@docchula.com\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…\n│        📧  Alert reply [wrong_date] sent to pwtn_@docchula.com"
+      "context": "│        ❌  Supabase match error: Supabase query error on table \"2558_04\": Could not find the table 'public.2558_04' in the schema cache\n│        📅  Table \"2558_04\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to pwtn_@docchula.com\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…\n│        📧  Alert reply [wrong_date] sent to pwtn_@docchula.com",
+      "threadId": "19e917653d05c9ba",
+      "originalSubject": "p4p 15 วรรธนัย ฤทธิรงค์วัฒนา",
+      "originalFilename": "15. วรรธนัย ฤทธิรงค์วัฒนา P4P มี.ค. 2569.xlsx",
+      "originalFrom": "Wattanai Rittirongwattana <pwtn_@docchula.com>",
+      "rootCause": "wrong_date_in_file",
+      "testResult": null
     },
     {
       "runId": 26807787772,
@@ -119,7 +179,13 @@
       "errorType": "physician_not_found",
       "line": "│        📧  Alert reply [physician_not_found] sent to artery_med@hotmail.com",
       "email": "artery_med@hotmail.com",
-      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to artery_med@hotmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────"
+      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to artery_med@hotmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────",
+      "threadId": "19e8706c74215915",
+      "originalSubject": "p4p    MAy  2026   จิรภัทร  ชล",
+      "originalFilename": "P4P จิรภัทร May 69 (1) (4) (1).xlsx",
+      "originalFrom": "Jiraphat Cholkraisuwat <artery_med@hotmail.com>",
+      "rootCause": "wrong_filename_pattern",
+      "testResult": null
     },
     {
       "runId": 26496249851,
@@ -129,7 +195,13 @@
       "errorType": "physician_not_found",
       "line": "│        📧  Alert reply [physician_not_found] sent to mumagiovo@gmail.com",
       "email": "mumagiovo@gmail.com",
-      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to mumagiovo@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────"
+      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to mumagiovo@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────",
+      "threadId": "19e67d9787b0862e",
+      "originalSubject": "P4P พ.ศวิตตา เมษา 69 กุมาร",
+      "originalFilename": "P4P ศวิตตา กุมาร เมษายน 69.xlsx",
+      "originalFrom": "Mudang Jkr <mumagiovo@gmail.com>",
+      "rootCause": "wrong_filename_pattern",
+      "testResult": null
     },
     {
       "runId": 26007268641,
@@ -139,7 +211,13 @@
       "errorType": "physician_not_found",
       "line": "│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ",
       "email": "sakhonmso@gmail.com",
-      "context": "│  Date:     Sun, 17 May 2026 12:04:10 -0700\n│  From:     Samut Sakhon Medical Staff Organization <sakhonmso@gmail.com>\n│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ\n│  Body:     เรียนผู้ส่ง  ระบบไม่สามารถประมวลผลไฟล์ P4P ที่ท่านส่งมาได้ กรุณาตรวจสอบและส่งใหม่อีกครั้ง\n│  🔄  Relay sender — searching thread for xlsx from original messages…\n│  📎  Found xlsx in thread — original sender: Sirineen M <msirineen@gmail.com>"
+      "context": "│  Date:     Sun, 17 May 2026 12:04:10 -0700\n│  From:     Samut Sakhon Medical Staff Organization <sakhonmso@gmail.com>\n│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ\n│  Body:     เรียนผู้ส่ง  ระบบไม่สามารถประมวลผลไฟล์ P4P ที่ท่านส่งมาได้ กรุณาตรวจสอบและส่งใหม่อีกครั้ง\n│  🔄  Relay sender — searching thread for xlsx from original messages…\n│  📎  Found xlsx in thread — original sender: Sirineen M <msirineen@gmail.com>",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 25999927273,
@@ -149,7 +227,13 @@
       "errorType": "physician_not_found",
       "line": "│        📧  Alert reply [physician_not_found] sent to msirineen@gmail.com",
       "email": "msirineen@gmail.com",
-      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to msirineen@gmail.com\n│        ✅  Drive upload: \"สิรินีร ม่วงศิริ\" (new file)\n│        ✅  Drive upload: \"ทัศนีย์ ม่วงศิริ\" (new file)\n│        ✅  Drive upload: \"สิรินีร ม่วงศิริ\" (new file)"
+      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to msirineen@gmail.com\n│        ✅  Drive upload: \"สิรินีร ม่วงศิริ\" (new file)\n│        ✅  Drive upload: \"ทัศนีย์ ม่วงศิริ\" (new file)\n│        ✅  Drive upload: \"สิรินีร ม่วงศิริ\" (new file)",
+      "threadId": "19e37218f9c2d98b",
+      "originalSubject": "p4p พสิรินีร พ ทัศนีย์ มีค เมษา 69",
+      "originalFilename": "พ สิรินีร เมษ  69.xlsx",
+      "originalFrom": "Sirineen M <msirineen@gmail.com>",
+      "rootCause": "wrong_filename_pattern",
+      "testResult": null
     },
     {
       "runId": 24774699788,
@@ -159,7 +243,13 @@
       "errorType": "supabase_error",
       "line": "│        ❌  Supabase save error: Supabase update error on table \"2569_02\": <html>",
       "email": null,
-      "context": "│        ✅  Drive upload: \"นภิชรียา กาชัย\" (new file)\n│        ✅  Drive upload: \"นภิชรียา กาชัย\" (new file)\n│        ❌  Supabase save error: Supabase update error on table \"2569_02\": <html>\n<head><title>502 Bad Gateway</title></head>\n<body>\n<center><h1>502 Bad Gateway</h1></center>"
+      "context": "│        ✅  Drive upload: \"นภิชรียา กาชัย\" (new file)\n│        ✅  Drive upload: \"นภิชรียา กาชัย\" (new file)\n│        ❌  Supabase save error: Supabase update error on table \"2569_02\": <html>\n<head><title>502 Bad Gateway</title></head>\n<body>\n<center><h1>502 Bad Gateway</h1></center>",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24711608936,
@@ -169,7 +259,13 @@
       "errorType": "physician_not_found",
       "line": "│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ",
       "email": "sakhonmso@gmail.com",
-      "context": "│  Date:     Mon, 20 Apr 2026 22:28:41 -0500\n│  From:     sakhonmso@gmail.com\n│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ\n│  Body:     เรียนผู้ส่ง  ระบบไม่สามารถประมวลผลไฟล์ P4P ที่ท่านส่งมาได้ กรุณาตรวจสอบและส่งใหม่อีกครั้ง\n│  🔄  Relay sender — searching thread for xlsx from original messages…\n│  📎  Found xlsx in thread — original sender: my ammy <my-ammy@hotmail.com>"
+      "context": "│  Date:     Mon, 20 Apr 2026 22:28:41 -0500\n│  From:     sakhonmso@gmail.com\n│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ\n│  Body:     เรียนผู้ส่ง  ระบบไม่สามารถประมวลผลไฟล์ P4P ที่ท่านส่งมาได้ กรุณาตรวจสอบและส่งใหม่อีกครั้ง\n│  🔄  Relay sender — searching thread for xlsx from original messages…\n│  📎  Found xlsx in thread — original sender: my ammy <my-ammy@hotmail.com>",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24702451812,
@@ -179,7 +275,13 @@
       "errorType": "physician_not_found",
       "line": "│        📧  Alert reply [physician_not_found] sent to y.sasima@gmail.com",
       "email": "y.sasima@gmail.com",
-      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to y.sasima@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────"
+      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to y.sasima@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────",
+      "threadId": "19dadeb95a4440a9",
+      "originalSubject": "P4P ศศิมา หยิบ มีนาคม 2569",
+      "originalFilename": "P4P ศศิมา หยิบ มีนาคม 2569.xlsx",
+      "originalFrom": "\"Sasima Yibsong (ผ่าน Google ชีต)\" <y.sasima@gmail.com>",
+      "rootCause": "wrong_filename_pattern",
+      "testResult": null
     },
     {
       "runId": 24702451812,
@@ -189,7 +291,13 @@
       "errorType": "physician_not_found",
       "line": "│        📧  Alert reply [physician_not_found] sent to my-ammy@hotmail.com",
       "email": "my-ammy@hotmail.com",
-      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to my-ammy@hotmail.com\n│        ✅  Drive upload: \"ศุภศรัณย์ ศุภพัฒนพงศ์\" (new file)\n│        💾  Score 7451.00 saved → table \"2569_01\", row e6cde73f-aa8f-42bf-a51e-214873c2a7f6\n│        📨  Sending to Telegram…"
+      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to my-ammy@hotmail.com\n│        ✅  Drive upload: \"ศุภศรัณย์ ศุภพัฒนพงศ์\" (new file)\n│        💾  Score 7451.00 saved → table \"2569_01\", row e6cde73f-aa8f-42bf-a51e-214873c2a7f6\n│        📨  Sending to Telegram…",
+      "threadId": "19daddaf619bc4eb",
+      "originalSubject": "ส่งต่อ: P4P พ ศุภศรัณย์ มกราคม และกุมภาพันธ์ 69",
+      "originalFilename": "P4P พ ศุภศรัณย์ เดือนกุมภาพันธ์ 2569.xlsx",
+      "originalFrom": "my ammy <my-ammy@hotmail.com>",
+      "rootCause": "wrong_filename_pattern",
+      "testResult": null
     },
     {
       "runId": 24602207903,
@@ -199,7 +307,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24601279031,
@@ -209,7 +323,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24599680306,
@@ -219,7 +339,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24598140657,
@@ -229,7 +355,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24595685829,
@@ -239,7 +371,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24591627015,
@@ -249,7 +387,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24590104207,
@@ -259,7 +403,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24588293102,
@@ -269,7 +419,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24586284840,
@@ -279,7 +435,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24582482927,
@@ -289,7 +451,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24557571349,
@@ -299,7 +467,13 @@
       "errorType": "supabase_error",
       "line": "│        ❌  Supabase match error: Supabase query error on table \"2570_02\": Could not find the table 'public.2570_02' in the schema cache",
       "email": null,
-      "context": "│        ✅  Score     : 8788.75\n│        🔍  Fuzzy-matching name in Supabase table \"2570_01\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_02\": Could not find the table 'public.2570_02' in the schema cache\n│        📅  Table \"2570_02\" not found — sending wrong_date reply\n│        ✅  Physician : สงกรานต์ ชุนหวัฒนา\n│        ✅  Date      : 2570_03"
+      "context": "│        ✅  Score     : 8788.75\n│        🔍  Fuzzy-matching name in Supabase table \"2570_01\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_02\": Could not find the table 'public.2570_02' in the schema cache\n│        📅  Table \"2570_02\" not found — sending wrong_date reply\n│        ✅  Physician : สงกรานต์ ชุนหวัฒนา\n│        ✅  Date      : 2570_03",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24557571349,
@@ -309,7 +483,13 @@
       "errorType": "wrong_date",
       "line": "│        📅  Table \"2570_02\" not found — sending wrong_date reply",
       "email": null,
-      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2570_01\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_02\": Could not find the table 'public.2570_02' in the schema cache\n│        📅  Table \"2570_02\" not found — sending wrong_date reply\n│        ✅  Physician : สงกรานต์ ชุนหวัฒนา\n│        ✅  Date      : 2570_03\n│        ✅  Score     : 7667.00"
+      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2570_01\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_02\": Could not find the table 'public.2570_02' in the schema cache\n│        📅  Table \"2570_02\" not found — sending wrong_date reply\n│        ✅  Physician : สงกรานต์ ชุนหวัฒนา\n│        ✅  Date      : 2570_03\n│        ✅  Score     : 7667.00",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24557571349,
@@ -319,7 +499,13 @@
       "errorType": "supabase_error",
       "line": "│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache",
       "email": "skch1136@gmail.com",
-      "context": "│        ✅  Score     : 7667.00\n│        🔍  Fuzzy-matching name in Supabase table \"2570_03\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        📅  Table \"2570_03\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache"
+      "context": "│        ✅  Score     : 7667.00\n│        🔍  Fuzzy-matching name in Supabase table \"2570_03\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        📅  Table \"2570_03\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache",
+      "threadId": "19d9a86ad269e4ed",
+      "originalSubject": "p4pหมอสงกรานต์ -3 เดือน",
+      "originalFilename": "สงกรานต์ ชุนหวัฒนา มค70.xlsx",
+      "originalFrom": "\"สงกรานต์ ชุนหวัฒนา\" <skch1136@gmail.com>",
+      "rootCause": "supabase_table_not_found",
+      "testResult": null
     },
     {
       "runId": 24557571349,
@@ -329,7 +515,13 @@
       "errorType": "wrong_date",
       "line": "│        📅  Table \"2570_03\" not found — sending wrong_date reply",
       "email": "skch1136@gmail.com",
-      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2570_03\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        📅  Table \"2570_03\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        📅  Table \"2570_01\" not found — sending wrong_date reply"
+      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2570_03\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        📅  Table \"2570_03\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        📅  Table \"2570_01\" not found — sending wrong_date reply",
+      "threadId": "19d9a86ad269e4ed",
+      "originalSubject": "p4pหมอสงกรานต์ -3 เดือน",
+      "originalFilename": "สงกรานต์ ชุนหวัฒนา มค70.xlsx",
+      "originalFrom": "\"สงกรานต์ ชุนหวัฒนา\" <skch1136@gmail.com>",
+      "rootCause": "wrong_date_in_file",
+      "testResult": null
     },
     {
       "runId": 24557571349,
@@ -339,7 +531,13 @@
       "errorType": "wrong_date",
       "line": "│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com",
       "email": "skch1136@gmail.com",
-      "context": "│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        📅  Table \"2570_03\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        📅  Table \"2570_01\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com"
+      "context": "│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        📅  Table \"2570_03\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        📅  Table \"2570_01\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com",
+      "threadId": "19d9a86ad269e4ed",
+      "originalSubject": "p4pหมอสงกรานต์ -3 เดือน",
+      "originalFilename": "สงกรานต์ ชุนหวัฒนา มค70.xlsx",
+      "originalFrom": "\"สงกรานต์ ชุนหวัฒนา\" <skch1136@gmail.com>",
+      "rootCause": "wrong_date_in_file",
+      "testResult": null
     },
     {
       "runId": 24557571349,
@@ -349,7 +547,13 @@
       "errorType": "supabase_error",
       "line": "│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache",
       "email": "skch1136@gmail.com",
-      "context": "│        📅  Table \"2570_03\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        📅  Table \"2570_01\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com"
+      "context": "│        📅  Table \"2570_03\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        📅  Table \"2570_01\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com",
+      "threadId": "19d9a86ad269e4ed",
+      "originalSubject": "p4pหมอสงกรานต์ -3 เดือน",
+      "originalFilename": "สงกรานต์ ชุนหวัฒนา มค70.xlsx",
+      "originalFrom": "\"สงกรานต์ ชุนหวัฒนา\" <skch1136@gmail.com>",
+      "rootCause": "supabase_table_not_found",
+      "testResult": null
     },
     {
       "runId": 24557571349,
@@ -359,7 +563,13 @@
       "errorType": "wrong_date",
       "line": "│        📅  Table \"2570_01\" not found — sending wrong_date reply",
       "email": "skch1136@gmail.com",
-      "context": "│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        📅  Table \"2570_01\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│  📭  No xlsx found in thread from original sender — skipping"
+      "context": "│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        📅  Table \"2570_01\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│  📭  No xlsx found in thread from original sender — skipping",
+      "threadId": "19d9a86ad269e4ed",
+      "originalSubject": "p4pหมอสงกรานต์ -3 เดือน",
+      "originalFilename": "สงกรานต์ ชุนหวัฒนา มค70.xlsx",
+      "originalFrom": "\"สงกรานต์ ชุนหวัฒนา\" <skch1136@gmail.com>",
+      "rootCause": "wrong_date_in_file",
+      "testResult": null
     },
     {
       "runId": 24557571349,
@@ -369,7 +579,13 @@
       "errorType": "supabase_error",
       "line": "│        ❌  Supabase match error: Supabase query error on table \"2569_12\": Could not find the table 'public.2569_12' in the schema cache",
       "email": "innzmd92@gmail.com",
-      "context": "│        ✅  Score     : 7239.00\n│        🔍  Fuzzy-matching name in Supabase table \"2569_12\"…\n│        ❌  Supabase match error: Supabase query error on table \"2569_12\": Could not find the table 'public.2569_12' in the schema cache\n│        📅  Table \"2569_12\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to innzmd92@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\""
+      "context": "│        ✅  Score     : 7239.00\n│        🔍  Fuzzy-matching name in Supabase table \"2569_12\"…\n│        ❌  Supabase match error: Supabase query error on table \"2569_12\": Could not find the table 'public.2569_12' in the schema cache\n│        📅  Table \"2569_12\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to innzmd92@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"",
+      "threadId": "19b1d74cffe14c14",
+      "originalSubject": "P4P นพ พิชยธัชฏ ม่วงศิริ",
+      "originalFilename": "นพ.พิชยธัชฏ ตค 68.xlsx",
+      "originalFrom": "Pichtat Muangsiri <innzmd92@gmail.com>",
+      "rootCause": "supabase_table_not_found",
+      "testResult": null
     },
     {
       "runId": 24557571349,
@@ -379,7 +595,13 @@
       "errorType": "wrong_date",
       "line": "│        📅  Table \"2569_12\" not found — sending wrong_date reply",
       "email": "innzmd92@gmail.com",
-      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2569_12\"…\n│        ❌  Supabase match error: Supabase query error on table \"2569_12\": Could not find the table 'public.2569_12' in the schema cache\n│        📅  Table \"2569_12\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to innzmd92@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────"
+      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2569_12\"…\n│        ❌  Supabase match error: Supabase query error on table \"2569_12\": Could not find the table 'public.2569_12' in the schema cache\n│        📅  Table \"2569_12\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to innzmd92@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────",
+      "threadId": "19b1d74cffe14c14",
+      "originalSubject": "P4P นพ พิชยธัชฏ ม่วงศิริ",
+      "originalFilename": "นพ.พิชยธัชฏ ตค 68.xlsx",
+      "originalFrom": "Pichtat Muangsiri <innzmd92@gmail.com>",
+      "rootCause": "wrong_date_in_file",
+      "testResult": null
     },
     {
       "runId": 24557571349,
@@ -389,7 +611,13 @@
       "errorType": "wrong_date",
       "line": "│        📧  Alert reply [wrong_date] sent to innzmd92@gmail.com",
       "email": "innzmd92@gmail.com",
-      "context": "│        ❌  Supabase match error: Supabase query error on table \"2569_12\": Could not find the table 'public.2569_12' in the schema cache\n│        📅  Table \"2569_12\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to innzmd92@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────"
+      "context": "│        ❌  Supabase match error: Supabase query error on table \"2569_12\": Could not find the table 'public.2569_12' in the schema cache\n│        📅  Table \"2569_12\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to innzmd92@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────",
+      "threadId": "19b1d74cffe14c14",
+      "originalSubject": "P4P นพ พิชยธัชฏ ม่วงศิริ",
+      "originalFilename": "นพ.พิชยธัชฏ ตค 68.xlsx",
+      "originalFrom": "Pichtat Muangsiri <innzmd92@gmail.com>",
+      "rootCause": "wrong_date_in_file",
+      "testResult": null
     },
     {
       "runId": 24557571349,
@@ -399,7 +627,13 @@
       "errorType": "supabase_error",
       "line": "│        ❌  Supabase match error: Supabase query error on table \"2568_01\": Could not find the table 'public.2568_01' in the schema cache",
       "email": null,
-      "context": "│        ✅  Score     : 7042.00\n│        🔍  Fuzzy-matching name in Supabase table \"2568_11\"…\n│        ❌  Supabase match error: Supabase query error on table \"2568_01\": Could not find the table 'public.2568_01' in the schema cache\n│        📅  Table \"2568_01\" not found — sending wrong_date reply\n│        ✅  Best match : \"พิชยธัชฏ ม่วงศิริ\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…"
+      "context": "│        ✅  Score     : 7042.00\n│        🔍  Fuzzy-matching name in Supabase table \"2568_11\"…\n│        ❌  Supabase match error: Supabase query error on table \"2568_01\": Could not find the table 'public.2568_01' in the schema cache\n│        📅  Table \"2568_01\" not found — sending wrong_date reply\n│        ✅  Best match : \"พิชยธัชฏ ม่วงศิริ\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24557571349,
@@ -409,7 +643,13 @@
       "errorType": "wrong_date",
       "line": "│        📅  Table \"2568_01\" not found — sending wrong_date reply",
       "email": null,
-      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2568_11\"…\n│        ❌  Supabase match error: Supabase query error on table \"2568_01\": Could not find the table 'public.2568_01' in the schema cache\n│        📅  Table \"2568_01\" not found — sending wrong_date reply\n│        ✅  Best match : \"พิชยธัชฏ ม่วงศิริ\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…\n│        📤  Uploading as \"พิชยธัชฏ ม่วงศิริ\"…"
+      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2568_11\"…\n│        ❌  Supabase match error: Supabase query error on table \"2568_01\": Could not find the table 'public.2568_01' in the schema cache\n│        📅  Table \"2568_01\" not found — sending wrong_date reply\n│        ✅  Best match : \"พิชยธัชฏ ม่วงศิริ\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…\n│        📤  Uploading as \"พิชยธัชฏ ม่วงศิริ\"…",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24556422090,
@@ -419,7 +659,13 @@
       "errorType": "supabase_error",
       "line": "│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache",
       "email": null,
-      "context": "│        ✅  Score     : 8788.75\n│        🔍  Fuzzy-matching name in Supabase table \"2570_01\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        ⚠️  Name mismatch — Drive upload skipped for \"สงกรานต์ ชุนหวัฒนา\".\n│        ✅  Physician : สงกรานต์ ชุนหวัฒนา"
+      "context": "│        ✅  Score     : 8788.75\n│        🔍  Fuzzy-matching name in Supabase table \"2570_01\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        ⚠️  Name mismatch — Drive upload skipped for \"สงกรานต์ ชุนหวัฒนา\".\n│        ✅  Physician : สงกรานต์ ชุนหวัฒนา",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24556422090,
@@ -429,7 +675,13 @@
       "errorType": "supabase_error",
       "line": "│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache",
       "email": null,
-      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2570_01\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        ⚠️  Name mismatch — Drive upload skipped for \"สงกรานต์ ชุนหวัฒนา\".\n│        ✅  Physician : สงกรานต์ ชุนหวัฒนา\n│        ✅  Date      : 2570_02"
+      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2570_01\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        ⚠️  Name mismatch — Drive upload skipped for \"สงกรานต์ ชุนหวัฒนา\".\n│        ✅  Physician : สงกรานต์ ชุนหวัฒนา\n│        ✅  Date      : 2570_02",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24556422090,
@@ -439,7 +691,13 @@
       "errorType": "supabase_error",
       "line": "│        ❌  Supabase match error: Supabase query error on table \"2570_02\": Could not find the table 'public.2570_02' in the schema cache",
       "email": null,
-      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2570_02\"…\n│        ⚠️  Name mismatch — Drive upload skipped for \"สงกรานต์ ชุนหวัฒนา\".\n│        ❌  Supabase match error: Supabase query error on table \"2570_02\": Could not find the table 'public.2570_02' in the schema cache\n│        📨  Sending to Telegram…\n│        ⚠️  Name mismatch — Drive upload skipped for \"สงกรานต์ ชุนหวัฒนา\".\n│        📨  Sending to Telegram…"
+      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2570_02\"…\n│        ⚠️  Name mismatch — Drive upload skipped for \"สงกรานต์ ชุนหวัฒนา\".\n│        ❌  Supabase match error: Supabase query error on table \"2570_02\": Could not find the table 'public.2570_02' in the schema cache\n│        📨  Sending to Telegram…\n│        ⚠️  Name mismatch — Drive upload skipped for \"สงกรานต์ ชุนหวัฒนา\".\n│        📨  Sending to Telegram…",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24164540476,
@@ -449,7 +707,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24162753399,
@@ -459,7 +723,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24160567270,
@@ -469,7 +739,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24158178112,
@@ -479,7 +755,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24154204576,
@@ -489,7 +771,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24148588585,
@@ -499,7 +787,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24109899195,
@@ -509,7 +803,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24108150012,
@@ -519,7 +819,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24106207320,
@@ -529,7 +835,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24104008592,
@@ -539,7 +851,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24099748028,
@@ -549,7 +867,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24094312677,
@@ -559,7 +883,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24089176278,
@@ -569,7 +899,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24084737701,
@@ -579,7 +915,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 24078110067,
@@ -589,7 +931,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 23884942117,
@@ -599,7 +947,13 @@
       "errorType": "supabase_error",
       "line": "│        ❌  Supabase match error: Supabase query error on table \"2568_03\": Could not find the table 'public.2568_03' in the schema cache",
       "email": null,
-      "context": "│        ✅  Score     : 2206.68\n│        🔍  Fuzzy-matching name in Supabase table \"2568_03\"…\n│        ❌  Supabase match error: Supabase query error on table \"2568_03\": Could not find the table 'public.2568_03' in the schema cache\n│        📤  Preparing first-sheet buffer for Drive upload…\n│        📤  Uploading as \"จิตรพรรณี บุญทองคง\"…\n│        ❌  Drive upload failed: Month folder \"3 - มีนาคม\" not found inside \"2568\""
+      "context": "│        ✅  Score     : 2206.68\n│        🔍  Fuzzy-matching name in Supabase table \"2568_03\"…\n│        ❌  Supabase match error: Supabase query error on table \"2568_03\": Could not find the table 'public.2568_03' in the schema cache\n│        📤  Preparing first-sheet buffer for Drive upload…\n│        📤  Uploading as \"จิตรพรรณี บุญทองคง\"…\n│        ❌  Drive upload failed: Month folder \"3 - มีนาคม\" not found inside \"2568\"",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 23752228699,
@@ -609,7 +963,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Mon, 30 Mar 2026 12:16:32 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+      "context": "│  Date:     Mon, 30 Mar 2026 12:16:32 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 23748513513,
@@ -619,7 +979,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Mon, 30 Mar 2026 12:16:32 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+      "context": "│  Date:     Mon, 30 Mar 2026 12:16:32 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 23744045039,
@@ -629,7 +995,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Mon, 30 Mar 2026 09:24:12 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+      "context": "│  Date:     Mon, 30 Mar 2026 09:24:12 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 23743515877,
@@ -639,7 +1011,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Mon, 30 Mar 2026 09:24:12 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+      "context": "│  Date:     Mon, 30 Mar 2026 09:24:12 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 23739933221,
@@ -649,7 +1027,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Mon, 30 Mar 2026 09:24:12 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+      "context": "│  Date:     Mon, 30 Mar 2026 09:24:12 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 23737697034,
@@ -659,7 +1043,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Mon, 30 Mar 2026 09:24:12 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+      "context": "│  Date:     Mon, 30 Mar 2026 09:24:12 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 23715877396,
@@ -669,7 +1059,13 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Sun, 29 Mar 2026 18:19:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+      "context": "│  Date:     Sun, 29 Mar 2026 18:19:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     },
     {
       "runId": 23652573830,
@@ -679,7 +1075,838 @@
       "errorType": "error_email_sent",
       "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
       "email": "no-reply@accounts.google.com",
-      "context": "│  Date:     Fri, 27 Mar 2026 14:56:40 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+      "context": "│  Date:     Fri, 27 Mar 2026 14:56:40 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google",
+      "threadId": null,
+      "originalSubject": null,
+      "originalFilename": null,
+      "originalFrom": null,
+      "rootCause": "noise_google_alert",
+      "testResult": null
     }
-  ]
+  ],
+  "enrichedAt": "2026-06-16T15:03:52.884Z",
+  "senderThreads": {
+    "warawutmatee@gmail.com": [
+      {
+        "threadId": "19ebab233484b170",
+        "subject": "P4P วราวุธ 4-5/69",
+        "from": "Warawut Mateesiriwat <warawutmatee@gmail.com>",
+        "date": "Fri, 12 Jun 2026 14:17:13 +0700",
+        "originalFilenames": [
+          "P4P วราวุธ อายุรกรรม เม.ย. 69.xlsx",
+          "P4P วราวุธ อายุรกรรม พ.ค. 69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19daac38f6fd8088",
+        "subject": "P4P วราวุธ กพ มีค 69",
+        "from": "Warawut Mateesiriwat <warawutmatee@gmail.com>",
+        "date": "Mon, 20 Apr 2026 19:00:21 +0700",
+        "originalFilenames": [
+          "วราวุธ เมธีศิริวัฒน์ มี.ค. 69.xlsx",
+          "วราวุธ เมธีศิริวัฒน์ กพ. 69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19c7590cd8c651b3",
+        "subject": "P4P วราวุธ 1/69",
+        "from": "Warawut Mateesiriwat <warawutmatee@gmail.com>",
+        "date": "Thu, 19 Feb 2026 18:02:18 +0700",
+        "originalFilenames": [
+          "วราวุธ เมธีศิริวัฒน์  ม.ค 69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19bc1834f338ef64",
+        "subject": "P4P วราวุธ 12/68",
+        "from": "Warawut Mateesiriwat <warawutmatee@gmail.com>",
+        "date": "Thu, 15 Jan 2026 18:55:53 +0700",
+        "originalFilenames": [
+          "วราวุธ เมธีศิริวัฒน์  ธ.ค. 68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19b2631ad17f3618",
+        "subject": "P4P วราวุธ",
+        "from": "Warawut Mateesiriwat <warawutmatee@gmail.com>",
+        "date": "Tue, 16 Dec 2025 15:04:55 +0700",
+        "originalFilenames": [
+          "วราวุธ เมธีศิริวัฒน์  พ.ย. 68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19a7284fa114c6b4",
+        "subject": "P4P วราวุธ",
+        "from": "Warawut Mateesiriwat <warawutmatee@gmail.com>",
+        "date": "Tue, 11 Nov 2025 17:44:55 +0700",
+        "originalFilenames": [
+          "วราวุธ เมธีศิริวัฒน์  ต.ค. 68.xlsx"
+        ]
+      }
+    ],
+    "patika_j@yahoo.com": [
+      {
+        "threadId": "19eba818326e0089",
+        "subject": "ส่งp4pเมย.69",
+        "from": "Patika J <patika_j@yahoo.com>",
+        "date": "Fri, 12 Jun 2026 13:25:00 +0700",
+        "originalFilenames": [
+          "P4P แพทย์เมย69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19db0b92f692a21b",
+        "subject": "ส่งP4Pมีค.69",
+        "from": "Patika J <patika_j@yahoo.com>",
+        "date": "Tue, 21 Apr 2026 22:46:52 +0700",
+        "originalFilenames": [
+          "P4Pพ.ปัทมิกา เจียรวุฒิสาร มีค69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19db0b3be337a5fe",
+        "subject": "ส่งP4Pกพ.69",
+        "from": "Patika J <patika_j@yahoo.com>",
+        "date": "Tue, 21 Apr 2026 22:40:47 +0700",
+        "originalFilenames": [
+          "P4Pปัทมิกา เจียรวุฒิสาร กพ.69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19cc15beb7da4b2f",
+        "subject": "ส่งต่อ: ส่งP4Pธค.68",
+        "from": "\"Patik J.\" <patika_j@yahoo.com>",
+        "date": "Fri, 6 Mar 2026 04:15:42 +0000 (UTC)",
+        "originalFilenames": [
+          "ส่งP4Pธค.68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19b91833d90ce911",
+        "subject": "ส่งP4Pพย.68",
+        "from": "Patika J <patika_j@yahoo.com>",
+        "date": "Tue, 6 Jan 2026 11:14:08 +0700",
+        "originalFilenames": [
+          "ส่งP4Pพย.68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19b9121be80bef76",
+        "subject": "ส่งp4pกย.68",
+        "from": "Patika J <patika_j@yahoo.com>",
+        "date": "Tue, 6 Jan 2026 09:27:38 +0700",
+        "originalFilenames": [
+          "ส่งp4P กย68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19b2f86d0fc952c1",
+        "subject": "ส่ง P4P ต.ค. 68",
+        "from": "\"Patik J.\" <patika_j@yahoo.com>",
+        "date": "Thu, 18 Dec 2025 03:32:52 +0000 (UTC)",
+        "originalFilenames": [
+          "ส่งP4P ตค.68.xlsx"
+        ]
+      }
+    ],
+    "my_fatty@hotmail.com": [
+      {
+        "threadId": "19e964bfb0ded2d5",
+        "subject": "",
+        "from": "sib poongklom <my_fatty@hotmail.com>",
+        "date": "Fri, 5 Jun 2026 05:40:18 +0000",
+        "originalFilenames": [
+          "สฤษดิ์ชัย มีนาคม 2569 .xlsx",
+          "สฤษดิ์ชัย เมษายน 2569 .xlsx",
+          "สฤษดิ์ชัย พฤศภาคม69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19cf5b5a5cc3876d",
+        "subject": "",
+        "from": "sib poongklom <my_fatty@hotmail.com>",
+        "date": "Mon, 16 Mar 2026 08:14:03 +0000",
+        "originalFilenames": [
+          "สฤษดิ์ชัย ธันวาคม 68 .xlsx",
+          "สฤษดิ์ชัย มกราคม69 .xlsx",
+          "สฤษดิ์ชัย กุมภาพันธ์ 69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19b20f547756a7d4",
+        "subject": "",
+        "from": "sib poongklom <my_fatty@hotmail.com>",
+        "date": "Mon, 15 Dec 2025 07:41:40 +0000",
+        "originalFilenames": [
+          "สฤษดิ์ชัย พฤศจิกายน 68 .xlsx"
+        ]
+      },
+      {
+        "threadId": "19a90d01ab0fc2c5",
+        "subject": "",
+        "from": "sib poongklom <my_fatty@hotmail.com>",
+        "date": "Mon, 17 Nov 2025 07:55:44 +0000",
+        "originalFilenames": [
+          "สฤษดิ์ชัย ตุลาคม 68 .xlsx",
+          "สฤษดิ์ชัย กันยายน 68 .xlsx"
+        ]
+      },
+      {
+        "threadId": "19a70da81a890f3f",
+        "subject": "",
+        "from": "sib poongklom <my_fatty@hotmail.com>",
+        "date": "Tue, 11 Nov 2025 02:59:15 +0000",
+        "originalFilenames": [
+          "สฤษดิ์ชัย หริมเทพาธิป สิงหาคม 2568.xlsx"
+        ]
+      }
+    ],
+    "artery_med@hotmail.com": [
+      {
+        "threadId": "19e8861fc9bb0f8a",
+        "subject": "P4p  จิรภัทร   พค  69",
+        "from": "Jiraphat Cholkraisuwat <artery_med@hotmail.com>",
+        "date": "Tue, 2 Jun 2026 12:49:39 +0000",
+        "originalFilenames": [
+          "จิรภัทร ชลไกรสุวัฒน์ พฤษภาคม 2569.xlsx"
+        ]
+      },
+      {
+        "threadId": "19e8706c74215915",
+        "subject": "p4p    MAy  2026   จิรภัทร  ชล",
+        "from": "Jiraphat Cholkraisuwat <artery_med@hotmail.com>",
+        "date": "Tue, 2 Jun 2026 06:30:24 +0000",
+        "originalFilenames": [
+          "P4P จิรภัทร May 69 (1) (4) (1).xlsx"
+        ]
+      },
+      {
+        "threadId": "19de18b9652e8fe4",
+        "subject": "p4p  จิรภัทร   ชล  เมษา 2569",
+        "from": "Jiraphat Cholkraisuwat <artery_med@hotmail.com>",
+        "date": "Fri, 1 May 2026 03:18:30 +0000",
+        "originalFilenames": [
+          "P4P จิรภัทร ชล     เมษา2569.xlsx"
+        ]
+      },
+      {
+        "threadId": "19d4d0b5946d7f01",
+        "subject": "p4p   มีนาคม 69",
+        "from": "Jiraphat Cholkraisuwat <artery_med@hotmail.com>",
+        "date": "Thu, 2 Apr 2026 07:14:39 +0000",
+        "originalFilenames": [
+          "P4P จิรภัทร มีนาคม 69 (1) (4) (1).xlsx"
+        ]
+      },
+      {
+        "threadId": "19cb6a7bce314710",
+        "subject": "p4 pจิรภัทร   กุมภา 2569",
+        "from": "Jiraphat Cholkraisuwat <artery_med@hotmail.com>",
+        "date": "Wed, 4 Mar 2026 02:22:48 +0000",
+        "originalFilenames": [
+          "P4P จิรภัทร กุมภาพันธ์ 69 (1) (4) (1).xlsx"
+        ]
+      },
+      {
+        "threadId": "19c21a31296030b6",
+        "subject": "p4p   จิรภัทร   ชล      มกราคม  69",
+        "from": "Jiraphat Cholkraisuwat <artery_med@hotmail.com>",
+        "date": "Tue, 3 Feb 2026 03:54:16 +0000",
+        "originalFilenames": [
+          "P4P จิรภัทร มกราคม 69 (1) (4) (1).xlsx"
+        ]
+      },
+      {
+        "threadId": "19b8c59420b58b6d",
+        "subject": "p4p จิรภัทร   ธค 2568",
+        "from": "Jiraphat Cholkraisuwat <artery_med@hotmail.com>",
+        "date": "Mon, 5 Jan 2026 04:10:13 +0000",
+        "originalFilenames": [
+          "P4P จิรภัทร ธันวาคม 68 (1) (4) (1).xlsx"
+        ]
+      },
+      {
+        "threadId": "19b8c40bd5421721",
+        "subject": "p4p จิรภัทร     ธค 68",
+        "from": "Jiraphat Cholkraisuwat <artery_med@hotmail.com>",
+        "date": "Mon, 5 Jan 2026 03:43:26 +0000",
+        "originalFilenames": [
+          "P4P จิรภัทร ชล     ธค2568.xlsx"
+        ]
+      },
+      {
+        "threadId": "19ae6b183c5af378",
+        "subject": "Fwd: p4p   จิรภัทร    พย  68",
+        "from": "Jiraphat Cholkraisuwat <artery_med@hotmail.com>",
+        "date": "Thu, 4 Dec 2025 00:09:39 +0000",
+        "originalFilenames": [
+          "P4P จิรภัทร พฤศจิ  68 (1) (4) (1).xlsx"
+        ]
+      },
+      {
+        "threadId": "19a47a565cda0447",
+        "subject": "p4p จิรภัทร   ตุลาคม 2568",
+        "from": "Jiraphat Cholkraisuwat <artery_med@hotmail.com>",
+        "date": "Mon, 3 Nov 2025 02:56:49 +0000",
+        "originalFilenames": [
+          "P4P จิรภัทร ชล     ตุลา2568.xlsx"
+        ]
+      }
+    ],
+    "mumagiovo@gmail.com": [
+      {
+        "threadId": "19e6da21a9208930",
+        "subject": "P4P พญ.ศวิตตา จุลกะรัตน์ ภาควิชากุมาร (พฤษภาคม 69)",
+        "from": "Mudang Jkr <mumagiovo@gmail.com>",
+        "date": "Thu, 28 May 2026 15:09:48 +0700",
+        "originalFilenames": [
+          "P4Pศวิตตา จุลกะรัตน์ (พฤษภาคม 69).xlsx"
+        ]
+      },
+      {
+        "threadId": "19e6d246dd6c7e5c",
+        "subject": "P4P พญ.ศวิตตา จุลกะรัตน์ ภาควิชากุมาร เดือนเมษายน 69",
+        "from": "Mudang Jkr <mumagiovo@gmail.com>",
+        "date": "Thu, 28 May 2026 12:52:20 +0700",
+        "originalFilenames": [
+          "P4Pศวิตตา จุลกะรัตน์ (เมษายน 69).xlsx"
+        ]
+      },
+      {
+        "threadId": "19e67d9787b0862e",
+        "subject": "P4P พ.ศวิตตา เมษา 69 กุมาร",
+        "from": "Mudang Jkr <mumagiovo@gmail.com>",
+        "date": "Wed, 27 May 2026 12:12:22 +0700",
+        "originalFilenames": [
+          "P4P ศวิตตา กุมาร เมษายน 69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19ddcd862974291f",
+        "subject": "P4P ศวิตตา กุมาร มีนาคม 69",
+        "from": "Mudang Jkr <mumagiovo@gmail.com>",
+        "date": "Thu, 30 Apr 2026 12:23:40 +0700",
+        "originalFilenames": [
+          "P4P ศวิตตา กุมาร มีนาคม 69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19dcd56846f82e38",
+        "subject": "P4P ศวิตตา กุมาร กพ. 69",
+        "from": "Mudang Jkr <mumagiovo@gmail.com>",
+        "date": "Mon, 27 Apr 2026 12:08:00 +0700",
+        "originalFilenames": []
+      },
+      {
+        "threadId": "19dcd45d2fb3c501",
+        "subject": "P4P กุมาร ศวิตตา มค. 69",
+        "from": "Mudang Jkr <mumagiovo@gmail.com>",
+        "date": "Mon, 27 Apr 2026 11:49:45 +0700",
+        "originalFilenames": []
+      },
+      {
+        "threadId": "19c135500d72c6a2",
+        "subject": "P4P ศวิตตา กุมาร ธันวา 68",
+        "from": "Mudang Jkr <mumagiovo@gmail.com>",
+        "date": "Sat, 31 Jan 2026 16:14:11 +0700",
+        "originalFilenames": []
+      },
+      {
+        "threadId": "19b48f98e4d5c1b1",
+        "subject": "P4P พย.68 ศวิตตา กุมาร",
+        "from": "Mudang Jkr <mumagiovo@gmail.com>",
+        "date": "Tue, 23 Dec 2025 09:11:01 +0700",
+        "originalFilenames": []
+      },
+      {
+        "threadId": "19b48f644bf8904c",
+        "subject": "P4P ตค.68 ศวิตตา กุมาร",
+        "from": "Mudang Jkr <mumagiovo@gmail.com>",
+        "date": "Tue, 23 Dec 2025 09:07:26 +0700",
+        "originalFilenames": []
+      },
+      {
+        "threadId": "19b48f266aabdd3f",
+        "subject": "P4P กย.68 ศวิตตา กุมาร",
+        "from": "Mudang Jkr <mumagiovo@gmail.com>",
+        "date": "Tue, 23 Dec 2025 09:03:12 +0700",
+        "originalFilenames": []
+      },
+      {
+        "threadId": "19a935d906d2a896",
+        "subject": "P4p ศวิตตา สค.68 กุมาร",
+        "from": "Mudang Jkr <mumagiovo@gmail.com>",
+        "date": "Tue, 18 Nov 2025 02:49:21 +0700",
+        "originalFilenames": []
+      }
+    ],
+    "msirineen@gmail.com": [
+      {
+        "threadId": "19e37218f9c2d98b",
+        "subject": "p4p พสิรินีร พ ทัศนีย์ มีค เมษา 69",
+        "from": "Sirineen M <msirineen@gmail.com>",
+        "date": "Mon, 18 May 2026 01:09:52 +0700",
+        "originalFilenames": [
+          "พ สิรินีร เมษ  69.xlsx",
+          "พ ทัศนีย์ มีค 69.xlsx",
+          "พ ทัศนีย์ เมษ 69.xlsx",
+          "พ สิรินีร มีค 69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19ceff1d5c2477af",
+        "subject": "p4p พ ทัศนีย พย 67",
+        "from": "Sirineen M <msirineen@gmail.com>",
+        "date": "Sun, 15 Mar 2026 12:21:56 +0700",
+        "originalFilenames": [
+          "พ ทัศนีย์ พย 67.xlsx"
+        ]
+      },
+      {
+        "threadId": "19cc8c6fabd44b25",
+        "subject": "p4p พทัศนีย พ สิรินีร",
+        "from": "Sirineen M <msirineen@gmail.com>",
+        "date": "Sat, 7 Mar 2026 21:49:54 +0700",
+        "originalFilenames": [
+          "พ ทัศนีย์ ธค 68.xlsx",
+          "พ สิรินีร ธค 68.xlsx",
+          "พ สิรินีร มค 69.xlsx",
+          "พ สิรินีร กพ 69.xlsx",
+          "พ ทัศนีย์ มค 69.xlsx",
+          "พ ทัศนีย์ กพ 69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19c5207760fd2bf3",
+        "subject": "",
+        "from": "Sirineen M <msirineen@gmail.com>",
+        "date": "Thu, 12 Feb 2026 20:25:30 +0700",
+        "originalFilenames": [
+          "พ สิรินีร ตค 68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19c52069e6b92052",
+        "subject": "p4p สิรินีร ตค 68",
+        "from": "Sirineen M <msirineen@gmail.com>",
+        "date": "Thu, 12 Feb 2026 20:24:36 +0700",
+        "originalFilenames": [
+          "~$พ สิรินีร ตค 68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19b26896b6cd0158",
+        "subject": "P4P พ ทัศนีย์ พย 68",
+        "from": "Sirineen M <msirineen@gmail.com>",
+        "date": "Tue, 16 Dec 2025 16:41:23 +0700",
+        "originalFilenames": [
+          "~$พ ทัศนีย์ พย 68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19b2685573157a43",
+        "subject": "P4P พ สิรินีร พย 68",
+        "from": "Sirineen M <msirineen@gmail.com>",
+        "date": "Tue, 16 Dec 2025 16:36:58 +0700",
+        "originalFilenames": [
+          "พ สิรินีร พย 68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19b267e829252f9e",
+        "subject": "P4p พ สิรินีร ตค 68",
+        "from": "Sirineen M <msirineen@gmail.com>",
+        "date": "Tue, 16 Dec 2025 16:29:31 +0700",
+        "originalFilenames": [
+          "~$พ สิรินีร ตค 68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19a96fbd6ec75aca",
+        "subject": "p4p พ ทัศนีย ตค 68",
+        "from": "Sirineen M <msirineen@gmail.com>",
+        "date": "Tue, 18 Nov 2025 19:41:05 +0700",
+        "originalFilenames": [
+          "พ ทัศนีย์ ม่วงศิริ ตค 68.xlsx"
+        ]
+      }
+    ],
+    "y.sasima@gmail.com": [
+      {
+        "threadId": "19dd4dd714e25503",
+        "subject": "P4P ศศิมา หยิบทรงศิริกุล เมษายน 2569",
+        "from": "\"Sasima Yibsong (ผ่าน Google ชีต)\" <y.sasima@gmail.com>",
+        "date": "Tue, 28 Apr 2026 16:12:54 +0000",
+        "originalFilenames": [
+          "P4P ศศิมา หยิบทรงศิริกุล เมษายน 2569.xlsx"
+        ]
+      },
+      {
+        "threadId": "19dae17a797ce9b0",
+        "subject": "P4P ศศิมา หยิบทรงศิริกุล มีนาคม 2569",
+        "from": "\"Sasima Yibsong (ผ่าน Google ชีต)\" <y.sasima@gmail.com>",
+        "date": "Tue, 21 Apr 2026 03:31:18 +0000",
+        "originalFilenames": [
+          "P4P ศศิมา หยิบทรงศิริกุล มีนาคม 2569.xlsx"
+        ]
+      },
+      {
+        "threadId": "19dadeb95a4440a9",
+        "subject": "P4P ศศิมา หยิบ มีนาคม 2569",
+        "from": "\"Sasima Yibsong (ผ่าน Google ชีต)\" <y.sasima@gmail.com>",
+        "date": "Tue, 21 Apr 2026 02:43:10 +0000",
+        "originalFilenames": [
+          "P4P ศศิมา หยิบ มีนาคม 2569.xlsx"
+        ]
+      },
+      {
+        "threadId": "19cd8935f854d348",
+        "subject": "P4P ศศิมา หยิบ ก.พ.69",
+        "from": "Sasima Yibsong <y.sasima@gmail.com>",
+        "date": "Thu, 26 Feb 2026 22:39:48 +0700",
+        "originalFilenames": [
+          "ศศิมา หยิบ ก.พ.69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19c5071424ce2fe8",
+        "subject": "P4P ศศิมา หยิบ มค 69",
+        "from": "Sasima Yibsong <y.sasima@gmail.com>",
+        "date": "Thu, 12 Feb 2026 13:01:51 +0700",
+        "originalFilenames": [
+          "ศศิมา หยิบ มค 69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19b8a03e61c088a0",
+        "subject": "ศศิมา หยิบ ธ.ค. 68",
+        "from": "Sasima Yibsong <y.sasima@gmail.com>",
+        "date": "Mon, 5 Jan 2026 00:17:34 +0700",
+        "originalFilenames": [
+          "ศศิมา หยิบ ธ.ค.68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19ada5de9a8a5c4e",
+        "subject": "ศศิมา หยิบ พ.ย. 68",
+        "from": "Sasima Yibsong <y.sasima@gmail.com>",
+        "date": "Mon, 1 Dec 2025 21:42:41 +0700",
+        "originalFilenames": [
+          "ศศิมา หยิบ พ.ย. 68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19a6e426df0579eb",
+        "subject": "ศศิมา หยิบ ต.ค.68",
+        "from": "\"Sasima Yibsong (ผ่าน Google ชีต)\" <y.sasima@gmail.com>",
+        "date": "Mon, 10 Nov 2025 14:53:57 +0000",
+        "originalFilenames": [
+          "ศศิมา หยิบ ต.ค.68.xlsx"
+        ]
+      }
+    ],
+    "my-ammy@hotmail.com": [
+      {
+        "threadId": "19e5e4a7f963893b",
+        "subject": "พ.ชัยวัฒน์ ",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Mon, 25 May 2026 08:39:57 +0000",
+        "originalFilenames": [
+          "นพ.ชัยวัฒน์ สุวรรณรักษ์   เมย.69 .xlsx"
+        ]
+      },
+      {
+        "threadId": "19e5e494421455b0",
+        "subject": "พ.ฐิติกร เมย.69",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Mon, 25 May 2026 08:38:38 +0000",
+        "originalFilenames": [
+          "นพ.ฐิติกร หอทิมาวรกุล  เมย 69 .xlsx"
+        ]
+      },
+      {
+        "threadId": "19dd1be96fc8cd93",
+        "subject": "P4P ฐิติกร มีนาคม 2569 ",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Tue, 28 Apr 2026 01:40:18 +0000",
+        "originalFilenames": [
+          "ฐิติกร  มีค.69 .xlsx"
+        ]
+      },
+      {
+        "threadId": "19dd1bd8241d4891",
+        "subject": "p4p ชัยวัฒน์ มีนาคม 2569 ",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Tue, 28 Apr 2026 01:39:06 +0000",
+        "originalFilenames": [
+          "ชัยวัฒน์ มีค. 69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19daddaf619bc4eb",
+        "subject": "ส่งต่อ: P4P พ ศุภศรัณย์ มกราคม และกุมภาพันธ์ 69",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Tue, 21 Apr 2026 02:24:56 +0000",
+        "originalFilenames": [
+          "P4P พ ศุภศรัณย์ เดือนกุมภาพันธ์ 2569.xlsx",
+          "P4P พ ศุภศรัณย์ เดือนมกราคม 2569.xlsx"
+        ]
+      },
+      {
+        "threadId": "19dadda46990e3d6",
+        "subject": "ส่งต่อ: P4P เดือน มกราคม 2569",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Tue, 21 Apr 2026 02:24:10 +0000",
+        "originalFilenames": [
+          "P4P พ ศุภศรัณย์ เดือนมกราคม 2569.xlsx"
+        ]
+      },
+      {
+        "threadId": "19d1e248f4aa6da6",
+        "subject": "ส่งต่อ: ปทิตตา วัชรปรีชาสกุล กพ69 p4p",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Tue, 24 Mar 2026 04:40:00 +0000",
+        "originalFilenames": [
+          "ปทิตตา วัชรปรีชาสกุล กพ69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19ce534a4d03e27d",
+        "subject": "P4P นพ.ฐิติกร",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Fri, 13 Mar 2026 03:19:12 +0000",
+        "originalFilenames": [
+          "นพ.ฐิติกร หอทิมาวรกุล กพ.69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19ce533e8e45abd3",
+        "subject": "p4p นพ.ชัยวัฒน์ สุวรรณรักษ์ ",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Fri, 13 Mar 2026 03:18:25 +0000",
+        "originalFilenames": [
+          "นพ.ชัยวัฒน์ สุวรรณรักษ์ กพ.69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19c7a033e21cfb2b",
+        "subject": "p4p ฐิติกร และ พ.ชัยวัฒน์ ",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Fri, 20 Feb 2026 07:45:54 +0000",
+        "originalFilenames": [
+          "ฐิติกร มค 69.xlsx",
+          "ชัยวัฒน์ มค 69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19bd4288f0aae2d9",
+        "subject": "ชัยวัฒน์ + ฐิติกร ",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Mon, 19 Jan 2026 02:49:42 +0000",
+        "originalFilenames": [
+          "ชัยวัฒน์ ธค 68 .xlsx",
+          "ฐิติกร ธค68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19bb038f64bcd5c5",
+        "subject": "ส่งต่อ: P4P พญอภิชญา กย68",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Mon, 12 Jan 2026 03:21:17 +0000",
+        "originalFilenames": [
+          "อภิชญา กย68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19b9c9e02beeb935",
+        "subject": "ส่งต่อ: P4P นพ.อนุพงษ์ ธนัญภูวสิษฏ์ ก.ย.68",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Thu, 8 Jan 2026 07:59:15 +0000",
+        "originalFilenames": [
+          "อนุพงษ์ ธนัญภูวสิษฏ์  กันยายน 2568.xlsx"
+        ]
+      },
+      {
+        "threadId": "19b2b3fd256fc0cb",
+        "subject": "ส่งต่อ: P4P กย 68",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Wed, 17 Dec 2025 07:39:17 +0000",
+        "originalFilenames": [
+          "P4P แพทย์ไพศาล.xlsx"
+        ]
+      },
+      {
+        "threadId": "19afc137644298c0",
+        "subject": "ชัยวัฒน์ พย.68 ฐิติกร พย.68 ",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Mon, 8 Dec 2025 03:48:41 +0000",
+        "originalFilenames": [
+          "ชัยวัฒน์  พย.xlsx",
+          "ฐิติกร พย.68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19a9ee65f1d44aa1",
+        "subject": "",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Thu, 20 Nov 2025 01:34:44 +0000",
+        "originalFilenames": [
+          "ฐิติกร  ตค.68.xlsx",
+          "ชัยวัฒน์ ตค. 68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19a8f6ef9f1c4309",
+        "subject": "ส่งต่อ: พญ.ชาลินี สัจเดว์ ตค 68 p4p",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Mon, 17 Nov 2025 01:30:02 +0000",
+        "originalFilenames": [
+          "Blank 2.xlsx"
+        ]
+      },
+      {
+        "threadId": "19a8f6e986b94c3f",
+        "subject": "ส่งต่อ: P4P พ.ปริชาพล อายุรกรรม ตค 68",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Mon, 17 Nov 2025 01:29:36 +0000",
+        "originalFilenames": [
+          "P4P ปริชาพล ธารทรรศนีย์ ตค 68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19a76ffd1f98af50",
+        "subject": "ส่งต่อ: P4P พญ.ชยาภรณ์ ตค68",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Wed, 12 Nov 2025 07:37:42 +0000",
+        "originalFilenames": [
+          "P4P พญ.ชยาภรณ์ ตค68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19a5d250e3e9f15d",
+        "subject": "ส่งต่อ: P4P ตค 68 กานต์กมล",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Fri, 7 Nov 2025 07:08:16 +0000",
+        "originalFilenames": [
+          "p4p (กานต์กมล ต.ค. 68).xlsx"
+        ]
+      },
+      {
+        "threadId": "19a5d242d6552d6b",
+        "subject": "ส่งต่อ: P4P ตค 2568 นพ. ธีรฉัตต์ ธนะสารสมบูรณ์",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Fri, 7 Nov 2025 07:07:18 +0000",
+        "originalFilenames": [
+          "พ. ธีรฉัตต์ ตค.68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19a5d238d9f5e72a",
+        "subject": "ส่งต่อ: ภาคภูมิ_รัศมีหิรัญ_ต.ค.68",
+        "from": "my ammy <my-ammy@hotmail.com>",
+        "date": "Fri, 7 Nov 2025 07:06:38 +0000",
+        "originalFilenames": [
+          "ภาคภูมิ_รัศมีหิรัญ_ต.ค.68.xlsx"
+        ]
+      }
+    ],
+    "pwtn_@docchula.com": [
+      {
+        "threadId": "19e917653d05c9ba",
+        "subject": "p4p 15 วรรธนัย ฤทธิรงค์วัฒนา",
+        "from": "Wattanai Rittirongwattana <pwtn_@docchula.com>",
+        "date": "Thu, 4 Jun 2026 14:08:47 +0700",
+        "originalFilenames": [
+          "15. วรรธนัย ฤทธิรงค์วัฒนา P4P มี.ค. 2569.xlsx",
+          "15. วรรธนัย ฤทธิรงค์วัฒนา P4P เม.ย 2569.xlsx",
+          "15. วรรธนัย ฤทธิรงค์วัฒนา P4P พ.ค. 2569.xlsx",
+          "15. วรรธนัย ฤทธิรงค์วัฒนา P4P ก.พ. 2569.xlsx"
+        ]
+      },
+      {
+        "threadId": "19c511d88a3a9ae0",
+        "subject": "p4p december",
+        "from": "Wattanai Rittirongwattana <pwtn_@docchula.com>",
+        "date": "Thu, 12 Feb 2026 16:10:09 +0700",
+        "originalFilenames": [
+          "15. วรรธนัย ฤทธิรงค์วัฒนา p4p december.xlsx"
+        ]
+      },
+      {
+        "threadId": "19c5110d56eb0ac6",
+        "subject": "p4p november",
+        "from": "Wattanai Rittirongwattana <pwtn_@docchula.com>",
+        "date": "Thu, 12 Feb 2026 15:56:17 +0700",
+        "originalFilenames": [
+          "15. วรรธนัย ฤทธิรงค์วัฒนา p4p november.xlsx"
+        ]
+      }
+    ],
+    "skch1136@gmail.com": [
+      {
+        "threadId": "19eb5df021b37d49",
+        "subject": "p4pหมอสงกรานต์ เมษา69 และ พค69",
+        "from": "\"สงกรานต์ ชุนหวัฒนา\" <skch1136@gmail.com>",
+        "date": "Thu, 11 Jun 2026 15:48:34 +0700",
+        "originalFilenames": [
+          "สงกรานต์ ชุนหวัฒนา เมษา69.xlsx",
+          "สงกรานต์ ชุนหวัฒนา พค69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19d9c1b4a2e62831",
+        "subject": "ขอส่งไฟล์ P4Pใหม่(แก้ไข พศ.เป็น69)จำนวน3เดือน",
+        "from": "\"สงกรานต์ ชุนหวัฒนา\" <skch1136@gmail.com>",
+        "date": "Fri, 17 Apr 2026 22:41:28 +0700",
+        "originalFilenames": [
+          "สงกรานต์ ชุนหวัฒนา มค69.xlsx",
+          "สงกรานต์ ชุนหวัฒนา มีค69.xlsx",
+          "สงกรานต์ ชุนหวัฒนา กพ69.xlsx"
+        ]
+      },
+      {
+        "threadId": "19d9a86ad269e4ed",
+        "subject": "p4pหมอสงกรานต์ -3 เดือน",
+        "from": "\"สงกรานต์ ชุนหวัฒนา\" <skch1136@gmail.com>",
+        "date": "Fri, 17 Apr 2026 15:19:27 +0700",
+        "originalFilenames": [
+          "สงกรานต์ ชุนหวัฒนา มค70.xlsx",
+          "สงกรานต์ ชุนหวัฒนา กพ70.xlsx",
+          "สงกรานต์ ชุนหวัฒนา มีค70.xlsx"
+        ]
+      },
+      {
+        "threadId": "19c0ce49cbfd6c06",
+        "subject": "ส่งp4pหมอสงกรานต์ พย.และ ธค.68",
+        "from": "\"สงกรานต์ ชุนหวัฒนา\" <skch1136@gmail.com>",
+        "date": "Fri, 30 Jan 2026 10:12:48 +0700",
+        "originalFilenames": [
+          "สงกรานต์ ชุนหวัฒนา ธค.68.xlsx",
+          "สงกรานต์ ชุนหวัฒนา พย.68.xlsx"
+        ]
+      },
+      {
+        "threadId": "19ac478b00239b55",
+        "subject": "p4pหมอสงกรานต์ กย.68-ตค.68",
+        "from": "\"สงกรานต์ ชุนหวัฒนา\" <skch1136@gmail.com>",
+        "date": "Thu, 27 Nov 2025 15:39:47 +0700",
+        "originalFilenames": [
+          "สงกรานต์ ชุนหวัฒนา ตค.68.xlsx",
+          "สงกรานต์ ชุนหวัฒนา กย.68.xlsx"
+        ]
+      }
+    ],
+    "innzmd92@gmail.com": [
+      {
+        "threadId": "19b1d74cffe14c14",
+        "subject": "P4P นพ พิชยธัชฏ ม่วงศิริ",
+        "from": "Pichtat Muangsiri <innzmd92@gmail.com>",
+        "date": "Sun, 14 Dec 2025 22:22:19 +0700",
+        "originalFilenames": [
+          "นพ.พิชยธัชฏ ตค 68.xlsx",
+          "นพ.พิชยธัชฏ พย 68.xlsx"
+        ]
+      }
+    ]
+  }
 }
