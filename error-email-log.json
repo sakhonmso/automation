@@ -1,9 +1,685 @@
 {
-  "generatedAt": "2026-06-16T14:44:41.079Z",
+  "generatedAt": "2026-06-16T14:50:34.996Z",
   "workflowName": "P4P Gmail Processor",
   "totalRunsScanned": 1073,
-  "filesScanned": 0,
-  "totalErrors": 0,
-  "byType": {},
-  "errors": []
+  "filesScanned": 2152,
+  "totalErrors": 67,
+  "byType": {
+    "physician_not_found": 12,
+    "supabase_error": 12,
+    "wrong_date": 10,
+    "error_email_sent": 33
+  },
+  "errors": [
+    {
+      "runId": 27423970090,
+      "runNumber": 1046,
+      "createdAt": "2026-06-12T15:01:16Z",
+      "conclusion": "success",
+      "errorType": "physician_not_found",
+      "line": "│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ",
+      "email": "sakhonmso@gmail.com",
+      "context": "│  Date:     Fri, 12 Jun 2026 03:24:54 -0500\n│  From:     Samut Sakhon Medical Staff Organization <sakhonmso@gmail.com>\n│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ\n│  Body:     เรียนผู้ส่ง  ระบบไม่สามารถประมวลผลไฟล์ P4P ที่ท่านส่งมาได้ กรุณาตรวจสอบและส่งใหม่อีกครั้ง\n│  🔄  Relay sender — searching thread for xlsx from original messages…\n│  📎  Found xlsx in thread — original sender: Patika J <patika_j@yahoo.com>"
+    },
+    {
+      "runId": 27404010904,
+      "runNumber": 1044,
+      "createdAt": "2026-06-12T08:24:04Z",
+      "conclusion": "success",
+      "errorType": "physician_not_found",
+      "line": "│        📧  Alert reply [physician_not_found] sent to warawutmatee@gmail.com",
+      "email": "warawutmatee@gmail.com",
+      "context": "│        📤  Uploading as \"วราวุธ เมธีศิริวัฒน์\"…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to warawutmatee@gmail.com\n│        ✅  Drive upload: \"วราวุธ เมธีศิริวัฒน์\" (new file)\n│        💾  Score 7353.82 saved → table \"2569_05\", row bf445e42-a734-4cae-8ff6-f624bfb27fd8\n│        📨  Sending to Telegram…"
+    },
+    {
+      "runId": 27404010904,
+      "runNumber": 1044,
+      "createdAt": "2026-06-12T08:24:04Z",
+      "conclusion": "success",
+      "errorType": "physician_not_found",
+      "line": "│        📧  Alert reply [physician_not_found] sent to patika_j@yahoo.com",
+      "email": "patika_j@yahoo.com",
+      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to patika_j@yahoo.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────"
+    },
+    {
+      "runId": 27016533420,
+      "runNumber": 988,
+      "createdAt": "2026-06-05T13:04:47Z",
+      "conclusion": "success",
+      "errorType": "physician_not_found",
+      "line": "│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ",
+      "email": "sakhonmso@gmail.com",
+      "context": "│  Date:     Fri, 5 Jun 2026 00:10:08 -0700\n│  From:     Samut Sakhon Medical Staff Organization <sakhonmso@gmail.com>\n│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ\n│  Body:     เรียนผู้ส่ง  ระบบไม่สามารถประมวลผลไฟล์ P4P ที่ท่านส่งมาได้ กรุณาตรวจสอบและส่งใหม่อีกครั้ง\n│  🔄  Relay sender — searching thread for xlsx from original messages…\n│  📎  Found xlsx in thread — original sender: sib poongklom <my_fatty@hotmail.com>"
+    },
+    {
+      "runId": 27000931571,
+      "runNumber": 986,
+      "createdAt": "2026-06-05T07:09:35Z",
+      "conclusion": "success",
+      "errorType": "physician_not_found",
+      "line": "│        📧  Alert reply [physician_not_found] sent to my_fatty@hotmail.com",
+      "email": "my_fatty@hotmail.com",
+      "context": "│        📤  Preparing first-sheet buffer for Drive upload…\n│        📤  Uploading as \"สฤษดิ์ชัย หริมเทพาธิป\"…\n│        📧  Alert reply [physician_not_found] sent to my_fatty@hotmail.com\n│        ✅  Drive upload: \"สฤษดิ์ชัย หริมเทพาธิป\" (new file)\n│        ✅  Drive upload: \"สฤษดิ์ชัย หริมเทพาธิป\" (new file)\n│        💾  Score 4730.00 saved → table \"2569_04\", row aacbe387-bf7a-477e-9e58-092593576193"
+    },
+    {
+      "runId": 26939696283,
+      "runNumber": 976,
+      "createdAt": "2026-06-04T08:16:21Z",
+      "conclusion": "success",
+      "errorType": "supabase_error",
+      "line": "│        ❌  Supabase match error: Supabase query error on table \"2558_05\": Could not find the table 'public.2558_05' in the schema cache",
+      "email": null,
+      "context": "│        ✅  Score     : 11880.00\n│        🔍  Fuzzy-matching name in Supabase table \"2558_05\"…\n│        ❌  Supabase match error: Supabase query error on table \"2558_05\": Could not find the table 'public.2558_05' in the schema cache\n│        📅  Table \"2558_05\" not found — sending wrong_date reply\n│        ✅  Best match : \"วรรธนัย ฤทธิรงค์วัฒนา\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…"
+    },
+    {
+      "runId": 26939696283,
+      "runNumber": 976,
+      "createdAt": "2026-06-04T08:16:21Z",
+      "conclusion": "success",
+      "errorType": "wrong_date",
+      "line": "│        📅  Table \"2558_05\" not found — sending wrong_date reply",
+      "email": null,
+      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2558_05\"…\n│        ❌  Supabase match error: Supabase query error on table \"2558_05\": Could not find the table 'public.2558_05' in the schema cache\n│        📅  Table \"2558_05\" not found — sending wrong_date reply\n│        ✅  Best match : \"วรรธนัย ฤทธิรงค์วัฒนา\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…\n│        ✅  Best match : \"วรรธนัย ฤทธิรงค์วัฒนา\" (100% similar)"
+    },
+    {
+      "runId": 26939696283,
+      "runNumber": 976,
+      "createdAt": "2026-06-04T08:16:21Z",
+      "conclusion": "success",
+      "errorType": "supabase_error",
+      "line": "│        ❌  Supabase match error: Supabase query error on table \"2558_04\": Could not find the table 'public.2558_04' in the schema cache",
+      "email": "pwtn_@docchula.com",
+      "context": "│        ✅  Best match : \"วรรธนัย ฤทธิรงค์วัฒนา\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…\n│        ❌  Supabase match error: Supabase query error on table \"2558_04\": Could not find the table 'public.2558_04' in the schema cache\n│        📅  Table \"2558_04\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to pwtn_@docchula.com\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…"
+    },
+    {
+      "runId": 26939696283,
+      "runNumber": 976,
+      "createdAt": "2026-06-04T08:16:21Z",
+      "conclusion": "success",
+      "errorType": "wrong_date",
+      "line": "│        📅  Table \"2558_04\" not found — sending wrong_date reply",
+      "email": "pwtn_@docchula.com",
+      "context": "│        📤  Preparing first-sheet buffer for Drive upload…\n│        ❌  Supabase match error: Supabase query error on table \"2558_04\": Could not find the table 'public.2558_04' in the schema cache\n│        📅  Table \"2558_04\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to pwtn_@docchula.com\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…"
+    },
+    {
+      "runId": 26939696283,
+      "runNumber": 976,
+      "createdAt": "2026-06-04T08:16:21Z",
+      "conclusion": "success",
+      "errorType": "wrong_date",
+      "line": "│        📧  Alert reply [wrong_date] sent to pwtn_@docchula.com",
+      "email": "pwtn_@docchula.com",
+      "context": "│        ❌  Supabase match error: Supabase query error on table \"2558_04\": Could not find the table 'public.2558_04' in the schema cache\n│        📅  Table \"2558_04\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to pwtn_@docchula.com\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…\n│        📤  Uploading as \"วรรธนัย ฤทธิรงค์วัฒนา\"…\n│        📧  Alert reply [wrong_date] sent to pwtn_@docchula.com"
+    },
+    {
+      "runId": 26807787772,
+      "runNumber": 962,
+      "createdAt": "2026-06-02T08:24:41Z",
+      "conclusion": "success",
+      "errorType": "physician_not_found",
+      "line": "│        📧  Alert reply [physician_not_found] sent to artery_med@hotmail.com",
+      "email": "artery_med@hotmail.com",
+      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to artery_med@hotmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────"
+    },
+    {
+      "runId": 26496249851,
+      "runNumber": 910,
+      "createdAt": "2026-05-27T07:04:34Z",
+      "conclusion": "success",
+      "errorType": "physician_not_found",
+      "line": "│        📧  Alert reply [physician_not_found] sent to mumagiovo@gmail.com",
+      "email": "mumagiovo@gmail.com",
+      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to mumagiovo@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────"
+    },
+    {
+      "runId": 26007268641,
+      "runNumber": 824,
+      "createdAt": "2026-05-18T00:31:48Z",
+      "conclusion": "success",
+      "errorType": "physician_not_found",
+      "line": "│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ",
+      "email": "sakhonmso@gmail.com",
+      "context": "│  Date:     Sun, 17 May 2026 12:04:10 -0700\n│  From:     Samut Sakhon Medical Staff Organization <sakhonmso@gmail.com>\n│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ\n│  Body:     เรียนผู้ส่ง  ระบบไม่สามารถประมวลผลไฟล์ P4P ที่ท่านส่งมาได้ กรุณาตรวจสอบและส่งใหม่อีกครั้ง\n│  🔄  Relay sender — searching thread for xlsx from original messages…\n│  📎  Found xlsx in thread — original sender: Sirineen M <msirineen@gmail.com>"
+    },
+    {
+      "runId": 25999927273,
+      "runNumber": 819,
+      "createdAt": "2026-05-17T19:03:51Z",
+      "conclusion": "success",
+      "errorType": "physician_not_found",
+      "line": "│        📧  Alert reply [physician_not_found] sent to msirineen@gmail.com",
+      "email": "msirineen@gmail.com",
+      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to msirineen@gmail.com\n│        ✅  Drive upload: \"สิรินีร ม่วงศิริ\" (new file)\n│        ✅  Drive upload: \"ทัศนีย์ ม่วงศิริ\" (new file)\n│        ✅  Drive upload: \"สิรินีร ม่วงศิริ\" (new file)"
+    },
+    {
+      "runId": 24774699788,
+      "runNumber": 481,
+      "createdAt": "2026-04-22T11:01:00Z",
+      "conclusion": "success",
+      "errorType": "supabase_error",
+      "line": "│        ❌  Supabase save error: Supabase update error on table \"2569_02\": <html>",
+      "email": null,
+      "context": "│        ✅  Drive upload: \"นภิชรียา กาชัย\" (new file)\n│        ✅  Drive upload: \"นภิชรียา กาชัย\" (new file)\n│        ❌  Supabase save error: Supabase update error on table \"2569_02\": <html>\n<head><title>502 Bad Gateway</title></head>\n<body>\n<center><h1>502 Bad Gateway</h1></center>"
+    },
+    {
+      "runId": 24711608936,
+      "runNumber": 465,
+      "createdAt": "2026-04-21T08:13:17Z",
+      "conclusion": "success",
+      "errorType": "physician_not_found",
+      "line": "│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ",
+      "email": "sakhonmso@gmail.com",
+      "context": "│  Date:     Mon, 20 Apr 2026 22:28:41 -0500\n│  From:     sakhonmso@gmail.com\n│  Subject:  [แจ้งข้อผิดพลาด] ไม่พบชื่อแพทย์ในระบบ\n│  Body:     เรียนผู้ส่ง  ระบบไม่สามารถประมวลผลไฟล์ P4P ที่ท่านส่งมาได้ กรุณาตรวจสอบและส่งใหม่อีกครั้ง\n│  🔄  Relay sender — searching thread for xlsx from original messages…\n│  📎  Found xlsx in thread — original sender: my ammy <my-ammy@hotmail.com>"
+    },
+    {
+      "runId": 24702451812,
+      "runNumber": 463,
+      "createdAt": "2026-04-21T03:28:10Z",
+      "conclusion": "success",
+      "errorType": "physician_not_found",
+      "line": "│        📧  Alert reply [physician_not_found] sent to y.sasima@gmail.com",
+      "email": "y.sasima@gmail.com",
+      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to y.sasima@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────"
+    },
+    {
+      "runId": 24702451812,
+      "runNumber": 463,
+      "createdAt": "2026-04-21T03:28:10Z",
+      "conclusion": "success",
+      "errorType": "physician_not_found",
+      "line": "│        📧  Alert reply [physician_not_found] sent to my-ammy@hotmail.com",
+      "email": "my-ammy@hotmail.com",
+      "context": "│        📨  Sending to Telegram…\n│        ✅  Telegram message sent.\n│        📧  Alert reply [physician_not_found] sent to my-ammy@hotmail.com\n│        ✅  Drive upload: \"ศุภศรัณย์ ศุภพัฒนพงศ์\" (new file)\n│        💾  Score 7451.00 saved → table \"2569_01\", row e6cde73f-aa8f-42bf-a51e-214873c2a7f6\n│        📨  Sending to Telegram…"
+    },
+    {
+      "runId": 24602207903,
+      "runNumber": 422,
+      "createdAt": "2026-04-18T09:56:30Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+    },
+    {
+      "runId": 24601279031,
+      "runNumber": 421,
+      "createdAt": "2026-04-18T08:58:57Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+    },
+    {
+      "runId": 24599680306,
+      "runNumber": 420,
+      "createdAt": "2026-04-18T07:19:13Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+    },
+    {
+      "runId": 24598140657,
+      "runNumber": 419,
+      "createdAt": "2026-04-18T05:44:32Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+    },
+    {
+      "runId": 24595685829,
+      "runNumber": 418,
+      "createdAt": "2026-04-18T03:15:13Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+    },
+    {
+      "runId": 24591627015,
+      "runNumber": 417,
+      "createdAt": "2026-04-17T23:48:47Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+    },
+    {
+      "runId": 24590104207,
+      "runNumber": 416,
+      "createdAt": "2026-04-17T22:50:37Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+    },
+    {
+      "runId": 24588293102,
+      "runNumber": 415,
+      "createdAt": "2026-04-17T21:52:40Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+    },
+    {
+      "runId": 24586284840,
+      "runNumber": 414,
+      "createdAt": "2026-04-17T20:55:00Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+    },
+    {
+      "runId": 24582482927,
+      "runNumber": 413,
+      "createdAt": "2026-04-17T19:15:40Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Fri, 17 Apr 2026 17:44:17 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัยที่สำคัญ\n│  Body:     [image: Google]\nเราได้บล็อกการพยายามลงชื่อเข้าใช้"
+    },
+    {
+      "runId": 24557571349,
+      "runNumber": 406,
+      "createdAt": "2026-04-17T09:16:21Z",
+      "conclusion": "success",
+      "errorType": "supabase_error",
+      "line": "│        ❌  Supabase match error: Supabase query error on table \"2570_02\": Could not find the table 'public.2570_02' in the schema cache",
+      "email": null,
+      "context": "│        ✅  Score     : 8788.75\n│        🔍  Fuzzy-matching name in Supabase table \"2570_01\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_02\": Could not find the table 'public.2570_02' in the schema cache\n│        📅  Table \"2570_02\" not found — sending wrong_date reply\n│        ✅  Physician : สงกรานต์ ชุนหวัฒนา\n│        ✅  Date      : 2570_03"
+    },
+    {
+      "runId": 24557571349,
+      "runNumber": 406,
+      "createdAt": "2026-04-17T09:16:21Z",
+      "conclusion": "success",
+      "errorType": "wrong_date",
+      "line": "│        📅  Table \"2570_02\" not found — sending wrong_date reply",
+      "email": null,
+      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2570_01\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_02\": Could not find the table 'public.2570_02' in the schema cache\n│        📅  Table \"2570_02\" not found — sending wrong_date reply\n│        ✅  Physician : สงกรานต์ ชุนหวัฒนา\n│        ✅  Date      : 2570_03\n│        ✅  Score     : 7667.00"
+    },
+    {
+      "runId": 24557571349,
+      "runNumber": 406,
+      "createdAt": "2026-04-17T09:16:21Z",
+      "conclusion": "success",
+      "errorType": "supabase_error",
+      "line": "│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache",
+      "email": "skch1136@gmail.com",
+      "context": "│        ✅  Score     : 7667.00\n│        🔍  Fuzzy-matching name in Supabase table \"2570_03\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        📅  Table \"2570_03\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache"
+    },
+    {
+      "runId": 24557571349,
+      "runNumber": 406,
+      "createdAt": "2026-04-17T09:16:21Z",
+      "conclusion": "success",
+      "errorType": "wrong_date",
+      "line": "│        📅  Table \"2570_03\" not found — sending wrong_date reply",
+      "email": "skch1136@gmail.com",
+      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2570_03\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        📅  Table \"2570_03\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        📅  Table \"2570_01\" not found — sending wrong_date reply"
+    },
+    {
+      "runId": 24557571349,
+      "runNumber": 406,
+      "createdAt": "2026-04-17T09:16:21Z",
+      "conclusion": "success",
+      "errorType": "wrong_date",
+      "line": "│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com",
+      "email": "skch1136@gmail.com",
+      "context": "│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        📅  Table \"2570_03\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        📅  Table \"2570_01\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com"
+    },
+    {
+      "runId": 24557571349,
+      "runNumber": 406,
+      "createdAt": "2026-04-17T09:16:21Z",
+      "conclusion": "success",
+      "errorType": "supabase_error",
+      "line": "│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache",
+      "email": "skch1136@gmail.com",
+      "context": "│        📅  Table \"2570_03\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        📅  Table \"2570_01\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com"
+    },
+    {
+      "runId": 24557571349,
+      "runNumber": 406,
+      "createdAt": "2026-04-17T09:16:21Z",
+      "conclusion": "success",
+      "errorType": "wrong_date",
+      "line": "│        📅  Table \"2570_01\" not found — sending wrong_date reply",
+      "email": "skch1136@gmail.com",
+      "context": "│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        📅  Table \"2570_01\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│        📧  Alert reply [wrong_date] sent to skch1136@gmail.com\n│  📭  No xlsx found in thread from original sender — skipping"
+    },
+    {
+      "runId": 24557571349,
+      "runNumber": 406,
+      "createdAt": "2026-04-17T09:16:21Z",
+      "conclusion": "success",
+      "errorType": "supabase_error",
+      "line": "│        ❌  Supabase match error: Supabase query error on table \"2569_12\": Could not find the table 'public.2569_12' in the schema cache",
+      "email": "innzmd92@gmail.com",
+      "context": "│        ✅  Score     : 7239.00\n│        🔍  Fuzzy-matching name in Supabase table \"2569_12\"…\n│        ❌  Supabase match error: Supabase query error on table \"2569_12\": Could not find the table 'public.2569_12' in the schema cache\n│        📅  Table \"2569_12\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to innzmd92@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\""
+    },
+    {
+      "runId": 24557571349,
+      "runNumber": 406,
+      "createdAt": "2026-04-17T09:16:21Z",
+      "conclusion": "success",
+      "errorType": "wrong_date",
+      "line": "│        📅  Table \"2569_12\" not found — sending wrong_date reply",
+      "email": "innzmd92@gmail.com",
+      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2569_12\"…\n│        ❌  Supabase match error: Supabase query error on table \"2569_12\": Could not find the table 'public.2569_12' in the schema cache\n│        📅  Table \"2569_12\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to innzmd92@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────"
+    },
+    {
+      "runId": 24557571349,
+      "runNumber": 406,
+      "createdAt": "2026-04-17T09:16:21Z",
+      "conclusion": "success",
+      "errorType": "wrong_date",
+      "line": "│        📧  Alert reply [wrong_date] sent to innzmd92@gmail.com",
+      "email": "innzmd92@gmail.com",
+      "context": "│        ❌  Supabase match error: Supabase query error on table \"2569_12\": Could not find the table 'public.2569_12' in the schema cache\n│        📅  Table \"2569_12\" not found — sending wrong_date reply\n│        📧  Alert reply [wrong_date] sent to innzmd92@gmail.com\n│  🏷️   Marked: read · starred · archived · \"เอกสาร P4P\"\n└────────────────────────────────────────────────────────────"
+    },
+    {
+      "runId": 24557571349,
+      "runNumber": 406,
+      "createdAt": "2026-04-17T09:16:21Z",
+      "conclusion": "success",
+      "errorType": "supabase_error",
+      "line": "│        ❌  Supabase match error: Supabase query error on table \"2568_01\": Could not find the table 'public.2568_01' in the schema cache",
+      "email": null,
+      "context": "│        ✅  Score     : 7042.00\n│        🔍  Fuzzy-matching name in Supabase table \"2568_11\"…\n│        ❌  Supabase match error: Supabase query error on table \"2568_01\": Could not find the table 'public.2568_01' in the schema cache\n│        📅  Table \"2568_01\" not found — sending wrong_date reply\n│        ✅  Best match : \"พิชยธัชฏ ม่วงศิริ\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…"
+    },
+    {
+      "runId": 24557571349,
+      "runNumber": 406,
+      "createdAt": "2026-04-17T09:16:21Z",
+      "conclusion": "success",
+      "errorType": "wrong_date",
+      "line": "│        📅  Table \"2568_01\" not found — sending wrong_date reply",
+      "email": null,
+      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2568_11\"…\n│        ❌  Supabase match error: Supabase query error on table \"2568_01\": Could not find the table 'public.2568_01' in the schema cache\n│        📅  Table \"2568_01\" not found — sending wrong_date reply\n│        ✅  Best match : \"พิชยธัชฏ ม่วงศิริ\" (100% similar)\n│        📤  Preparing first-sheet buffer for Drive upload…\n│        📤  Uploading as \"พิชยธัชฏ ม่วงศิริ\"…"
+    },
+    {
+      "runId": 24556422090,
+      "runNumber": 405,
+      "createdAt": "2026-04-17T08:48:08Z",
+      "conclusion": "success",
+      "errorType": "supabase_error",
+      "line": "│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache",
+      "email": null,
+      "context": "│        ✅  Score     : 8788.75\n│        🔍  Fuzzy-matching name in Supabase table \"2570_01\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        ⚠️  Name mismatch — Drive upload skipped for \"สงกรานต์ ชุนหวัฒนา\".\n│        ✅  Physician : สงกรานต์ ชุนหวัฒนา"
+    },
+    {
+      "runId": 24556422090,
+      "runNumber": 405,
+      "createdAt": "2026-04-17T08:48:08Z",
+      "conclusion": "success",
+      "errorType": "supabase_error",
+      "line": "│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache",
+      "email": null,
+      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2570_01\"…\n│        ❌  Supabase match error: Supabase query error on table \"2570_01\": Could not find the table 'public.2570_01' in the schema cache\n│        ❌  Supabase match error: Supabase query error on table \"2570_03\": Could not find the table 'public.2570_03' in the schema cache\n│        ⚠️  Name mismatch — Drive upload skipped for \"สงกรานต์ ชุนหวัฒนา\".\n│        ✅  Physician : สงกรานต์ ชุนหวัฒนา\n│        ✅  Date      : 2570_02"
+    },
+    {
+      "runId": 24556422090,
+      "runNumber": 405,
+      "createdAt": "2026-04-17T08:48:08Z",
+      "conclusion": "success",
+      "errorType": "supabase_error",
+      "line": "│        ❌  Supabase match error: Supabase query error on table \"2570_02\": Could not find the table 'public.2570_02' in the schema cache",
+      "email": null,
+      "context": "│        🔍  Fuzzy-matching name in Supabase table \"2570_02\"…\n│        ⚠️  Name mismatch — Drive upload skipped for \"สงกรานต์ ชุนหวัฒนา\".\n│        ❌  Supabase match error: Supabase query error on table \"2570_02\": Could not find the table 'public.2570_02' in the schema cache\n│        📨  Sending to Telegram…\n│        ⚠️  Name mismatch — Drive upload skipped for \"สงกรานต์ ชุนหวัฒนา\".\n│        📨  Sending to Telegram…"
+    },
+    {
+      "runId": 24164540476,
+      "runNumber": 287,
+      "createdAt": "2026-04-08T23:45:23Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+    },
+    {
+      "runId": 24162753399,
+      "runNumber": 286,
+      "createdAt": "2026-04-08T22:50:40Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+    },
+    {
+      "runId": 24160567270,
+      "runNumber": 285,
+      "createdAt": "2026-04-08T21:50:57Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+    },
+    {
+      "runId": 24158178112,
+      "runNumber": 284,
+      "createdAt": "2026-04-08T20:53:49Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+    },
+    {
+      "runId": 24154204576,
+      "runNumber": 283,
+      "createdAt": "2026-04-08T19:26:25Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+    },
+    {
+      "runId": 24148588585,
+      "runNumber": 282,
+      "createdAt": "2026-04-08T17:13:20Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Wed, 08 Apr 2026 16:35:11 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+    },
+    {
+      "runId": 24109899195,
+      "runNumber": 273,
+      "createdAt": "2026-04-07T23:45:09Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+    },
+    {
+      "runId": 24108150012,
+      "runNumber": 272,
+      "createdAt": "2026-04-07T22:47:45Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+    },
+    {
+      "runId": 24106207320,
+      "runNumber": 271,
+      "createdAt": "2026-04-07T21:51:43Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+    },
+    {
+      "runId": 24104008592,
+      "runNumber": 270,
+      "createdAt": "2026-04-07T20:56:18Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+    },
+    {
+      "runId": 24099748028,
+      "runNumber": 269,
+      "createdAt": "2026-04-07T19:14:42Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+    },
+    {
+      "runId": 24094312677,
+      "runNumber": 268,
+      "createdAt": "2026-04-07T17:09:48Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+    },
+    {
+      "runId": 24089176278,
+      "runNumber": 267,
+      "createdAt": "2026-04-07T15:17:20Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+    },
+    {
+      "runId": 24084737701,
+      "runNumber": 266,
+      "createdAt": "2026-04-07T13:45:55Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+    },
+    {
+      "runId": 24078110067,
+      "runNumber": 265,
+      "createdAt": "2026-04-07T11:04:39Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Tue, 07 Apr 2026 09:25:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nมีการลงชื่อเข้าใช้ครั้งใหม่ใน Windows"
+    },
+    {
+      "runId": 23884942117,
+      "runNumber": 162,
+      "createdAt": "2026-04-02T05:08:39Z",
+      "conclusion": "success",
+      "errorType": "supabase_error",
+      "line": "│        ❌  Supabase match error: Supabase query error on table \"2568_03\": Could not find the table 'public.2568_03' in the schema cache",
+      "email": null,
+      "context": "│        ✅  Score     : 2206.68\n│        🔍  Fuzzy-matching name in Supabase table \"2568_03\"…\n│        ❌  Supabase match error: Supabase query error on table \"2568_03\": Could not find the table 'public.2568_03' in the schema cache\n│        📤  Preparing first-sheet buffer for Drive upload…\n│        📤  Uploading as \"จิตรพรรณี บุญทองคง\"…\n│        ❌  Drive upload failed: Month folder \"3 - มีนาคม\" not found inside \"2568\""
+    },
+    {
+      "runId": 23752228699,
+      "runNumber": 120,
+      "createdAt": "2026-03-30T15:14:01Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Mon, 30 Mar 2026 12:16:32 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+    },
+    {
+      "runId": 23748513513,
+      "runNumber": 119,
+      "createdAt": "2026-03-30T13:56:19Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Mon, 30 Mar 2026 12:16:32 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+    },
+    {
+      "runId": 23744045039,
+      "runNumber": 118,
+      "createdAt": "2026-03-30T12:11:29Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Mon, 30 Mar 2026 09:24:12 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+    },
+    {
+      "runId": 23743515877,
+      "runNumber": 117,
+      "createdAt": "2026-03-30T11:57:35Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Mon, 30 Mar 2026 09:24:12 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+    },
+    {
+      "runId": 23739933221,
+      "runNumber": 116,
+      "createdAt": "2026-03-30T10:22:58Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Mon, 30 Mar 2026 09:24:12 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+    },
+    {
+      "runId": 23737697034,
+      "runNumber": 115,
+      "createdAt": "2026-03-30T09:28:17Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Mon, 30 Mar 2026 09:24:12 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+    },
+    {
+      "runId": 23715877396,
+      "runNumber": 100,
+      "createdAt": "2026-03-29T18:21:55Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Sun, 29 Mar 2026 18:19:43 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+    },
+    {
+      "runId": 23652573830,
+      "runNumber": 60,
+      "createdAt": "2026-03-27T14:57:56Z",
+      "conclusion": "success",
+      "errorType": "error_email_sent",
+      "line": "│  Subject:  การแจ้งเตือนความปลอดภัย",
+      "email": "no-reply@accounts.google.com",
+      "context": "│  Date:     Fri, 27 Mar 2026 14:56:40 GMT\n│  From:     Google <no-reply@accounts.google.com>\n│  Subject:  การแจ้งเตือนความปลอดภัย\n│  Body:     [image: Google]\nคุณอนุญาตให้ sakhonmso-p4p เข้าถึงข้อมูลบางส่วนในบัญชี Google"
+    }
+  ]
 }
