@@ -94,11 +94,11 @@ async function getFirstMessageWithFile(threadId, fileSubstring) {
   return null;
 }
 
-function buildRaw(to, subject, filename, mimeType, b64data) {
+function buildRaw(from, to, subject, filename, mimeType, b64data) {
   const boundary = "----=_Part_Test_" + Date.now();
   const parts = [
     `To: ${to}`,
-    `From: ${to}`,
+    `From: ${from}`,
     `Subject: [TEST] ${subject}`,
     `MIME-Version: 1.0`,
     `Content-Type: multipart/mixed; boundary="${boundary}"`,
@@ -135,16 +135,23 @@ for (const tc of TEST_CASES) {
 
   console.log(`    File: ${att.filename}`);
 
+  // Use insert (not send) so we can set From = original sender.
+  // Injects directly into inbox as unread, simulating reception from the original doctor.
   const raw = buildRaw(
+    tc.sender,
     ME,
-    `ส่ง P4P (ทดสอบ) — ${att.filename}`,
+    att.filename,
     att.filename,
     att.mimeType ?? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     att.data,
   );
 
-  await gmail.users.messages.send({ userId: "me", requestBody: { raw } });
-  console.log(`    ✅  Sent to inbox`);
+  await gmail.users.messages.insert({
+    userId: "me",
+    internalDateSource: "dateHeader",
+    requestBody: { raw, labelIds: ["INBOX", "UNREAD"] },
+  });
+  console.log(`    ✅  Inserted into inbox (from: ${tc.sender})`);
 }
 
 console.log("\n✅ All test emails sent. Trigger P4P Gmail Processor to validate.");
