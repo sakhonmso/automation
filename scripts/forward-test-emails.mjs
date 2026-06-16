@@ -82,7 +82,10 @@ async function getAttachment(messageId, fileSubstring) {
     userId: "me", messageId, id: part.body.attachmentId,
   });
 
-  return { filename: part.filename, data: attRes.data.data, mimeType: part.mimeType };
+  // Gmail API returns base64url; MIME requires standard base64
+  const b64url = attRes.data.data;
+  const b64std = b64url.replace(/-/g, "+").replace(/_/g, "/");
+  return { filename: part.filename, data: b64std, mimeType: part.mimeType };
 }
 
 async function getFirstMessageWithFile(threadId, fileSubstring) {
