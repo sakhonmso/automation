@@ -1,0 +1,91 @@
+name: 🔍 Scan P4P Error Emails (temp diagnostic)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      # Fetch all run IDs + metadata for the P4P Gmail Processor workflow
+      - name: Fetch run metadata
+        id: meta
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Fetching all run pages..."
+          RUNS="[]"
+          PAGE=1
+          while true; do
+            PAGE_DATA=$(gh api \
+              "/repos/${{ github.repository }}/actions/workflows/249859375/runs?per_page=100&page=$PAGE" \
+              --jq '[.workflow_runs[] | {id:.id, number:.run_number, createdAt:.created_at, conclusion:.conclusion}]')
+            COUNT=$(echo "$PAGE_DATA" | jq 'length')
+            echo "  Page $PAGE: $COUNT runs"
+            RUNS=$(echo "$RUNS $PAGE_DATA" | jq -s 'add')
+            if [ "$COUNT" -lt 100 ]; then break; fi
+            PAGE=$((PAGE+1))
+          done
+          TOTAL=$(echo "$RUNS" | jq 'length')
+          echo "Total runs: $TOTAL"
+          echo "$RUNS" > run-meta.json
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+
+      # Download logs for all runs in parallel batches
+      - name: Download all run logs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p logs
+          TOTAL=${{ steps.meta.outputs.total }}
+          echo "Downloading logs for $TOTAL runs..."
+
+          jq -r '.[].id' run-meta.json | while read RUN_ID; do
+            (
+              OUT="logs/$RUN_ID"
+              mkdir -p "$OUT"
+              # Download log zip and extract
+              gh api "/repos/${{ github.repository }}/actions/runs/$RUN_ID/logs" \
+                -H "Accept: application/vnd.github+json" \
+                --output "$OUT/log.zip" 2>/dev/null || true
+              if [ -f "$OUT/log.zip" ]; then
+                unzip -q "$OUT/log.zip" -d "$OUT/" 2>/dev/null || true
+                rm -f "$OUT/log.zip"
+              fi
+            ) &
+            # Limit parallelism to 20
+            while [ "$(jobs -r | wc -l)" -ge 20 ]; do sleep 0.2; done
+          done
+          wait
+          echo "All downloads complete."
+          echo "Log dirs: $(ls logs | wc -l)"
+
+      # Run the scanner
+      - name: Scan logs for errors
+        env:
+          LOG_DIR: logs
+          RUN_META_JSON: ${{ toJson(fromJson(steps.meta.outputs.total)) }}
+        run: |
+          RUN_META_JSON=$(cat run-meta.json) LOG_DIR=logs node scripts/scan-error-emails.mjs
+
+      # Commit the result back to the repo
+      - name: Commit error-email-log.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add error-email-log.json
+          git commit -m "data: add error-email-log.json from full run scan" || echo "Nothing to commit"
+          git push
