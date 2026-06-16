@@ -3,14 +3,18 @@
  * Delete after use.
  */
 import { config as dotenvConfig } from "dotenv";
-import { createGmailClient } from "../gmail-client.js";
+import { google } from "googleapis";
 
 dotenvConfig({ override: true });
 
-const gmail = createGmailClient();
-const auth  = gmail.getAuth();
+const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN } = process.env;
+if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REFRESH_TOKEN) {
+  throw new Error("Missing Google OAuth env vars");
+}
 
-const { google } = await import("googleapis");
+const auth = new google.auth.OAuth2(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET);
+auth.setCredentials({ refresh_token: GOOGLE_REFRESH_TOKEN });
+
 const client = google.gmail({ version: "v1", auth });
 
 // Find the label ID for "เอกสาร P4P"
