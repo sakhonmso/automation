@@ -615,7 +615,6 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
   }
 
   // ── Upload to Google Drive (must succeed before saving score / archiving) ─
-  let driveFileId = null;
   const drive = getDrive();
   if (drive) {
     if (!match) {
@@ -638,12 +637,11 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
         }
 
         console.log(`│        📤  Uploading as "${uploadName}"…`);
-        const { fileId, fileName, replaced } = await drive.uploadFile(
+        const { fileName, replaced } = await drive.uploadFile(
           uploadBuffer,
           uploadName,
           analysis.date
         );
-        driveFileId = fileId ?? null;
         console.log(`│        ✅  Drive upload: "${fileName}" (${replaced ? "replaced existing" : "new file"})`);
       } catch (driveErr) {
         console.error(`│        ❌  Drive upload failed: ${driveErr.message}`);
@@ -660,7 +658,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
   let scoreSaved = false;
   if (match) {
     try {
-      await saveScore(analysis.date, match.index, analysis.score, driveFileId);
+      await saveScore(analysis.date, match.index, analysis.score);
       scoreSaved = true;
       console.log(`│        💾  Score ${analysis.score.toFixed(2)} saved → table "${analysis.date}", row ${match.index}`);
     } catch (dbErr) {

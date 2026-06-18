@@ -192,7 +192,7 @@ export async function logSubmission({ physicianName, department, workMonth, subm
  * @param {number|string} index  Primary key value (column "index")
  * @param {number}        score  Score to save (float8)
  */
-export async function saveScore(date, index, score, driveFileId = null) {
+export async function saveScore(date, index, score) {
   if (!isValidDate(date)) {
     throw new Error(`Cannot save score — invalid date key: "${date}"`);
   }
@@ -204,10 +204,9 @@ export async function saveScore(date, index, score, driveFileId = null) {
   }
 
   const supabase = getSupabase();
-  const payload = driveFileId !== null ? { score, drive_file_id: driveFileId } : { score };
   const { error } = await supabase
     .from(date)
-    .update(payload)
+    .update({ score })
     .eq("index", index);
 
   if (error) throw new Error(`Supabase update error on table "${date}": ${error.message}`);
