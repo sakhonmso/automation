@@ -1,0 +1,47 @@
+name: 🗂️ Backfill P4P Submissions
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_months:
+        description: 'Comma list of BE work months (e.g. 2569_05,2569_04,2569_03)'
+        required: false
+        default: '2569_05,2569_04,2569_03'
+      after:
+        description: 'Scan threads after this Gmail date (YYYY/MM/DD)'
+        required: false
+        default: '2026/03/01'
+      dry_run:
+        description: 'Preview without writing (true/false)'
+        required: false
+        default: 'false'
+
+jobs:
+  backfill:
+    name: Backfill submissions from Gmail threads
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run backfill
+        env:
+          GOOGLE_CLIENT_ID:     ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY:         ${{ secrets.SUPABASE_KEY }}
+          TARGET_MONTHS:        ${{ github.event.inputs.target_months }}
+          BACKFILL_AFTER:       ${{ github.event.inputs.after }}
+          DRY_RUN:              ${{ github.event.inputs.dry_run }}
+        run: node scripts/backfill-submissions.mjs
