@@ -12,7 +12,7 @@
 import { createGmailClient }             from "./gmail-client.js";
 import { createDriveClient }             from "./drive-client.js";
 import { analyseJson, resolveBeMonth, resolvePhysicianNameFromSheet } from "./claude-analyst.js";
-import { matchName, saveScore }          from "./supabase-client.js";
+import { matchName, saveScore, logSubmission } from "./supabase-client.js";
 import { sendTelegram, formatResultMessage, formatErrorMessage } from "./telegram.js";
 import { buildHtmlReply }               from "./templates/reply.js";
 import { buildHtmlErrorReply }          from "./templates/error-reply.js";
@@ -478,7 +478,7 @@ async function sendAlertReply({ errorType = "other", safeFilename = "", detected
  * @param {string} context.messageId    Gmail message ID for thread reply
  * @param {object} context.gmail        Shared Gmail client instance
  */
-async function processBuffer(buffer, { subject = "", body = "", filename, replyTo = "", messageId = "", gmail }) {
+async function processBuffer(buffer, { subject = "", body = "", filename, replyTo = "", messageId = "", emailDate = null, threadId = null, gmail }) {
   /** Shorthand: fire an "other" alert reply for unexpected pipeline errors. */
   const otherReply = () => sendAlertReply({
     errorType   : "other",
@@ -665,6 +665,24 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
       console.log(`│        💾  Score ${analysis.score.toFixed(2)} saved → table "${analysis.date}", row ${match.index}`);
     } catch (dbErr) {
       console.error(`│        ❌  Supabase save error: ${dbErr.message}`);
+    }
+  }
+
+  // ── Log submission for punctuality tracking ───────────────────────────
+  if (scoreSaved) {
+    try {
+      const ts = emailDate ? new Date(emailDate) : new Date();
+      await logSubmission({
+        physicianName: match.matchedName,
+        department   : match.department ?? "",
+        workMonth    : analysis.date,
+        submittedAt  : ts.toISOString(),
+        threadId     : threadId ?? null,
+        filename     : filename ?? null,
+      });
+      console.log(`│        📊  Submission logged (punctuality)`);
+    } catch (logErr) {
+      console.warn(`│        ⚠️  Submission log skipped (non-fatal): ${logErr.message}`);
     }
   }
 
@@ -865,6 +883,8 @@ async function main() {
                 body     : tm.msg.body    || msgBody,
                 replyTo  : tmEmail,   // reply to the original physician, not the relay
                 messageId: id,        // thread-link to the current (relay) message
+                emailDate: msg.date,
+                threadId : msg.threadId,
               };
               const results = await Promise.allSettled(
                 xlsxInMsg.map((att) => processAttachment(att, tm.msg.id, relayContext, gmail))
@@ -938,6 +958,8 @@ async function main() {
           body     : msgBody,
           replyTo  : fromEmail,
           messageId: id,
+          emailDate: msg.date,
+          threadId : msg.threadId,
         };
         const results = await Promise.allSettled(
           threadXlsx.atts.map((att) => processAttachment(att, threadXlsx.messageId, context, gmail))
@@ -1004,6 +1026,8 @@ async function main() {
       body     : msgBody,
       replyTo  : fromEmail,
       messageId: id,
+      emailDate: msg.date,
+      threadId : msg.threadId,
     };
     const results = await Promise.allSettled(
       attachments.map((att) => processAttachment(att, id, context, gmail))

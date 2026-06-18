@@ -163,6 +163,29 @@ export async function matchName(name, date, threshold = SIMILARITY_THRESHOLD) {
 }
 
 /**
+ * Log a successful P4P submission to the p4p_submissions table.
+ * Uses ON CONFLICT DO NOTHING so re-processing the same email never overwrites
+ * the first (earliest) submission row for a given physician + work month.
+ */
+export async function logSubmission({ physicianName, department, workMonth, submittedAt, threadId, filename }) {
+  const supabase = getSupabase();
+  const { error } = await supabase
+    .from("p4p_submissions")
+    .upsert(
+      {
+        physician_name: physicianName,
+        department    : department ?? null,
+        work_month    : workMonth,
+        submitted_at  : submittedAt,
+        thread_id     : threadId  ?? null,
+        filename      : filename  ?? null,
+      },
+      { onConflict: "physician_name,work_month", ignoreDuplicates: true }
+    );
+  if (error) throw new Error(`p4p_submissions insert error: ${error.message}`);
+}
+
+/**
  * Update the score column for a specific row identified by its primary key.
  *
  * @param {string}        date   Table name, e.g. "2569_02"
