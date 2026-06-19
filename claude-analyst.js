@@ -176,6 +176,53 @@ const NON_NAME_THAI = new Set([
   "เวชศาสตร์ฉุกเฉิน", "ผู้ป่วยนอก", "จิตเวช",
 ]);
 
+// Canonical month strings (≥ 4 chars) used as fuzzy-match targets.
+// Short abbreviations (≤ 3 chars) are covered by exact NON_NAME_THAI.has() and
+// their floor(len/4) threshold would be 0, so they give no fuzzy benefit.
+const MONTH_FUZZY_TARGETS = [
+  // Full names
+  "มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
+  "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม",
+  // Truncated forms (4–6 chars)
+  "มกรา","กุมภา","กุมภ","มีนา","เมษา","พฤษภ","มิถุน","มิถุ",
+  "กรกฎ","สิงหา","กันยา","กันย","ตุลา","พฤศจิ","พฤศ","ธันวา","ธันว",
+  // ษ↔ศ variants
+  "เมศายน","เมศา","พฤศภาคม","พฤศภ","พฤษจิกายน","พฤษจิ",
+];
+
+/** Levenshtein distance (character-level). */
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+  const row = Array.from({ length: n + 1 }, (_, i) => i);
+  for (let i = 1; i <= m; i++) {
+    let prev = row[0];
+    row[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const tmp = row[j];
+      row[j] = a[i - 1] === b[j - 1] ? prev : 1 + Math.min(prev, row[j], row[j - 1]);
+      prev = tmp;
+    }
+  }
+  return row[n];
+}
+
+/**
+ * Returns true if token is a known non-name word (exact match in NON_NAME_THAI)
+ * OR looks like a misspelled Thai month name (Levenshtein ≤ floor(canonical.length / 4)).
+ * Tokens shorter than 3 chars skip the fuzzy path to avoid false positives.
+ */
+function isNonName(token) {
+  if (NON_NAME_THAI.has(token)) return true;
+  if (token.length < 3) return false;
+  for (const canonical of MONTH_FUZZY_TARGETS) {
+    const threshold = Math.floor(canonical.length / 4);
+    if (threshold > 0 && levenshtein(token, canonical) <= threshold) return true;
+  }
+  return false;
+}
+
 /**
  * Try to extract "firstname lastname" from a single text string.
  * Strategy:
@@ -220,7 +267,7 @@ function extractNameFromText(text) {
     const first = m1[1];
     const last  = m1[2];
     // If the word after the firstname is a month name, discard it — return firstname only
-    if (last && !NON_NAME_THAI.has(last)) return `${first} ${last}`;
+    if (last && !isNonName(last)) return `${first} ${last}`;
     return first; // single-token → will hit firstname-only Supabase lookup
   }
 
@@ -246,12 +293,12 @@ function extractNameFromText(text) {
   while ((m2 = twoWordRe.exec(text3)) !== null) {
     const first = m2[1];
     const last  = m2[2];
-    if (!NON_NAME_THAI.has(first) && !NON_NAME_THAI.has(last)) {
+    if (!isNonName(first) && !isNonName(last)) {
       return `${first} ${last}`;
     }
     // When first is valid but second is a non-name token (e.g. a month), record
     // it as a single-token candidate — mirrors Pattern 1's firstname-only return.
-    if (!singleTokenFallback && !NON_NAME_THAI.has(first) && NON_NAME_THAI.has(last)) {
+    if (!singleTokenFallback && !isNonName(first) && isNonName(last)) {
       singleTokenFallback = first;
     }
   }
@@ -264,7 +311,7 @@ function extractNameFromText(text) {
   // Only returns if exactly one non-excluded Thai word exists — avoids false positives
   // when multiple Thai words are present but none formed a valid pair.
   const soloRe = /[฀-๿]{2,}/g;
-  const soloHits = [...text3.matchAll(soloRe)].map((m) => m[0]).filter((t) => !NON_NAME_THAI.has(t));
+  const soloHits = [...text3.matchAll(soloRe)].map((m) => m[0]).filter((t) => !isNonName(t));
   if (soloHits.length === 1) return soloHits[0];
 
   return null;
