@@ -658,7 +658,7 @@ async function processBuffer(buffer, { subject = "", body = "", filename, replyT
   let scoreSaved = false;
   if (match) {
     try {
-      await saveScore(analysis.date, match.index, analysis.score);
+      await saveScore(analysis.date, match.index, analysis.score, ts.toISOString())
       scoreSaved = true;
       console.log(`│        💾  Score ${analysis.score.toFixed(2)} saved → table "${analysis.date}", row ${match.index}`);
     } catch (dbErr) {
