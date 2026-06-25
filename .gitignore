@@ -3,6 +3,9 @@
 .env.local
 .env.*.local
 
+# Runtime log — contains physician PII (email addresses)
+error-email-log.json
+
 # Python
 __pycache__/
 *.pyc
